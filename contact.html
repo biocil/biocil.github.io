@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style3.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/fontawesome.min.css">
+<button id="goTopBtn" class="go-top-btn" onclick="goToTop()">
+<i class="fas fa-arrow-up"></i>
+</button>
+<script src="script1.js"></script>
+</head>
+<body>
+<section class="sub-header-contact">
+    <nav>
+<a href="index.html"><img src="image/logo.png" class="logo"></a>
+<div class="nav-links" id="navlinks">
+    <i class="fa-solid fa-xmark" onclick="hideMenu()"></i>
+    <ul>
+        <li class="active"><a href="index.html">Home</a></li>
+        <li><a href="join.html">Join Us</a></li>
+        <li><a href="team.html">Research</a></li>
+        <li><a href="publication.html">Publications</a></li>
+        <li class="dropdown">
+                    <a href="people.html" class="dropbtn">People</a>
+            <div class="dropdown-content">
+                        <a href="people.html#current-members" onclick="scrollToSection('current-members')">Current Members</a>
+                        <a href="people.html#alumni" onclick="scrollToSection('alumni')">Alumni</a>
+                        <a href="people.html#collaborators">Collaborators</a>
+                    </div>
+                </li>
+        <li><a href="news&events.html">News&Events</a></li>
+        <li><a href="contact.html">Contact</a></li>
+    </ul>
+    </div>
+       <i class="fa-solid fa-bars" onclick="showMenu()"></i>
+     </nav>
+    <div class="content">
+        <h1>Contact Us</h1>
+    </div>
+</section>
+
+  <!-------Contact us content-------->
+<section class="location">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3007.0506193781284!2d29.087959215416646!3d41.08974062929267!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cacbab7668ecb5%3A0x3c00dcc46a55ddcc!2sMedipol%20%C3%9Cniversitesi%20Kuzey%20Yerle%C5%9Fke!5e0!3m2!1str!2str!4v1690138008111!5m2!1str!2str" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</section>
+<section class="contact-us">
+    <div class="row">
+        <div class="contact-col">
+          <div>
+              <i class="fa fa-home"></i>
+              <span>
+                  <h6>Istanbul Medipol University North Campus / Kavacık</h6>
+                  <p>Beykoz/İstanbul</p>
+              </span>
+          </div>
+            <div>
+              <i class="fa fa-phone"></i>
+              <span>
+                  <h6>216 681 5100</h6>
+                  <p>Monday to Saturday, 10AM to 6PM</p>
+              </span>
+          </div>
+            <div>
+              <i class="fa-regular fa-envelope"></i>
+              <span>
+                  <a href="mailto:mftoy@medipol.edu.tr" style="text-decoration: none"><h6>mftoy@medipol.edu.tr</h6></a>
+                  <p>Email us your questions</p>
+              </span>
+          </div>
+        </div>
+    </div>
+</section>
+
+<!--Footer-->
+<div class="footer">
+  <p>Copyright © Istanbul </p>
+</div>
+<script src="script1.js"></script>
+</body>
+</html>

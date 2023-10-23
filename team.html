@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style3.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/fontawesome.min.css">
+<button id="goTopBtn" class="go-top-btn" onclick="goToTop()">
+<i class="fas fa-arrow-up"></i>
+</button>
+<script src="script1.js"></script>
+<script src="script.js"></script>
+</head>
+<body>
+<section class="sub-header-research">
+    <nav>
+<a href="index.html"><img src="image/logo.png" class="logo"></a>
+<div class="nav-links" id="navlinks">
+    <i class="fa-solid fa-xmark" onclick="hideMenu()"></i>
+    <ul>
+        <li class="active"><a href="index.html">Home</a></li>
+        <li><a href="join.html">Join Us</a></li>
+        <li><a href="team.html">Research</a></li>
+        <li><a href="publication.html">Publications</a></li>
+        <li class="dropdown">
+                    <a href="people.html" class="dropbtn">People</a>
+            <div class="dropdown-content">
+                        <a href="people.html#current-members" onclick="scrollToSection('current-members')">Current Members</a>
+                        <a href="people.html#alumni" onclick="scrollToSection('alumni')">Alumni</a>
+                        <a href="people.html#collaborators">Collaborators</a>
+                    </div>
+                </li>
+        <li><a href="news&events.html">News&Events</a></li>
+        <li><a href="contact.html">Contact</a></li>
+    </ul>
+    </div>
+       <i class="fa-solid fa-bars" onclick="showMenu()"></i>
+     </nav>
+    <div class="content">
+        <h1>Research</h1>
+    </div>
+</section>
+
+<a><h2>Research Areas</h2></a>
+<div class="container2">
+  <div class="col">
+    <h2>Coherent Optics</h2>
+    <div class="caption">
+      <p>""Coherent optics" encompasses technologies and methods in optics and optical communications that leverage
+          consistent phase relationships within light waves. It harnesses these properties to enable high-speed data
+          transmission, optical networking, and diverse scientific and medical applications. Coherent optics has significantly
+          advanced optical communications and continues to drive faster and more efficient data transmission systems.</p>
+    </div>
+    <img src="image/4.png" style="width:100px" loading="lazy">
+  </div>
+    <div class="col">
+    <h2>Optical Microscopy</h2>
+      <div class="caption">
+      <p>Optical microscopy, also known as light microscopy, is a microscopy technique that uses visible light and
+        a system of lenses to magnify and observe small objects or specimens. It is one of the oldest and most widely
+        used techniques in microscopy, allowing scientists, researchers, and educators to study a wide range of
+        biological, medical, and materials science samples</p>
+    </div>
+      <img src="image/59bed83c7a216d0b052f1274.png" loading="lazy">
+  </div>
+    <div class="col">
+    <h2>Holographic Imaging</h2>
+      <div class="caption">
+      <p>Holographic imaging is a technique that uses holography to create three-dimensional (3D) images of objects or
+        scenes. Unlike traditional photography or two-dimensional imaging, holography captures both the amplitude and
+        phase of light, allowing it to record and reproduce the complete information about the light wavefront reflected
+        or scattered by the object. This results in a more realistic and detailed representation of the object, including
+        its depth and spatial information.</p>
+    </div>
+      <img src="image/5f4a7c631077f40004941afa.png" style="color: #cccccc" loading="lazy">
+  </div>
+    <div class="col">
+    <h2>Optical Diffraction Tomography</h2>
+      <div class="caption">
+      <p>Optical Diffraction Tomography (ODT) is an advanced imaging technique used in microscopy and biomedical research
+        to non-invasively create three-dimensional (3D) images of transparent specimens with high resolution. ODT
+        combines principles from optics, diffraction, and tomography to generate 3D reconstructions of the refractive
+        index distribution within biological cells and other transparent samples. This technique provides valuable
+        insights into the internal structures and properties of microscopic objects.</p>
+    </div>
+      <img src="image/580b585b2edbce24c47b2a0b.png" loading="lazy">
+  </div>
+</div>
+
+<section class="research-container">
+<div class="project-box" data-project="project1" style="text-align: center;">
+  <img src="image/2022-1.png" alt="Research Project 1" style="margin-bottom: 20px;" loading="lazy">
+  <p style="font-size: 19px; font-family: Arial, sans-serif; font-weight: bold;">High Resolution Total Internal Reflection Holographic Microscopy for the Investigation of Cellular Interfaces</p>
+  <h2 style="font-size: 20px; font-family: Arial, sans-serif; color: #2196f3;">Funding</h2>
+  <p style="font-size: 18px; font-family: Arial, sans-serif; color: #777777;">TUBITAK 3501 Career Development Program</p>
+  <p class="project-progress">Duration: 2020-Ongoing</p>
+</div>
+
+  <div class="project-box" data-project="project2" style="text-align: center;">
+    <img src="image/2019-3.png" alt="Research Project 1" style="margin-bottom: 20px;" loading="lazy">
+    <p style="font-size: 19px; font-family: Arial, sans-serif; font-weight: bold; color: #777777;"> Dual Mode and Multi Wavelength 3D Quantitative Phase and Fluorescence Microscopy</p>
+    <h2 style="font-size: 20px; font-family: Arial, sans-serif; color: #2196f3;">Funding</h2>
+    <p style="font-size: 18px; font-family: Arial, sans-serif; color: #777777;"> TUBITAK COST Holotomo 2017-2020  (Role - PI: M. F. Toy)</p>
+    <p class="project-progress">Duration: 2017 – 2019</p>
+  </div>
+
+    <div class="project-box" data-project="project3" style="text-align: center;">
+    <img src="image/2019-1.png" alt="Research Project 1" style="margin-bottom: 20px;" loading="lazy">
+    <p style="font-size: 19px; font-family: Arial, sans-serif; font-weight: bold;">Center for Novel Microscopy Technologies</p>
+    <h2 style="font-size: 20px; font-family: Arial, sans-serif; color: #2196f3;">Funding</h2>
+    <p style="font-size: 18px; font-family: Arial, sans-serif; color: #777777;"> Istanbul Development Agency</p>
+    <p class="project-progress">Duration: 2016 – 2017</p>
+  </div>
+
+    <div class="project-box" data-project="project4" style="text-align: center;">
+    <img src="image/2022-4.png" alt="Research Project 1" style="margin-bottom: 20px;" loading="lazy">
+    <p style="font-size: 19px; font-family: Arial, sans-serif; font-weight: bold;"> High Resolution Optical Spectrometer with Broad Free Spectral Range</p>
+    <h2 style="font-size: 20px; font-family: Arial, sans-serif; color: #2196f3;">Funding</h2>
+    <p style="font-size: 18px; font-family: Arial, sans-serif; color: #777777;"> TUBITAK 1001 Scientific and Technological Research Projects Funding Program</p>
+    <p class="project-progress">Duration:  2016 – 2019</p>
+  </div>
+
+    <div class="project-box" data-project="project5" style="text-align: center;">
+    <img src="image/2022-2.png" alt="Research Project 1" style="margin-bottom: 20px;" loading="lazy">
+    <p style="font-size: 19px; font-family: Arial, sans-serif; font-weight: bold;">Holographic Micro-Factory</p>
+    <h2 style="font-size: 20px; font-family: Arial, sans-serif; color: #2196f3;">Funding</h2>
+    <p style="font-size: 18px; font-family: Arial, sans-serif; color: #777777;"> TUBITAK 2232 International Fellowship for Outstanding Researchers</p>
+    <p class="project-progress">Duration:   2015 – 2017</p>
+  </div>
+</section>
+
+<div class="title-container" id="current-members">
+<h2>Student Project</h2>
+<section class="student-container">
+    <div class="project-box" data-project="project6" style="text-align: center;">
+     <img src="image/2022-3.png" alt="Research Project 1" style="margin-bottom: 20px;" loading="lazy">
+     <p style="font-size: 19px; font-family: Arial, sans-serif; font-weight: bold;"> Digital Holographic Microscopy System with Integrated Incubator</p>
+     <h3 style="font-size: 20px; font-family: Arial, sans-serif; color: #2196f3;">Funding</h3>
+     <p style="font-size: 18px; font-family: Arial, sans-serif; color: #777777;"> TUBITAK 2209-A Research Project Support Programme for Undergraduate Students</p>
+     <p class="project-progress">Duration: 2022</p>
+    </div>
+
+  <div class="project-box" data-project="project7" style="text-align: center;">
+    <img src="image/aksan.png" alt="Research Project 1" style="margin-bottom: 20px;" loading="lazy">
+    <p style="font-size: 19px; font-family: Arial, sans-serif; font-weight: bold;"> Projection Vein Finder</p>
+    <h3 style="font-size: 20px; font-family: Arial, sans-serif; color: #2196f3;">Funding</h3>
+    <p style="font-size: 18px; font-family: Arial, sans-serif; color: #777777;"> TUBITAK 2209-A Research Project Support Programme for Undergraduate Students</p>
+    <p class="project-progress">Duration: 2021</p>
+  </div>
+
+    <div class="project-box" data-project="project8" style="text-align: center;">
+    <img src="image/necip.png" alt="Research Project 1" style="margin-bottom: 20px;" loading="lazy">
+    <p style="font-size: 19px; font-family: Arial, sans-serif; font-weight: bold;"> Epifluorescence Microscopy on a Student Microscope</p>
+    <h3 style="font-size: 20px; font-family: Arial, sans-serif; color: #2196f3;">Funding</h3>
+    <p style="font-size: 18px; font-family: Arial, sans-serif; color: #777777;"> TUBITAK 2209-A Research Project Support Programme for Undergraduate Students</p>
+    <p class="project-progress">Duration: 2019</p>
+  </div>
+</section>
+    </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal1">
+      <span class="close-modal" id="closeModal">&times;</span>
+      <div class="modal-content1" id="modalContent">
+        <!-- Project details will be populated here -->
+      </div>
+    </div>
+  </div>
+
+ <!--Footer-->
+<div class="footer">
+  <p>Copyright © Istanbul </p>
+</div>
+<script src="script1.js"></script>
+</body>
+</html>
+
+
+

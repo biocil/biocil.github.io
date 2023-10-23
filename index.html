@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="max-age=3600">
+    <link rel="stylesheet" href="style3.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/fontawesome.min.css">
+    <!----a href="https://www.flaticon.com/free-icons/hologram" title="hologram icons">Hologram icons created by Freepik - Flaticon</a>--->
+<button id="goTopBtn" class="go-top-btn" onclick="goToTop()">
+<i class="fas fa-arrow-up"></i>
+</button>
+<script src="script1.js"></script>
+<script src="script.js"></script>
+</head>
+<body>
+<section class="header">
+    <video autoplay loop muted playsinline class="back-video">
+        <source src="clip/video.mp4" type="video/mp4">
+    </video>
+    <nav>
+<a href="index.html"><img src="image/logo.png" class="logo"></a>
+<div class="nav-links" id="navlinks">
+    <i class="fa-solid fa-xmark" onclick="hideMenu()"></i>
+    <ul>
+        <li class="active"><a href="index.html">Home</a></li>
+        <li><a href="join.html">Join Us</a></li>
+        <li><a href="team.html">Research</a></li>
+        <li><a href="publication.html">Publications</a></li>
+        <li class="dropdown">
+                    <a href="people.html" class="dropbtn">People</a>
+            <div class="dropdown-content">
+                        <a href="people.html#current-members" onclick="scrollToSection('current-members')">Current Members</a>
+                        <a href="people.html#alumni" onclick="scrollToSection('alumni')">Alumni</a>
+                        <a href="people.html#collaborators">Collaborators</a>
+                    </div>
+                </li>
+        <li><a href="news&events.html">News&Events</a></li>
+        <li><a href="contact.html">Contact</a></li>
+    </ul>
+    </div>
+       <i class="fa-solid fa-bars" onclick="showMenu()"></i>
+     </nav>
+    <div class="content">
+        <h1>Biophotonics and Computational Imaging Laboratory (BCIL)</h1>
+        <a href="" class="hero-btn">Welcome to Your New Journey</a>
+    </div>
+</section>
+
+    <!-------Explanation------>
+<div class="section-with-wave">
+<div class="rows">
+    <div class="col-md-6 text-center content-left">
+    <h1 class="promo-title flex">What is Biophotonics and Computational Imaging?</h1>
+         <p>  Biophotonics and computational imaging are two closely related fields that combine biology, optics,
+             and computational techniques to advance our understanding of biological processes, medical diagnostics,
+             and imaging technologies. Biophotonics focuses on the application of light-based techniques in biology and medicine, while
+             computational imaging aims to enhance the capabilities of imaging systems through advanced computational
+             methods. These fields often intersect, with computational techniques being applied to biophotonics data
+             to extract meaningful information and improve our understanding of biological processes and medical diagnostics.</p>
+    </div>
+        <div class="col-md-6 content-right">
+    <img src="image/hologram.png" class="img-fluid" loading="lazy">
+</div>
+</div>
+<div class="wave-container">
+    <svg
+        class="waves"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        viewBox="0 24 150 28"
+        preserveAspectRatio="none"
+        shape-rendering="auto">
+        <defs>
+            <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"/>
+        </defs>
+        <g class="parallax">
+            <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7")/>
+            <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5")/>
+            <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3")/>
+            <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff"/>
+        </g>
+    </svg>
+</div>
+</div>
+
+<!-------Our Lab------->
+<section class="lab">
+    <h2>Our Laboratory</h2>
+    <div class="lab-col">
+        <p>This research laboratory focuses on the development of label-free and labeled optical microscopy
+            technologies. On one line of activities, digital holography principle is applied for microscopic
+            samples to achieve quantitative phase imaging and optical diffraction tomography. These techniques
+            provide quantifiable and biologically relevant imaging contrast (phase retardation or refractive index)
+            without any fluorescent marker. The tomographic imaging approach serves optical super-resolution in-plane
+            on top of the axial sectioning capability. Alternative schemes of simplified quantitative phase imaging
+            systems are developed for specific applications. On the other line, fluorescence microcopy super-resolution
+            imaging technologies are explored for multi modal microscopic imaging applications.</p>
+    <img src="image/Unknown.jpeg" loading="lazy">
+    </div>
+</section>
+
+<!--Footer-->
+<div class="footer">
+  <p>Copyright © Istanbul </p>
+</div>
+<script src="script1.js"></script>
+</body>
+</html>

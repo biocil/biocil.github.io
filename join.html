@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style3.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/fontawesome.min.css">
+<button id="goTopBtn" class="go-top-btn" onclick="goToTop()">
+<i class="fas fa-arrow-up"></i>
+</button>
+<script src="script1.js"></script>
+<script src="script.js"></script>
+</head>
+<body>
+<section class="sub-header-join">
+    <nav>
+<a href="index.html"><img src="image/logo.png" class="logo"></a>
+<div class="nav-links" id="navlinks">
+    <i class="fa-solid fa-xmark" onclick="hideMenu()"></i>
+    <ul>
+        <li class="active"><a href="index.html">Home</a></li>
+        <li><a href="join.html">Join Us</a></li>
+        <li><a href="team.html">Research</a></li>
+        <li><a href="publication.html">Publications</a></li>
+        <li class="dropdown">
+                    <a href="people.html" class="dropbtn">People</a>
+            <div class="dropdown-content">
+                        <a href="people.html#current-members" onclick="scrollToSection('current-members')">Current Members</a>
+                        <a href="people.html#alumni" onclick="scrollToSection('alumni')">Alumni</a>
+                        <a href="people.html#collaborators">Collaborators</a>
+                    </div>
+                </li>
+        <li><a href="news&events.html">News&Events</a></li>
+        <li><a href="contact.html">Contact</a></li>
+    </ul>
+    </div>
+       <i class="fa-solid fa-bars" onclick="showMenu()"></i>
+     </nav>
+</section>
+
+<!---Content of the page---->
+<div class="service">
+    <div class="title">
+        <h2>Join Us</h2>
+    </div>
+    <div class="box">
+        <div class="cardi">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <h1>MSc/PhD Position in Optics/Photonics</h1>
+            <div class="pra">
+                <p>We are seeking multiple enthusiastic MSc and PhD students to work on experimental and
+                    algorithmic developments for novel coherent optical imaging systems.
+                 <h2>Research Areas</h2>
+                <ul class="pm">
+                    <li>Applied Optics</li>
+                    <li>Optical Microscopy</li>
+                    <li>Fourier Optics</li>
+                    <li>Coherent Imaging</li>
+                    <li>Optical Superresolution</li>
+                </ul> <br>
+                 <h2>Required Skills</h2>
+       <ul class="p">
+                    <li> A BSc or MSc degree in Electrical and Electronics Engineering, Biomedical Engineering, Mechanical
+                        Engineering, Physics, or any relevant field.</li>
+                    <li>A good understanding of fundamentals of optics and signal processing.</li>
+                    <li>Programming experience in LabView, Matlab, or Python.</li>
+                    <li>Good communication skills both in written and spoken English. </li>
+                </ul>
+                <br>
+                <h2>Funding & Benefits</h2>
+                <ul class="p">
+                    <li> Fully funded including tuiton waiver and monthly stipend. (Stipend will follow TÜBİTAK rates.)</li>
+                    <li> Additional benefits from IMU includes meal allowances and discounted on campus housing.</li>
+                </ul>
+                </p>
+            </div>
+        </div>
+    </div>
+        <div class="box">
+        <div class="cardi2">
+            <i class="fa-solid fa-address-book"></i>
+            <h1>Contact</h1>
+<p>
+    <strong>For further information:</strong><br>
+    <p style="font-size: 16px; color: #777777">
+    Asst. Prof. M. Fatih Toy:
+    <a href="mailto:mftoy@medipol.edu.tr" class="link-button">
+        <i class="fa-solid fa-envelope"></i> mftoy@medipol.edu.tr
+    </a><br>
+    Application requirements and deadlines:
+    <a href="https://sens.medipol.edu.tr/graduate-applications/" class="link-button">
+        <i class="fas fa-external-link-alt"></i> https://sens.medipol.edu.tr/graduate-applications/
+    </a>
+    </p>
+</p>
+        </div>
+    </div>
+</div>
+
+<!--Footer-->
+<div class="footer">
+  <p>Copyright © Istanbul </p>
+</div>
+<script src="script1.js"></script>
+</body>
+</html>
