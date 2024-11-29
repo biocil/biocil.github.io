@@ -13,8 +13,6 @@ sections:
         filename: welcome.jpg
       text: |
         <br>
-        
-# Welcome to BiocIL
 
 We are the **Biophotonics and Computational Imaging Laboratory (BiocIL)**, a multidisciplinary research group led by **Dr. Muhammed Fatih Toy** at **Istanbul Medipol University**. Our laboratory focuses on cutting-edge techniques such as **Quantitative Phase Imaging (QPI)**, **Digital Holography**, and **Fluorescence Microscopy** to explore the microscopic world of biological systems.
 
