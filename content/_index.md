@@ -8,8 +8,7 @@ sections:
   - block: hero
     content:
       title: |
-        Wowchemy
-        Research Group
+        Biophotonics and Computational Imaging Laboratory
       image:
         filename: welcome.jpg
       text: |
