@@ -47,15 +47,13 @@ social:
   - icon: envelope
     icon_pack: fas
     link: 'mailto:mftoy@medipol.edu.tr'
-  - icon: twitter
+  - icon: linkedin
     icon_pack: fab
-    link: https://twitter.com/oltcit
+    link: https://www.linkedin.com/in/fatih-toy-ba544117/
   - icon: google-scholar
     icon_pack: ai
     link: https://scholar.google.com/citations?user=pYF8fPUAAAAJ
-  - icon: github
-    icon_pack: fab
-    link: https://github.com/fatihtoy
+
 # Link to a PDF of your resume/CV from the About widget.
 # To enable, copy your resume/CV to `static/files/cv.pdf` and uncomment the lines below.
 # - icon: cv
