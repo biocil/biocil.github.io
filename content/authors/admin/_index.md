@@ -69,7 +69,7 @@ highlight_name: false
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
 user_groups:
-  - Principal Investigators
+  - Principal Investigator
 ---
 
 M. Fatih Toy is an Associate Professor of Electrical and Electronics Engineering at Istanbul Medipol University. His research interests include digital holography, quantitative phase imaging, and optical superresolution. He leads the BioCIL group, which develops novel label free microscopy techniques.
