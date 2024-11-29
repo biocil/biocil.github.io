@@ -1,12 +1,12 @@
 ---
-title: "An example journal article"
+title: "Two-wavelength grating interferometry for MEMS sensors"
 authors:
+- Onur Ferhanoğlu
 - admin
-- Robert Ford
+- Hakan Ürey
 author_notes:
-- "Equal contribution"
-- "Equal contribution"
-date: "2015-09-01T00:00:00Z"
+
+date: "2007-12-01T00:00:00Z"
 doi: ""
 
 # Schedule page publish date (NOT publication's date).
@@ -18,13 +18,13 @@ publishDate: "2017-01-01T00:00:00Z"
 publication_types: ["article-journal"]
 
 # Publication name and optional abbreviated publication name.
-publication: "*Journal of Source Themes, 1*(1)"
-publication_short: ""
+publication: "*IEEE Photonics Technology Letters, 19*(23)"
+publication_short: "IEEE PTL"
 
-abstract: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis posuere tellus ac convallis placerat. Proin tincidunt magna sed ex sollicitudin condimentum. Sed ac faucibus dolor, scelerisque sollicitudin nisi. Cras purus urna, suscipit quis sapien eu, pulvinar tempor diam. Quisque risus orci, mollis id ante sit amet, gravida egestas nisl. Sed ac tempus magna. Proin in dui enim. Donec condimentum, sem id dapibus fringilla, tellus enim condimentum arcu, nec volutpat est felis vel metus. Vestibulum sit amet erat at nulla eleifend gravida.
+abstract: Diffraction gratings integrated with micro-electro-mechanical-systems (MEMS) offer shot noise limited sub-nanometer displacement detection sensitivities but are limited in detection range for mechanical transducers. A two-wavelength readout method is developed that maintains high sensitivity while increasing the detection range, which is demonstrated using a MEMS spectrometer with integrated diffraction grating. The two-laser illumination extended the detection range from 105 nm to 1.7mum assuming the readout sensitivity is maintained at >50% of the maximum sensitivity.
 
 # Summary. An optional shortened abstract.
-summary: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis posuere tellus ac convallis placerat. Proin tincidunt magna sed ex sollicitudin condimentum.
+summary: A two-wavelength readout method is developed that maintains high sensitivity while increasing the detection range, which is demonstrated using a MEMS spectrometer with integrated diffraction grating. 
 
 tags:
 - Source Themes
@@ -33,8 +33,8 @@ featured: false
 # links:
 # - name: ""
 #   url: ""
-url_pdf: http://arxiv.org/pdf/1512.04133v1
-url_code: 'https://github.com/HugoBlox/hugo-blox-builder'
+url_pdf: 'https://ieeexplore.ieee.org/abstract/document/4380468'
+url_code: ''
 url_dataset: ''
 url_poster: ''
 url_project: ''
