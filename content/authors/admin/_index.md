@@ -15,7 +15,7 @@ role: Associate Professor of Electrical and Electronics Engineering
 # Organizations/Affiliations
 organizations:
   - name: Istanbul Medipol University
-    url: ''
+    url: 'hhtps://www.medipol.edu.tr/en/'
 
 # Short bio (displayed in user profile at end of posts)
 bio: My research interests include digital holography, quantitative phase imaging, optical diffraction tomography and optical superresolution.
@@ -29,15 +29,15 @@ interests:
 
 education:
   courses:
-    - course: PhD in Artificial Intelligence
-      institution: Stanford University
-      year: 2012
-    - course: MEng in Artificial Intelligence
-      institution: Massachusetts Institute of Technology
-      year: 2009
-    - course: BSc in Artificial Intelligence
-      institution: Massachusetts Institute of Technology
+    - course: PhD in Photonics
+      institution: École Polytechnique Fédérale de Lausanne (EPFL), Switzerland
+      year: 2013
+    - course: MSc in Electrical and Computer Engineering
+      institution: Koç University, Turkey
       year: 2008
+    - course: BSc in Electrical & Electronics Engineering
+      institution: Koç University, Turkey 
+      year: 2006
 
 # Social/Academic Networking
 # For available icons, see: https://docs.hugoblox.com/getting-started/page-builder/#icons
