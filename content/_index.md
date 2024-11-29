@@ -14,9 +14,9 @@ sections:
       text: |
         <br>
         
-        # Welcome to BiocIL
+        ## Welcome to BiocIL
     
-        We are the **Biophotonics and Computational Imaging Laboratory (BiocIL)**, a multidisciplinary research group at **Istanbul Medipol University**.
+        We are the **Biophotonics and Computational Imaging Laboratory (BiocIL)**, a multidisciplinary research group at **Istanbul Medipol University**.\n
 
         Our laboratory develops cutting-edge techniques such as **Quantitative Phase Imaging (QPI)**, **Digital Holographic Microscopy**, and **Holo-Tomography** to explore the microscopic world.
   
