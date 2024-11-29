@@ -13,16 +13,16 @@ sections:
       email: test@example.org
       phone: 888 888 88 88
       address:
-        street: 450 Serra Mall
-        city: Stanford
-        region: CA
-        postcode: '94305'
-        country: United States
-        country_code: US
+        street: Ekinciler Cad. Nr. 19
+        city: Beykoz
+        region: Istanbul
+        postcode: '34810'
+        country: Turkey
+        country_code: TR
       coordinates:
-        latitude: '37.4275'
-        longitude: '-122.1697'
-      directions: Enter Building 1 and take the stairs to Office 200 on Floor 2
+        latitude: '41.091217218507204'
+        longitude: '29.09162475609552'
+      directions: Enter Building C and take the stairs to Office 234 on Floor 2 
       office_hours:
         - 'Monday 10:00 to 13:00'
         - 'Wednesday 09:00 to 10:00'
