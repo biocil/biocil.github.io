@@ -14,7 +14,10 @@ sections:
       text: |
         <br>
         
-        The **Wowchemy Research Group** has been a center of excellence for Artificial Intelligence research, teaching, and practice since its founding in 2016.
+# Welcome to BiocIL
+
+We are the **Biophotonics and Computational Imaging Laboratory (BiocIL)**, a multidisciplinary research group led by **Dr. Muhammed Fatih Toy** at **Istanbul Medipol University**. Our laboratory focuses on cutting-edge techniques such as **Quantitative Phase Imaging (QPI)**, **Digital Holography**, and **Fluorescence Microscopy** to explore the microscopic world of biological systems.
+
   
   - block: collection
     content:
