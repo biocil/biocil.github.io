@@ -3,27 +3,29 @@
 title: M. Fatih Toy
 
 # Full Name (for SEO)
-first_name: Nelson
-last_name: Bighetti
+first_name: M. Fatih
+last_name: Toy
 
 # Is this the primary user of the site?
 superuser: true
 
 # Role/position
-role: Professor of Artificial Intelligence
+role: Associate Professor of Electrical and Electronics Engineering
 
 # Organizations/Affiliations
 organizations:
-  - name: Stanford University
+  - name: Istanbul Medipol University
     url: ''
 
 # Short bio (displayed in user profile at end of posts)
-bio: My research interests include distributed robotics, mobile computing and programmable matter.
+bio: My research interests include digital holography, quantitative phase imaging, optical diffraction tomography and optical superresolution.
 
 interests:
-  - Artificial Intelligence
-  - Computational Linguistics
-  - Information Retrieval
+  - Digital Holography
+  - Quantitative Phase Imaging
+  - Optical Diffraction Tomography
+  - Holo-Tomography
+  - Optical Superresolution
 
 education:
   courses:
