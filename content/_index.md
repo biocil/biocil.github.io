@@ -14,7 +14,8 @@ sections:
       text: |
         <br>
         
-         We are a multidisciplinary research group at [**Istanbul Medipol University**]. (https://www.medipol.edu.tr/)\n
+         We are a multidisciplinary research group at [**Istanbul Medipol University**]. (https://www.medipol.edu.tr/)
+        \n
 
         Our laboratory develops cutting-edge techniques such as **Quantitative Phase Imaging (QPI)**, **Digital Holographic Microscopy**, and **Holo-Tomography** to explore the unseen microscopic world.
   
