@@ -37,7 +37,7 @@ featured: false
 links:
 - name: "Link"
   url: "https://patents.google.com/patent/WO2023172228A3"
-url_pdf: 'WO2023172228A3.pdf'
+url_pdf: 'publication/WO2023172228/WO2023172228A3.pdf'
 url_code: ''
 url_dataset: ''
 url_poster: ''

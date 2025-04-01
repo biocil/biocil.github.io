@@ -40,7 +40,7 @@ featured: false
 links:
 - name: "Link"
   url: "https://patents.google.com/patent/WO2024208601A1/"
-url_pdf: 'WO2024208601A1.pdf'
+url_pdf: 'publication/wo2024208601/WO2024208601A1.pdf'
 url_code: ''
 url_dataset: ''
 url_poster: ''
