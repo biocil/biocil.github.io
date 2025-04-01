@@ -13,17 +13,17 @@ sections:
         align: center
         background:
           image:
-            filename: coders.jpg
+            filename: lab3.jpg
             filters:
-              brightness: 0.7
-          position: right
+              brightness: 0.5
+          position: center
           color: '#666'
       - title: Lunch & Learn ☕️
         content: 'Share your knowledge with the group and explore exciting new topics together!'
         align: left
         background:
           image:
-            filename: contact.jpg
+            filename: res.jpg
             filters:
               brightness: 0.7
           position: center
@@ -35,7 +35,7 @@ sections:
           image:
             filename: welcome.jpg
             filters:
-              brightness: 0.5
+              brightness: 0.7
           position: center
           color: '#333'
         link:
@@ -48,7 +48,7 @@ sections:
       slide_height: ''
       is_fullscreen: true
       # Automatically transition through slides?
-      loop: false
+      loop: true
       # Duration of transition between slides (in ms)
-      interval: 2000
+      interval: 5000
 ---
