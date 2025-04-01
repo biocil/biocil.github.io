@@ -1,30 +1,65 @@
 ---
 # Display name
+
 title: Emirhan Pehlevan
 
-# Full name (for SEO)
+# Full Name (for SEO)
+
 first_name: Emirhan
 last_name: Pehlevan
 
 # Is this the primary user of the site?
+
 superuser: false
 
 # Role/position
+
 role: Undergraduate Research Assistant
 
+# Organizations/Affiliations
 
-# Link to a PDF of your resume/CV from the About widget.
-# To enable, copy your resume/CV to `static/files/cv.pdf` and uncomment the lines below.
-# - icon: cv
-#   icon_pack: ai
-#   link: files/cv.pdf
+organizations:
+- name: Istanbul Medipol University
+  url: 'https://www.medipol.edu.tr/en/'
 
-# Enter email to display Gravatar (if Gravatar enabled in Config)
-email: ''
+# Short bio (displayed in user profile at end of posts)
+
+bio: Undergrad student with experience in embedded programming, hardware design, and full-stack development. Interested in robotics, IoT, and image processing.
+
+interests:
+- Embedded Programming
+- Robotics
+- IoT
+- Image Processing
+- Full-Stack Development
+
+education:
+  courses: 
+  - course: BSc in Electrical & Electronics Engineering
+    institution: Istanbul Medipol University
+    year: Ongoing
+
+# Social/Academic Networking
+
+social:
+- icon: envelope
+  icon_pack: fas
+  link: 'mailto:emirpehlevan@outlook.com'
+- icon: linkedin
+  icon_pack: fab
+  link: https://www.linkedin.com/in/emirhanpehlevan/
+- icon: github
+  icon_pack: fab
+  link: https://github.com/x3beche
+
+# Highlight the author in author lists? (true/false)
+
+highlight_name: false
 
 # Organizational groups that you belong to (for People widget)
-#   Set this to `[]` or comment out if you are not using People widget.
+
 user_groups:
-  - Undergraduate Research Assistants
- 
+- Undergraduate Research Assistants
 ---
+
+Undergrad student with experience in embedded programming, hardware design, and full-stack development. Interested in robotics, IoT, and image processing.
