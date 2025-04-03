@@ -31,18 +31,18 @@ main:
   #  url: tour
   #  weight: 10
   - name: Research
-    url: project
+    url: research
     weight: 20
   - name: Grants and Awards
-    url: project/#project-1
+    url: research/#grants_awards
     parent: Research
     weight: 1
   - name: Student Projects
-    url: project/#project-2
+    url: research/#student_projects
     parent: Research
     weight: 2
   - name: Lab Equipment
-    url: project/#project-3
+    url: research/#lab_equipment
     parent: Research
     weight: 3
   - name: People
