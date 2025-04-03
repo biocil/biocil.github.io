@@ -8,7 +8,6 @@
 appearance:
   theme_day: minimal
   theme_night:
-  color: red
   font: native
   font_size: L
 
@@ -69,7 +68,7 @@ locale:
 
 features:
   syntax_highlighter:
-    enable: false
+    enable: true
     extra_languages:
       - r
       - latex

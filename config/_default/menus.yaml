@@ -26,21 +26,33 @@
 main:
   - name: Home
     url: /
-    weight: 1
-  - name: Tour
-    url: tour
     weight: 10
-  - name: News
-    url: post
+  #- name: Tour
+  #  url: tour
+  #  weight: 10
+  - name: Research
+    url: project
     weight: 20
+  - name: Grants and Awards
+    url: project/#project-1
+    parent: Research
+    weight: 1
+  - name: Student Projects
+    url: project/#project-2
+    parent: Research
+    weight: 2
+  - name: Lab Equipment
+    url: project/#project-3
+    parent: Research
+    weight: 3
   - name: People
     url: people
     weight: 30
-  - name: Projects
-    url: project
-    weight: 40
   - name: Publications
     url: publication
+    weight: 40
+  - name: News
+    url: post
     weight: 50
   - name: Contact
     url: contact
