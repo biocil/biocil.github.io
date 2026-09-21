@@ -59,7 +59,7 @@ highlight_name: false
 # Organizational groups that you belong to (for People widget)
 
 user_groups:
-- Undergraduate Research Assistants
+- Alumni
 ---
 
 Undergrad student with experience in embedded programming, hardware design, and full-stack development. Interested in robotics, IoT, and image processing.
