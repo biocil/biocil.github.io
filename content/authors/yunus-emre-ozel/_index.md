@@ -61,7 +61,7 @@ highlight_name: false
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
 user_groups:
-  - Undergraduate Research Assistants
+  - Alumni
 ---
 
 Yunus Emre Özel is an Undergraduate Student in Electrical and Electronics Engineering at Istanbul Medipol University. His research interests include analog electronics.
