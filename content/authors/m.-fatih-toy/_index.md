@@ -72,6 +72,6 @@ user_groups:
   - Principal Investigator
 ---
 
-M. Fatih Toy is an Associate Professor of Electrical and Electronics Engineering at Istanbul Medipol University. His research interests include digital holography, quantitative phase imaging, and optical superresolution. He leads the BioCIL group, which develops novel label free microscopy techniques.
+M. Fatih Toy is an Associate Professor of Electrical and Electronics Engineering at Istanbul Medipol University. His research interests include digital holography, quantitative phase imaging, and optical superresolution. He leads the Phi-X group, which develops novel label free microscopy techniques.
 
 
