@@ -15,6 +15,6 @@ authors:
 
 **Budget:** 1,720,000TL
 
-**Duration:** 15.01.2024 - Ongoing
+**Duration:** 15.01.2024 - 15.09.2026
 
 Project financed under the 4th Joint Call for Proposals of TÜBİTAK – NARD (Moldova).
