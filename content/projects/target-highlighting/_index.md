@@ -489,10 +489,7 @@ Maha Sahloul<sup>1,2</sup>, Kaan Akşit<sup>3</sup>, and M. Fatih Toy<sup>1,2</s
 
 <div class="project_video">
 
-<video controls playsinline>
-    <source src="project_video.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-</video>
+<iframe src="https://widgets.figshare.com/articles/32841446/embed?show_title=0" width="777" height="480" allowfullscreen frameborder="0"></iframe>
 
 </div>
 
