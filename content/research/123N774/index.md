@@ -60,7 +60,7 @@ Project financed under the 4th Joint Call for Proposals of TÜBİTAK – NARD (M
         >
             <!-- Project site -->
             <a
-                href="/research/123n774/target-highlighting/"
+                href="/projects/target-highlighting/"
                 class="btn btn-primary"
                 style="
                     font-size: 13px;
