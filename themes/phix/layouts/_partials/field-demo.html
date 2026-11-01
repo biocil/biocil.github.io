@@ -1,0 +1,43 @@
+{{- /* Intensity imaging versus complex-field imaging: amplitude (absorption) and phase (retardation),
+       converted to thickness or height, with a 3D view and a line profile. */ -}}
+{{- $tr := eq site.Language.Lang "tr" -}}
+<div class="demo field-ui" id="field-demo">
+  <div class="specimens" role="group" aria-label="{{ if $tr }}Numune{{ else }}Specimen{{ end }}">
+    <span>{{ if $tr }}Numune{{ else }}Specimen{{ end }}</span>
+    <button class="chip" type="button" data-fspec="cells" aria-pressed="true">{{ if $tr }}Saydam hücreler{{ else }}Transparent cells{{ end }}</button>
+    <button class="chip" type="button" data-fspec="beads" aria-pressed="false">{{ if $tr }}Boyalı ve saydam boncuklar{{ else }}Dyed and clear beads{{ end }}</button>
+    <button class="chip" type="button" data-fspec="lens" aria-pressed="false">{{ if $tr }}Mikromercek dizisi{{ else }}Microlens array{{ end }}</button>
+    <button class="chip" type="button" data-fspec="surface" aria-pressed="false">{{ if $tr }}Yansıtıcı yüzey{{ else }}Reflective surface{{ end }}</button>
+  </div>
+  <ol class="steps">
+    <li>
+      <div class="step-h"><span class="step-n">1</span><h3>{{ if $tr }}Şiddet görüntüsü{{ else }}Intensity image{{ end }}</h3></div>
+      <div class="screen"><canvas id="f-int" width="256" height="256" role="img" aria-label="{{ if $tr }}Geleneksel aydınlık alan şiddet görüntüsü{{ else }}Conventional bright-field intensity image{{ end }}"></canvas></div>
+      <p class="note">{{ if $tr }}Sıradan bir kameranın koherent olmayan ışıkla kaydettiği şey: yalnızca şiddet. Saydam yapılar neredeyse görünmez.{{ else }}What an ordinary camera records with incoherent light: intensity only. Transparent structures barely show.{{ end }}</p>
+    </li>
+    <li>
+      <div class="step-h"><span class="step-n">2</span><h3>{{ if $tr }}Genlik{{ else }}Amplitude{{ end }}</h3></div>
+      <div class="screen"><canvas id="f-amp" width="256" height="256" role="img" aria-label="{{ if $tr }}Karmaşık alanın ölçülen genliği{{ else }}Measured amplitude of the complex field{{ end }}"></canvas></div>
+      <p class="note">{{ if $tr }}Karmaşık alanın ilk yarısı. Numunenin ışığı soğurduğu ya da daha az yansıttığı yerlerde düşer.{{ else }}The first half of the complex field. It falls where the specimen absorbs or reflects less light.{{ end }}</p>
+    </li>
+    <li>
+      <div class="step-h"><span class="step-n">3</span><h3>{{ if $tr }}Faz{{ else }}Phase{{ end }}</h3>
+        <span class="seg" role="group" aria-label="{{ if $tr }}Göster{{ else }}Show{{ end }}"><button type="button" data-fview="wrapped" aria-pressed="false">{{ if $tr }}Sarılı{{ else }}Wrapped{{ end }}</button><button type="button" data-fview="unwrapped" aria-pressed="true">{{ if $tr }}Fiziksel büyüklük{{ else }}Physical quantity{{ end }}</button></span></div>
+      <div class="screen"><canvas id="f-phase" width="256" height="256" tabindex="0" role="img" aria-label="{{ if $tr }}Ölçülen faz ya da ondan türetilen kalınlık veya yükseklik. Profil çizgisini taşımak için tıklayın ya da ok tuşlarını kullanın.{{ else }}Measured phase or the thickness or height derived from it. Click or use the arrow keys to move the profile line.{{ end }}"></canvas></div>
+      <p class="note">{{ if $tr }}İkinci yarı: numunenin ışığı ne kadar geciktirdiği. Profil çizgisini taşımak için tıklayın.{{ else }}The second half: how much the specimen delays the light. Click to move the profile line.{{ end }}</p>
+    </li>
+  </ol>
+  <ol class="steps two wide" start="4">
+    <li>
+      <div class="step-h"><span class="step-n">4</span><h3>{{ if $tr }}3B kalınlık ya da yükseklik{{ else }}Thickness or height in 3D{{ end }}</h3></div>
+      <div class="screen wide"><canvas id="f-3d" width="640" height="420" role="img" aria-label="{{ if $tr }}Fazdan türetilen kalınlık ya da yüksekliğin 3B yüzeyi. Döndürmek için sürükleyin.{{ else }}3D surface of the thickness or height derived from the phase. Drag to rotate.{{ end }}"></canvas></div>
+      <p class="note">{{ if $tr }}Döndürmek için sürükleyin. Geçirgenlik: t = φ λ / (2π Δn). Yansıma: h = φ λ / 4π.{{ else }}Drag to rotate. Transmission: t = φ λ / (2π Δn). Reflection: h = φ λ / 4π.{{ end }}</p>
+    </li>
+    <li>
+      <div class="step-h"><span class="step-n">5</span><h3>{{ if $tr }}Çizgi profili{{ else }}Line profile{{ end }}</h3></div>
+      <div class="screen wide"><canvas id="f-prof" width="640" height="420" role="img" aria-label="{{ if $tr }}Ölçülen büyüklüğün gerçek numuneyle karşılaştırmalı çizgi profili{{ else }}Line profile of the measured quantity compared with the true specimen{{ end }}"></canvas></div>
+      <p class="note">{{ if $tr }}Düz çizgi: fazdan ölçülen. Kesikli: gerçek numune.{{ else }}Solid: measured from the phase. Dashed: the true specimen.{{ end }}</p>
+    </li>
+  </ol>
+  <p class="status" id="f-status" aria-live="polite">{{ if $tr }}Benzetim yükleniyor…{{ else }}Loading the simulation…{{ end }}</p>
+</div>

@@ -1,0 +1,36 @@
+<meta charset="utf-8">
+<script>try{var p=localStorage.getItem("phix-palette");if(p)document.documentElement.setAttribute("data-palette",p)}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+{{- $title := cond .IsHome (printf "%s | %s" site.Params.lab.short (T "lab_name")) (printf "%s | %s" .Title site.Params.lab.short) }}
+<title>{{ $title }}</title>
+{{- $desc := site.Params.description }}
+{{- with .Params.summary }}{{ $desc = . }}{{ else }}{{ with .Params.abstract }}{{ $desc = . }}{{ end }}{{ end }}
+{{- if and (not .IsHome) (not .Params.summary) (not .Params.abstract) .Content }}{{ $desc = .Summary }}{{ end }}
+{{- $desc = $desc | plainify | htmlUnescape | strings.TrimSpace | truncate 200 }}
+<meta name="description" content="{{ $desc }}">
+<link rel="canonical" href="{{ .Permalink }}">
+<meta property="og:site_name" content="{{ site.Params.lab.short }}">
+<meta property="og:title" content="{{ .Title | default site.Title }}">
+<meta property="og:description" content="{{ $desc }}">
+<meta property="og:type" content="{{ cond .IsPage "article" "website" }}">
+<meta property="og:url" content="{{ .Permalink }}">
+{{- $share := "" }}
+{{- with partial "featured.html" . }}{{ $share = (.Process "fill 1200x630 Center jpg q80").Permalink }}{{ end }}
+{{- if not $share }}{{ with resources.Get site.Params.share_image }}{{ $share = .Permalink }}{{ end }}{{ end }}
+{{- with $share }}
+<meta property="og:image" content="{{ . }}">
+<meta name="twitter:card" content="summary_large_image">
+{{- end }}
+<meta name="theme-color" content="{{ index (dict "glass" "#10302A" "tint" "#261C3A" "phoenix" "#6E140F") (site.Params.palette | default "glass") | default "#10302A" }}">
+<link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">
+{{- with resources.Get "media/icon.png" }}
+<link rel="apple-touch-icon" href="{{ (.Resize "180x180 png").RelPermalink }}">
+{{- end }}
+{{- with .OutputFormats.Get "rss" }}<link rel="alternate" type="application/rss+xml" href="{{ .RelPermalink }}" title="{{ site.Title }}">{{ end }}
+<link rel="preload" href="{{ "fonts/Archivo-var.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
+<style>@font-face{font-family:"Archivo";src:url("{{ "fonts/Archivo-var.woff2" | relURL }}") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-style:normal;font-display:swap}</style>
+{{- $css := resources.Get "css/main.css" | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+{{- if .IsHome }}
+<script type="application/ld+json">{{ dict "@context" "https://schema.org" "@type" "ResearchOrganization" "name" (printf "%s %s" site.Params.lab.short site.Params.lab.name) "url" site.BaseURL "email" site.Params.lab.email "parentOrganization" (dict "@type" "CollegeOrUniversity" "name" site.Params.lab.university "url" site.Params.lab.university_url) | jsonify | safeJS }}</script>
+{{- end }}

@@ -1,0 +1,18 @@
+{{ define "main" }}
+{{ partial "page-head.html" . }}
+<div class="wrap page-body">
+  <div class="theme-page">
+    <div class="prose">
+      <h2>{{ T "open_positions" }}</h2>
+      {{ with .Params.openings }}
+      <ul class="openings">{{ range . }}<li><b>{{ .title }}</b>{{ with .deadline }}<span>{{ printf (T "apply_by") . }}</span>{{ else }}<span>{{ T "open_all_year" }}</span>{{ end }}{{ with .text }}<p>{{ . | markdownify }}</p>{{ end }}{{ with .url }}<a href="{{ . }}">{{ T "details" }}</a>{{ end }}</li>{{ end }}</ul>
+      {{ else }}
+      <p>{{ .Params.no_openings_text | default (T "no_openings") }}</p>
+      {{ end }}
+      {{ .Content }}
+      <p><a class="btn btn-primary" href="mailto:{{ site.Params.lab.email }}">{{ printf (T "email_x") site.Params.lab.email }}</a></p>
+    </div>
+    <aside>{{ with resources.Get "media/welcome.jpg" }}<figure class="lead-fig">{{ partial "img.html" (dict "img" . "w" 900 "alt" "A holographic microscope setup on an optical table, lit by glowing optical fibres." "class" "rounded") }}</figure>{{ end }}</aside>
+  </div>
+</div>
+{{ end }}

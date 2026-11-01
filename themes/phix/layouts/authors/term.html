@@ -1,0 +1,28 @@
+{{ define "main" }}
+<div class="wrap page-body profile">
+  <aside>
+    {{ partial "avatar.html" (dict "page" . "fill" "640x640" "class" "avatar big") }}
+    <ul class="plain social">
+      {{ range .Params.social }}{{ if .link }}{{ $name := .label | default (index (dict "envelope" "Email" "linkedin" "LinkedIn" "google-scholar" "Google Scholar" "github" "GitHub" "twitter" "X (Twitter)" "x-twitter" "X" "orcid" "ORCID" "researchgate" "ResearchGate" "globe" "Website" "youtube" "YouTube" "cv" "CV") .icon | default (humanize .icon)) }}<li><a href="{{ .link }}">{{ $name }}</a></li>{{ end }}{{ end }}
+    </ul>
+  </aside>
+  <div>
+    <h1>{{ .Title }}</h1>
+    <p class="role big">{{ .Params.role }}</p>
+    {{ with .Params.organizations }}<p class="muted">{{ range $i, $o := . }}{{ if $i }}; {{ end }}{{ with $o.url }}<a href="{{ . }}">{{ end }}{{ $o.name }}{{ if $o.url }}</a>{{ end }}{{ end }}</p>{{ end }}
+    <div class="prose">
+      {{ with .Content }}{{ . }}{{ else }}{{ with .Params.bio }}<p>{{ . | markdownify }}</p>{{ end }}{{ end }}
+    </div>
+    {{ with .Params.interests }}<h2 class="h4">{{ T "interests" }}</h2><ul class="chips">{{ range . }}<li>{{ . }}</li>{{ end }}</ul>{{ end }}
+    {{ with .Params.education.courses }}<h2 class="h4">{{ T "education" }}</h2><ul class="plain edu">{{ range . }}<li>{{ .course }}<span>{{ .institution }}{{ with .year }}, {{ . }}{{ end }}</span></li>{{ end }}</ul>{{ end }}
+    {{ $pubs := where .Pages "Section" "publication" }}
+    {{ with $pubs }}
+    <section class="sub"><h2>{{ T "publications" }}</h2><ol class="pub-list">{{ range .ByDate.Reverse }}{{ partial "pub-item.html" . }}{{ end }}</ol></section>
+    {{ end }}
+    {{ $proj := where .Pages "Section" "in" (slice "funding" "student_projects" "projects") }}
+    {{ with $proj }}
+    <section class="sub"><h2>{{ T "projects" }}</h2><ul class="plain">{{ range .ByDate.Reverse }}<li><a href="{{ .RelPermalink }}">{{ .Title }}</a><span>{{ .Params.scheme }}{{ if .Date }}, {{ .Date.Format "2006" }}{{ end }}</span></li>{{ end }}</ul></section>
+    {{ end }}
+  </div>
+</div>
+{{ end }}

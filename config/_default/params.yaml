@@ -1,123 +1,48 @@
-# SITE SETUP
-# Guide: https://docs.hugoblox.com/tutorial/
-# Documentation: https://docs.hugoblox.com/
-# This file is formatted using YAML syntax - learn more at https://learnxinyminutes.com/docs/yaml/
+# Colour palette: glass (bottle green and brass), tint (aubergine and magenta,
+# after the sensitive-tint colours of polarized light) or phoenix (the lab’s red).
+palette: glass
 
-# Appearance
+# Lab details used across the site (header, footer, contact page, SEO).
 
-appearance:
-  theme_day: minimal
-  theme_night:
-  font: native
-  font_size: L
+description: >-
+  Phi-X develops quantitative phase, digital holographic and holotomographic
+  microscopes, and the computation behind them, at Istanbul Medipol University.
 
-# SEO
-
-marketing:
-  seo:
-    site_type: ResearchOrganization
-    local_business_type: ''
-    org_name: ''
-    description: 'Our laboratory develops novel techniques in the fields of Quantitative Phase Imaging (QPI), Digital Holographic Microscopy, and Holo-Tomography to explore the unseen microscopic world.'
-    twitter: 'GetResearchDev'
-  analytics:
-    google_analytics: ''
-    baidu_tongji: ''
-    google_tag_manager: ''
-    microsoft_clarity: ''
-  verification:
-    google: ''
-    baidu: ''
-
-# Site header
-
-header:
-  navbar:
-    enable: true
-    logo:
-      # Logo text
-      text: ""
-      # Logo filename in `assets/media/` folder
-      filename: "logo.svg"
-    align: r
-    show_logo: true
-    show_language: false
-    show_day_night: true
-    show_search: true
-    highlight_active_link: true
-
-# Site footer
-
-footer:
-  copyright:
-    notice: '© {year} Phi-X. This work is licensed under {license}'
-    license:
-      enable: true
-      allow_derivatives: false
-      share_alike: false
-      allow_commercial: false
-
-# Localization
-
-locale:
-  date_format: 'Jan 2, 2006'
-  time_format: '3:04 PM'
-  address_format: en-us
-
-# Site features
-
-features:
-  syntax_highlighter:
-    enable: true
-    extra_languages:
-      - r
-      - latex
-  math:
-    enable: true
-  privacy_pack:
-    enable: false
-  repository:
-    url: 'https://github.com/<username>/<repository>'
-    content_dir: content
-    branch: main
-  avatar:
-    gravatar: false
-    shape: circle
-  comment:
-    provider: ''
-    disqus:
-      shortname: ''
-      show_count: true
-    commento:
-      url: ''
-    giscus:
-      repo: ''
-      repo_id: ''
-      category: ''
-      category_id: ''
-  search:
-    provider: wowchemy
-    algolia:
-      app_id: ''
-      api_key: ''
-      index_name: ''
-      show_logo: false
+lab:
+  short: Phi-X
+  name: Biophotonics and Computational Imaging Laboratory
+  university: Istanbul Medipol University
+  university_url: https://www.medipol.edu.tr/en/
+  department: Department of Biomedical Engineering
+  email: mftoy@medipol.edu.tr
+  phone: '+90 216 681 5100 (ext. 5627)'
+  address:
+    - Istanbul Medipol University, Kavacık Mah. Ekinciler Cad. No. 19
+    - 34810 Beykoz, Istanbul, Türkiye
   map:
-    provider: 'mapnik'
-    api_key: ''
-    zoom: 15
+    lat: 41.09122
+    lon: 29.09162
 
-# Extensions
+# Links shown in the footer.
+links:
+  - name: Google Scholar
+    url: https://scholar.google.com.tr/citations?user=pYF8fPUAAAAJ
+  - name: ORCID
+    url: https://orcid.org/0000-0003-0176-8807
+  - name: AVESİS
+    url: https://avesis.medipol.edu.tr/mftoy
+  - name: GitHub
+    url: https://github.com/biocil
 
-extensions:
-  decap_cms:
-    branch: main
-    local_backend: false
-  academicons:
-    enable: true
+part_of:
+  - name: Istanbul Medipol University
+    url: https://www.medipol.edu.tr/en/
+  - name: Department of Biomedical Engineering
+  - name: COST Action PhoBioS
+    url: https://lightbiosurface.com/
 
-# Citation style
+# Footer notice. {year} is replaced with the current year.
+copyright: '© {year} Phi-X. Text licensed under CC BY-NC-ND 4.0; figures from publications remain © their publishers.'
 
-publications:
-  date_format: January 2006
-  citation_style: apa
+# Image used when pages are shared on social media (in assets/media/).
+share_image: media/share.jpg

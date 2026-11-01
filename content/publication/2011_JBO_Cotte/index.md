@@ -18,8 +18,8 @@ publishDate: "2017-01-01T00:00:00Z"
 publication_types: ["article-journal"]
 
 # Publication name and optional abbreviated publication name.
-publication: "*Optics Express*, 16 (10)"
-publication_short: "Optics Express"
+publication: "*Journal of Biomedical Optics*, 16 (10)"
+publication_short: "Journal of Biomedical Optics"
 
 abstract: We present a theory to extend the classical Abbe resolution limit by introducing a spatially varying phase into the illumination beam of a phase imaging system. It allows measuring lateral and axial distance differences between point sources to a higher accuracy than intensity imaging alone. Various proposals for experimental realization are debated. Concretely, the phase of point scatterers' interference is experimentally visualized by high numerical aperture (NA = 0.93) digital holographic microscopy combined with angular scanning. Proof-of-principle measurements are presented by using sub-wavelength nanometric holes on an opaque metallic film. In this manner, Rayleighs classical two-point resolution condition can be rebuilt. With different illumination phases, enhanced bandpass information content is demonstrated, and its spatial resolution is theoretically shown to be potentially signal-to-noise ratio limited.
 

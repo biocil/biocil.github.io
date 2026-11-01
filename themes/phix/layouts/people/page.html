@@ -1,0 +1,30 @@
+{{ define "main" }}
+{{ partial "page-head.html" . }}
+<div class="wrap page-body">
+  {{ $people := (site.GetPage "/authors").Pages.ByParam "last_name" }}
+  {{ range .Params.groups }}{{ $g := . }}
+  {{ $members := slice }}{{ range $people }}{{ if in .Params.user_groups $g.key }}{{ $members = $members | append . }}{{ end }}{{ end }}
+  {{ if $members }}
+  <section class="sub people-group" aria-labelledby="g-{{ $g.key | anchorize }}">
+    <h2 id="g-{{ $g.key | anchorize }}">{{ $g.title | default $g.key }}</h2>
+    {{ if $g.compact }}
+    <ul class="compact-people">
+      {{ range $members }}<li>{{ if or .Content .Params.bio .Params.role }}<a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ else }}{{ .Title }}{{ end }}<span>{{ with .Params.alumni_note }}{{ . }}{{ else }}{{ .Params.role }}{{ with .Params.organizations }}{{ with index . 0 }}{{ with .name }}, {{ . }}{{ end }}{{ end }}{{ end }}{{ end }}</span></li>{{ end }}
+    </ul>
+    {{ else }}
+    <div class="team {{ if eq $g.key "Principal Investigator" }}pi-row{{ end }}">
+      {{ range $members }}
+      <article class="person">
+        <a href="{{ .RelPermalink }}" tabindex="-1" aria-hidden="true">{{ partial "avatar.html" (dict "page" . "fill" (cond (eq $g.key "Principal Investigator") "900x675" "480x480")) }}</a>
+        <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+        <p class="role">{{ .Params.role }}</p>
+        {{ with .Params.bio }}<p>{{ . | markdownify }}</p>{{ end }}
+      </article>
+      {{ end }}
+    </div>
+    {{ end }}
+  </section>
+  {{ end }}
+  {{ end }}
+</div>
+{{ end }}

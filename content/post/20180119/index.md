@@ -1,5 +1,6 @@
 ---
 title: Yenilikçi Mikroskoplar Kanseri Erken Evrede Teşhis Edecek (Turkish Content)
+kind: Press
 date: 2018-01-19
 external_link: https://www.dha.com.tr/saglik-yasam/yenilikci-mikroskoplar-kanseri-erken-evrede-teshis-edecek-1560904
 ---

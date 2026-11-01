@@ -1,0 +1,21 @@
+{{ define "main" }}
+<header class="page-head">
+  <div class="wrap">
+    <p class="venue-line">{{ .Params.scheme }}</p>
+    <h1>{{ .Title }}</h1>
+  </div>
+</header>
+<div class="wrap page-body">
+  <dl class="facts">
+    {{ with .Params.funder }}<div><dt>{{ T "funder" }}</dt><dd>{{ . }}</dd></div>{{ end }}
+    {{ with .Params.code }}<div><dt>{{ T "project_number" }}</dt><dd>{{ . }}</dd></div>{{ end }}
+    {{ with .Params.start }}<div><dt>{{ if $.Params.end }}{{ T "duration" }}{{ else }}{{ T "year" }}{{ end }}</dt><dd>{{ time.Format "January 2006" (time.AsTime .) }}{{ with $.Params.end }} {{ T "to" }} {{ time.Format "January 2006" (time.AsTime .) }}{{ end }}</dd></div>{{ end }}
+    {{ with .Params.budget }}<div><dt>{{ T "budget" }}</dt><dd>{{ . }}</dd></div>{{ end }}
+    {{ with .Params.role }}<div><dt>{{ T "our_role" }}</dt><dd>{{ . }}</dd></div>{{ end }}
+    {{ with .GetTerms "authors" }}<div><dt>{{ T "team" }}</dt><dd>{{ partial "authors.html" $ }}</dd></div>{{ end }}
+    {{ with .Params.external_link }}<div><dt>{{ T "website" }}</dt><dd><a href="{{ . }}">{{ . }}</a></dd></div>{{ end }}
+  </dl>
+  <div class="prose">{{ .Content }}</div>
+  <p class="back"><a href="{{ "/funding/" | relLangURL }}">{{ T "all_funding" }}</a></p>
+</div>
+{{ end }}

@@ -1,22 +1,15 @@
 ---
-title: TUBITAK 2209-A Research Project Support Program for Undergraduate Students
+title: "Digital holographic microscopy system with integrated incubator"
+scheme: "TÜBİTAK 2209-A Undergraduate Research Projects"
 date: 2022-05-15
-#external_link: https://github.com/pandas-dev/pandas
-tags:
-  - TUBITAK
-  - Digital Holographic Microscopy
-
+team:
+  - Zeynep Ozbilgin
+  - Sevdenur Aksit
 authors:
-- M. Fatih Toy
-- Zeynep Ozbilgin
-- Sevdenur Aksit
-
+  - M. Fatih Toy
+  - Zeynep Ozbilgin
+  - Sevdenur Aksit
+tags:
+  - Digital Holographic Microscopy
 ---
 
-**Project Title:** Digital Holographic Microscopy System with Integrated Incubator
-
-**Team:** 
-- Zeynep Ozbilgin
-- Sevdenur Aksit
-
-**Year:** 2022

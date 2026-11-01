@@ -1,22 +1,15 @@
 ---
-title: TUBITAK 2209-A Research Project Support Program for Undergraduate Students
+title: "Smartphone-based holographic blood analyser"
+scheme: "TÜBİTAK 2209-A Undergraduate Research Projects"
 date: 2024-05-15
-#external_link: https://github.com/pandas-dev/pandas
-tags:
-  - TUBITAK
-  - Blood Analysis
-
+team:
+  - Abdurrahman Akkoyun
+  - Vahap Can Sari
 authors:
-- M. Fatih Toy
-- Abdurrahman Akkoyun
-- Vahap Can Sari
-
+  - M. Fatih Toy
+  - Abdurrahman Akkoyun
+  - Vahap Can Sari
+tags:
+  - Blood Analysis
 ---
 
-**Project Title:** Smartphone Based Holographic Blood Analyzer
-
-**Team:** 
-- Abdurrahman Akkoyun
-- Vahap Can Sari
-
-**Year:** 2024

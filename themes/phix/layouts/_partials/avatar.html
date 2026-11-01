@@ -1,0 +1,11 @@
+{{- /* Params: page (author term page), fill ("WxH"), class */ -}}
+{{- $p := .page -}}
+{{- with $p.Resources.GetMatch "avatar*" -}}
+{{- partial "img.html" (dict "img" . "fill" ($.fill | default "480x480") "alt" (printf (T "portrait_of") $p.Title) "class" ($.class | default "avatar")) -}}
+{{- else -}}{{- with $p.Params.avatar_url -}}
+<img src="{{ . }}" alt="{{ printf (T "portrait_of") $p.Title }}" class="{{ $.class | default "avatar" }}" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+{{- else -}}
+{{- $parts := split $p.Title " " -}}
+<div class="initials {{ $.class | default "avatar" }}" aria-hidden="true">{{ substr (index $parts 0) 0 1 }}{{ substr (index $parts (sub (len $parts) 1)) 0 1 }}</div>
+{{- end -}}
+{{- end -}}

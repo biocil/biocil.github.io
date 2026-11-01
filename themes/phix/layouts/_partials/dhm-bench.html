@@ -1,0 +1,42 @@
+{{- /* Off-axis digital holography: record → Fourier filter → field, with numerical refocusing and aberration compensation. */ -}}
+{{- $tr := eq site.Language.Lang "tr" -}}
+<div class="demo bench-ui" id="bench">
+  <div class="specimens" role="group" aria-label="{{ if $tr }}Numune{{ else }}Specimen{{ end }}">
+    <span>{{ if $tr }}Numune{{ else }}Specimen{{ end }}</span>
+    <button class="chip" type="button" data-spec="cells" aria-pressed="true">{{ if $tr }}Hücreler{{ else }}Cells{{ end }}</button>
+    <button class="chip" type="button" data-spec="axons" aria-pressed="false">{{ if $tr }}Miyelinli aksonlar{{ else }}Myelinated axons{{ end }}</button>
+    <button class="chip" type="button" data-spec="target" aria-pressed="false">{{ if $tr }}Çözünürlük hedefi{{ else }}Resolution target{{ end }}</button>
+  </div>
+  <ol class="steps">
+    <li>
+      <div class="step-h"><span class="step-n">1</span><h3>{{ if $tr }}Hologramı kaydet{{ else }}Record the hologram{{ end }}</h3></div>
+      <div class="screen"><canvas id="holoB" width="256" height="256" role="img" aria-label="{{ if $tr }}Hücrelerin benzetim eksen dışı hologramı{{ else }}Simulated off-axis hologram of cells{{ end }}"></canvas></div>
+      <p class="note">{{ if $tr }}Nesne dalgası eğik bir referans ışınıyla girişim yapar. Numunenin fazı düz saçakları büker.{{ else }}The object wave interferes with a tilted reference beam. The sample’s phase bends the straight fringes.{{ end }}</p>
+    </li>
+    <li>
+      <div class="step-h"><span class="step-n">2</span><h3>{{ if $tr }}Fourier uzayında filtrele{{ else }}Filter in Fourier space{{ end }}</h3></div>
+      <div class="screen"><canvas id="spec" width="512" height="512" tabindex="0" role="img" aria-label="{{ if $tr }}Dairesel filtreyle hologramın Fourier spektrumu. Filtreyi taşımak için sürükleyin ya da ok tuşlarını kullanın.{{ else }}Fourier spectrum of the hologram with a circular filter. Drag, or use the arrow keys, to move the filter.{{ end }}"></canvas></div>
+      <p class="note">{{ if $tr }}Eğim, spektrumu sıfırıncı mertebe ve iki yan mertebeye ayırır. Daireyi sürükleyin ya da odaklayıp ok tuşlarını kullanın.{{ else }}The tilt separates the spectrum into a zero order and two side orders. Drag the circle, or focus it and use the arrow keys.{{ end }}</p>
+    </li>
+    <li>
+      <div class="step-h"><span class="step-n">3</span><h3>{{ if $tr }}Alanı oku{{ else }}Read out the field{{ end }}</h3>
+        <span class="seg" role="group" aria-label="{{ if $tr }}Göster{{ else }}Show{{ end }}"><button type="button" data-view="phase" aria-pressed="true">{{ if $tr }}Faz{{ else }}Phase{{ end }}</button><button type="button" data-view="amp" aria-pressed="false">{{ if $tr }}Genlik{{ else }}Amplitude{{ end }}</button></span></div>
+      <div class="screen"><canvas id="phaseB" width="256" height="256" role="img" aria-label="{{ if $tr }}Rekonstrükte alan{{ else }}Reconstructed field{{ end }}"></canvas></div>
+      <div class="cbar" aria-hidden="true"><span id="cbarLo">−π</span><i id="cbar"></i><span id="cbarHi">π rad</span></div>
+    </li>
+  </ol>
+  <div class="controls">
+    <div class="ctl"><label for="angle">{{ if $tr }}Saçak açısı{{ else }}Fringe angle{{ end }} <output id="angleOut" for="angle">45°</output></label><input id="angle" type="range" min="0" max="180" step="1" value="45"></div>
+    <div class="ctl"><label for="period">{{ if $tr }}Saçak aralığı{{ else }}Fringe spacing{{ end }} <output id="periodOut" for="period">5.0 px</output></label><input id="period" type="range" min="3" max="9" step="0.1" value="5"></div>
+    <div class="ctl"><label for="radius">{{ if $tr }}Filtre yarıçapı{{ else }}Filter radius{{ end }} <output id="radiusOut" for="radius">20</output></label><input id="radius" type="range" min="4" max="64" step="1" value="20"></div>
+    <button class="btn btn-ghost" type="button" id="snap">{{ if $tr }}+1 mertebeye ortala{{ else }}Centre on +1 order{{ end }}</button>
+  </div>
+  <fieldset class="controls focus-ctl">
+    <legend>{{ if $tr }}Sayısal odaklama ve aberasyon düzeltme{{ else }}Numerical focusing and aberration compensation{{ end }}</legend>
+    <div class="ctl"><label for="defocus">{{ if $tr }}Numune odak kayması{{ else }}Sample defocus{{ end }} <output id="defocusOut" for="defocus">0 µm</output></label><input id="defocus" type="range" min="-20" max="20" step="1" value="0"></div>
+    <div class="ctl"><label for="zrec">{{ if $tr }}Rekonstrüksiyon mesafesi{{ else }}Reconstruction distance{{ end }} <output id="zrecOut" for="zrec">0 µm</output></label><input id="zrec" type="range" min="-20" max="20" step="0.5" value="0"></div>
+    <label class="check"><input type="checkbox" id="curv"> {{ if $tr }}Objektif faz eğriliği{{ else }}Objective phase curvature{{ end }}</label>
+    <div class="btn-row"><button class="btn btn-ghost" type="button" id="autofocus">{{ if $tr }}Otomatik odak{{ else }}Autofocus{{ end }}</button><button class="btn btn-ghost" type="button" id="compensate">{{ if $tr }}Aberasyonları düzelt{{ else }}Compensate aberrations{{ end }}</button></div>
+  </fieldset>
+  <p class="status" id="status" aria-live="polite">{{ if $tr }}Benzetim yükleniyor…{{ else }}Loading the simulation…{{ end }}</p>
+</div>

@@ -1,5 +1,6 @@
 ---
 title: Peering into Living Cells (English Content)
+kind: Press
 date: 2013-02-11
 external_link: https://actu.epfl.ch/news/peering-into-living-cells/
 image:

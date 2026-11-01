@@ -10,9 +10,7 @@ last_name: Gurcan
 superuser: false
 
 # Role/position
-role: Former Graduate Research Assistant 
-
-
+role: Former graduate research assistant
 # Organizations/Affiliations
 organizations:
   - name: Princeton University
@@ -64,4 +62,5 @@ highlight_name: false
 user_groups:
   - Alumni
  
+alumni_note: Now a PhD student at Princeton University
 ---

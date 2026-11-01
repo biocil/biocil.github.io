@@ -1,0 +1,32 @@
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="{{ "/" | relLangURL }}" aria-label="{{ site.Params.lab.short }} {{ T "home" }}">{{ partial "logo.html" . }}<span>{{ site.Params.lab.short }}</span></a>
+    <nav aria-label="Main">
+      <ul>
+        {{- $cur := . }}
+        {{- range site.Menus.main }}
+        {{- $active := or ($cur.IsMenuCurrent "main" .) ($cur.HasMenuCurrent "main" .) (and (ne .URL "/") (strings.HasPrefix $cur.RelPermalink (relLangURL .URL))) }}
+        <li><a href="{{ .URL | relLangURL }}"{{ if .Params.highlight }} class="join"{{ end }}{{ if $active }} aria-current="page"{{ end }}>{{ .Name }}</a></li>
+        {{- end }}
+      </ul>
+    </nav>
+    <div class="nav-tools">
+      {{- if hugo.IsMultilingual }}
+      {{- $cur := . }}
+      {{- range site.Home.AllTranslations }}{{ if ne .Language.Lang site.Language.Lang }}
+      {{- $target := . }}{{ range $cur.AllTranslations }}{{ if eq .Language.Lang $target.Language.Lang }}{{ $target = . }}{{ end }}{{ end }}
+      <a class="lang" href="{{ $target.RelPermalink }}" hreflang="{{ .Language.Lang }}" lang="{{ .Language.Lang }}" title="{{ .Language.Label }}">{{ upper .Language.Lang }}</a>
+      {{- end }}{{ end }}
+      {{- end }}
+      <div class="pal">
+        <button type="button" class="pal-btn" id="pal-btn" aria-haspopup="true" aria-expanded="false" aria-controls="pal-menu" title="{{ T "colour_scheme" }}"><span class="pal-dot" aria-hidden="true"></span><span class="sr-only">{{ T "colour_scheme" }}</span></button>
+        <div class="pal-menu" id="pal-menu" role="menu" hidden>
+          <p>{{ T "colour_scheme" }}</p>
+          {{- range slice (slice "glass" "#10302A" "#E0B252") (slice "medipol" "#0A2D57" "#5BC2EE") (slice "tint" "#261C3A" "#F4A340") (slice "phoenix" "#6E140F" "#FFFFFF") }}
+          <button type="button" role="menuitemradio" data-pal="{{ index . 0 }}" aria-checked="false"><span class="sw" style="background:linear-gradient(135deg,{{ index . 1 | safeCSS }} 55%,{{ index . 2 | safeCSS }} 55%)"></span>{{ T (printf "palette_%s" (index . 0)) }}</button>
+          {{- end }}
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

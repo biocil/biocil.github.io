@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="{{ site.Language.Locale | default "en" }}" data-palette="{{ site.Params.palette | default "glass" }}">
+<head>
+{{ partial "head.html" . }}
+</head>
+<body class="kind-{{ .Kind }}{{ with .Section }} sec-{{ . }}{{ end }}">
+<a class="skip" href="#main">{{ T "skip" }}</a>
+{{ partial "nav.html" . }}
+<main id="main">
+{{ block "main" . }}{{ end }}
+</main>
+{{ partial "footer.html" . }}
+{{ $site := resources.Get "js/site.js" | minify | fingerprint }}
+<script src="{{ $site.RelPermalink }}" integrity="{{ $site.Data.Integrity }}" defer></script>
+{{ if or .IsHome (.Store.Get "holo") }}
+{{ $holo := resources.Get "js/holo.js" | minify | fingerprint }}
+<script src="{{ $holo.RelPermalink }}" integrity="{{ $holo.Data.Integrity }}" defer></script>
+<script src="{{ "js/phix3d.js" | relURL }}" defer></script>
+{{ end }}
+</body>
+</html>

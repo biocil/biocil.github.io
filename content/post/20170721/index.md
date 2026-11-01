@@ -1,5 +1,6 @@
 ---
 title: ”Türkiye’de Bilim mi Var?” Diyenleri Şaşırtacak 10 Mühendislik Harikası ve Mühendisleri (Turkish Content)
+kind: Press
 date: 2017-07-21
 external_link: https://onedio.com/haber/turkiye-de-bilim-mi-var-diyenleri-sasirtacak-10-muhendislik-harikasi-ve-muhendisleri-776958
 ---

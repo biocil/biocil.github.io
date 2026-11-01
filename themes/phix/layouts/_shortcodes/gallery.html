@@ -1,0 +1,22 @@
+{{- /* Photo gallery. Put one image per line inside the shortcode: file name | caption
+       {{< gallery >}}
+       photo1.jpg | Caption one
+       photo2.jpg | Caption two
+       {{< /gallery >}}
+       Images are looked up in the page folder. */ -}}
+<div class="gallery">
+{{- range split (trim .Inner "\n ") "\n" }}
+  {{- $line := trim . " " }}
+  {{- if $line }}
+    {{- $parts := split $line "|" }}
+    {{- $file := trim (index $parts 0) " " }}
+    {{- $cap := "" }}{{ if gt (len $parts) 1 }}{{ $cap = trim (index $parts 1) " " }}{{ end }}
+    {{- with $.Page.Resources.GetMatch $file }}
+    <figure>
+      <a href="{{ (.Resize "2000x q85").RelPermalink }}">{{ partial "img.html" (dict "img" . "w" 900 "alt" $cap "sizes" "(max-width: 700px) 100vw, 33vw") }}</a>
+      {{ with $cap }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}
+    </figure>
+    {{- else }}{{ warnf "gallery: image %q not found in %s" $file $.Page.File.Path }}{{ end }}
+  {{- end }}
+{{- end }}
+</div>

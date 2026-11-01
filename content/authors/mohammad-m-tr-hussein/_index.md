@@ -1,24 +1,21 @@
 ---
 # Display name
-title: Mohammad M TR Hussein
-
+title: Mohammad M. T. R. Hussein
 # Full Name (for SEO)
 first_name: Mohammad
-last_name: M. T.R. Hussein
-
+last_name: Hussein
 # Is this the primary user of the site?
 superuser: false
 
 # Role/position
-role: Graduate Research Assistant
-
+role: MSc graduate, 2026
 # Organizations/Affiliations
 organizations:
   - name: Istanbul Medipol University
     url: 'https://www.medipol.edu.tr/en/'
 
 # Short bio (displayed in user profile at end of posts)
-bio: My research interests include polarization sensitive digital holography, Birefringence's quantitative phase imaging, Jones matrix extraction.
+bio: Polarization-sensitive digital holography, birefringence imaging and full-field Jones matrix reconstruction.
 
 interests:
   - Digital Holography
@@ -27,9 +24,9 @@ interests:
 
 education:
   courses:
-    - course: MSc in Biomedical Engineering (Current)
+    - course: MSc in Biomedical Engineering
       institution: Istanbul Medipol University, Turkey
-      year: 2024 
+      year: 2026
     - course: BSc in Biomedical Engineering
       institution: Istanbul Medipol University, Turkey 
       year: 2023
@@ -41,7 +38,7 @@ education:
 social:
   - icon: envelope
     icon_pack: fas
-    link: 'mailto:mohammad.hussein@std.medipol.edu.tr'
+    link: ''
   - icon: linkedin
     icon_pack: fab
     link: https://www.linkedin.com/in/mohammad-m-t-r-hussein-065aa71b6/
@@ -63,7 +60,6 @@ highlight_name: false
 user_groups:
   - Graduate Research Assistants
 ---
+Mohammad M. T. R. Hussein defended his MSc thesis in Biomedical Engineering at Istanbul Medipol University on 13 August 2026, on polarization-sensitive digital holographic microscopy with structured illumination. He developed dual-shot polarization DHM for full-field Jones matrix imaging, published in Biomedical Optics Express.
 
-Mohammad M. T.R. Hussein is a Masters Student in Biomedical Engineering at Istanbul Medipol University. His research interests include polarization sensitive digital holography, quantitative phase imaging. 
-
-
+His poster won third place at the FOTONİK 2025 workshop, and he has been accepted for a research internship at KAUST.

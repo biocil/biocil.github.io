@@ -1,53 +1,77 @@
-# Configuration of Hugo
-# Guide: https://docs.hugoblox.com/tutorial/
-# Hugo Documentation: https://gohugo.io/getting-started/configuration/#all-configuration-settings
-# This file is formatted using YAML syntax - learn more at https://learnxinyminutes.com/docs/yaml/
+# Site configuration for the Phi-X lab website.
+# The look of the site comes from the theme in themes/phix/.
+# Content lives in content/; see README.md for how to edit it.
 
-title: Phi - X # Website name
-baseURL: 'https://biocil.github.io/' # Website URL
-
-############################
-## LANGUAGE
-############################
-
+title: Phi-X
+baseURL: https://biocil.github.io/
 defaultContentLanguage: en
-hasCJKLanguage: false
 defaultContentLanguageInSubdir: false
+
+# English is the default (at /), Turkish lives under /tr/.
+# Turkish pages come from content_tr/; anything not translated there falls back
+# to the English page from content/ (publications, news, profiles…).
+languages:
+  en:
+    label: English
+    locale: en-US
+    weight: 1
+  tr:
+    label: Türkçe
+    locale: tr-TR
+    weight: 2
+
+module:
+  mounts:
+    - source: content_tr
+      target: content
+      sites:
+        matrix:
+          languages: ['tr']
+    - source: content
+      target: content
+      sites:
+        matrix:
+          languages: ['*']
+theme: phix
+
 removePathAccents: true
-
-############################
-## ADVANCED
-############################
-
-enableGitInfo: false
-summaryLength: 30
-pagination:
-  pagerSize: 10
-enableEmoji: true
 enableRobotsTXT: true
-footnotereturnlinkcontents: <sup>^</sup>
-ignoreFiles: [\.ipynb$, .ipynb_checkpoints$, \.Rmd$, \.Rmarkdown$, _cache$]
+summaryLength: 30
+timeout: 300s
+ignoreFiles: ['\.ipynb$', '\.ipynb_checkpoints$', '\.Rmd$', '_cache$']
+
+pagination:
+  pagerSize: 30
+
+# Taxonomies: "authors" powers the people pages and author links.
+taxonomies:
+  author: authors
+  tag: tags
+
 permalinks:
-  authors: '/author/:slug/'
-  tags: '/tag/:slug/'
-  categories: '/category/:slug/'
-  publication_types: '/publication-type/:slug/'
-disableAliases: true
+  term:
+    authors: /author/:slug/
+    tags: /tag/:slug/
+
 outputs:
-  home: [HTML, RSS, JSON, WebAppManifest, headers, redirects]
+  home: [HTML, RSS]
   section: [HTML, RSS]
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true      # allows raw HTML inside Markdown (used by project pages)
+  highlight:
+    noClasses: false
+
 imaging:
   resampleFilter: lanczos
-  quality: 75
   anchor: smart
-timeout: 600000
-taxonomies:
-  tag: tags
-  category: categories
-  publication_type: publication_types
-  author: authors
-markup:
-  _merge: deep
+  jpeg:
+    quality: 80
+  webp:
+    quality: 80
+
 related:
   threshold: 80
   includeNewer: true
@@ -55,9 +79,5 @@ related:
   indices:
     - name: tags
       weight: 100
-    - name: categories
-      weight: 70
-security:
-  _merge: deep
-sitemap:
-  _merge: deep
+    - name: authors
+      weight: 60

@@ -1,0 +1,47 @@
+{{ define "main" }}
+{{ partial "page-head.html" . }}
+<div class="wrap page-body">
+  {{ with .Content }}<div class="prose intro">{{ . }}</div>{{ end }}
+  {{ $items := .Pages.ByParam "start" }}
+  {{ $a0 := float (.Params.axis_start | default 2015) }}{{ $a1 := float (.Params.axis_end | default 2027) }}{{ $span := sub $a1 $a0 }}
+  <div class="gantt" role="list" aria-label="{{ T "timeline_label" }}">
+    <div class="g-axis" aria-hidden="true"><span></span><div class="ticks" style="--cols:{{ $span }}">{{ range seq (int $a0) 2 (int $a1) }}<span style="left:{{ mul (div (sub (float .) $a0) $span) 100 }}%">{{ . }}</span>{{ end }}</div></div>
+    {{- /* one row per project, network and award, newest at the top */}}
+    {{ range $items.Reverse }}
+      {{ $kind := .Params.kind | default "grant" }}
+      {{ $s := partial "yearfrac.html" .Params.start }}
+      {{ $isNow := and .Params.end (gt (time.AsTime .Params.end).Unix (now.AddDate 0 -1 0).Unix) }}
+      {{ if and (eq $kind "grant") (not .Params.end) }}{{ $isNow = true }}{{ end }}
+      <div class="g-row g-{{ $kind }}" role="listitem">
+        <div class="g-label"><a href="{{ .RelPermalink }}">{{ if eq $kind "grant" }}{{ .Title }}{{ else }}{{ .Params.short | default .Title }}{{ end }}</a><span>{{ .Params.scheme }}, {{ (time.AsTime .Params.start).Format "2006" }}{{ if .Params.end }}–{{ (time.AsTime .Params.end).Format "2006" }}{{ else if eq $kind "grant" }}–{{ T "present" }}{{ end }}</span></div>
+        <div class="track">
+          {{- if or .Params.end (eq $kind "grant") }}{{ $e := partial "yearfrac.html" (.Params.end | default now) }}<span class="bar{{ if ne $kind "grant" }} soft{{ end }}{{ if $isNow }} now{{ end }}" style="left:{{ mul (div (sub $s $a0) $span) 100 }}%;width:{{ mul (div (sub $e $s) $span) 100 }}%"></span>{{ end }}
+          {{- if eq $kind "award" }}<span class="pt" style="left:{{ mul (div (sub $s $a0) $span) 100 }}%"></span>{{ end }}
+        </div>
+      </div>
+    {{ end }}
+    <p class="g-legend" aria-hidden="true"><span><i class="lg-bar"></i>{{ T "research_projects" }}</span><span><i class="lg-soft"></i>{{ T "european_networks" }}</span><span><i class="lg-pt"></i>{{ T "awards" }}</span></p>
+  </div>
+
+  {{ range slice (slice "grant" (T "research_projects")) (slice "network" (T "european_networks")) (slice "award" (T "awards")) }}
+  {{ $kind := index . 0 }}{{ $label := index . 1 }}
+  {{ $group := where $items.Reverse "Params.kind" $kind }}
+  {{ if $group }}
+  <section class="sub">
+    <h2>{{ $label }}</h2>
+    <ul class="fund-list">
+      {{ range $group }}
+      <li>
+        <div class="when">{{ (time.AsTime .Params.start).Format "2006" }}{{ with .Params.end }}–{{ (time.AsTime .).Format "2006" }}{{ end }}</div>
+        <div>
+          <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+          <p class="muted">{{ .Params.scheme }}{{ with .Params.code }}, {{ printf (T "project_no") . }}{{ end }}{{ with .Params.budget }}, {{ printf (T "budget_x") . }}{{ end }}{{ with .Params.role }}. {{ . }}{{ end }}</p>
+        </div>
+      </li>
+      {{ end }}
+    </ul>
+  </section>
+  {{ end }}
+  {{ end }}
+</div>
+{{ end }}

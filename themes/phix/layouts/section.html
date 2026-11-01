@@ -1,0 +1,11 @@
+{{ define "main" }}
+{{ partial "page-head.html" . }}
+<div class="wrap page-body">
+  {{ with .Content }}<div class="prose">{{ . }}</div>{{ end }}
+  <ul class="card-list">
+    {{ range .Pages }}
+    <li><a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ with .Params.summary }}<p>{{ . }}</p>{{ end }}</li>
+    {{ end }}
+  </ul>
+</div>
+{{ end }}

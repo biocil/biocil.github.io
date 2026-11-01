@@ -1,0 +1,16 @@
+{{- /* Usage: {{< video src="clip.mp4" poster="clip.jpg" controls="yes" caption="…" >}}
+       The file is looked up in the page folder, then in assets/media/, then used as a URL.
+       Without `controls`, the video plays muted and loops (paused for visitors who prefer reduced motion). */ -}}
+{{- $src := .Get "src" -}}
+{{- $url := $src -}}{{- $type := strings.TrimPrefix "." (path.Ext $src) -}}{{- $poster := "" -}}
+{{- $posterName := .Get "poster" | default (replace $src (path.Ext $src) ".jpg") -}}
+{{- if not (strings.HasPrefix $src "http") -}}
+  {{- with or (.Page.Resources.GetMatch $src) (resources.Get (path.Join "media" $src)) -}}{{- $url = .RelPermalink -}}{{- $type = .MediaType.SubType -}}{{- end -}}
+  {{- with or (.Page.Resources.GetMatch $posterName) (resources.Get (path.Join "media" $posterName)) -}}{{- $poster = .RelPermalink -}}{{- end -}}
+{{- end -}}
+<figure class="video">
+<video {{ if .Get "controls" }}controls{{ else }}autoplay muted loop playsinline data-autoplay{{ end }} preload="metadata"{{ with $poster }} poster="{{ . }}"{{ end }}{{ with .Get "id" }} id="video-{{ . | anchorize }}"{{ end }}>
+  <source src="{{ $url }}" type="video/{{ $type }}">
+</video>
+{{ with .Get "caption" }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}
+</figure>

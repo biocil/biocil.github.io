@@ -1,0 +1,8 @@
+{{ define "main" }}
+{{ partial "page-head.html" . }}
+<div class="wrap page-body">
+  <ul class="tag-cloud">
+    {{ range .Pages.ByTitle }}<li><a href="{{ .RelPermalink }}">{{ .Title }}</a> <span>{{ len .Pages }}</span></li>{{ end }}
+  </ul>
+</div>
+{{ end }}

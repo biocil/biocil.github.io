@@ -1,0 +1,17 @@
+{{ define "main" }}
+{{ $lab := site.Params.lab }}
+{{ partial "page-head.html" . }}
+<div class="wrap page-body">
+  <div class="contact-grid">
+    <div>
+      <h2 class="h4">{{ T "email" }}</h2>
+      <p class="big"><a href="mailto:{{ $lab.email }}">{{ $lab.email }}</a></p>
+      {{ with $lab.phone }}<h2 class="h4">{{ T "phone" }}</h2><p>{{ . }}</p>{{ end }}
+      <h2 class="h4">{{ T "address" }}</h2>
+      <address>{{ range $lab.address }}{{ . }}<br>{{ end }}</address>
+      {{ with $lab.map }}<p><a class="btn btn-line" href="https://www.openstreetmap.org/?mlat={{ .lat }}&amp;mlon={{ .lon }}#map=17/{{ .lat }}/{{ .lon }}">{{ T "open_map" }}</a></p>{{ end }}
+    </div>
+    <div class="prose">{{ .Content }}</div>
+  </div>
+</div>
+{{ end }}

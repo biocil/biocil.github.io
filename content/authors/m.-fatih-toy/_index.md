@@ -10,16 +10,14 @@ last_name: Toy
 superuser: true
 
 # Role/position
-role: Associate Professor of Electrical and Electronics Engineering
-
+role: Associate Professor and Head of Biomedical Engineering
 # Organizations/Affiliations
 organizations:
   - name: Istanbul Medipol University
     url: 'https://www.medipol.edu.tr/en/'
 
 # Short bio (displayed in user profile at end of posts)
-bio: My research interests include digital holography, quantitative phase imaging, optical diffraction tomography and optical superresolution.
-
+bio: Leads the lab. Digital holography, quantitative phase imaging, holotomography and computational microscopy.
 interests:
   - Digital Holography
   - Quantitative Phase Imaging
@@ -71,7 +69,8 @@ highlight_name: false
 user_groups:
   - Principal Investigator
 ---
+M. Fatih Toy is an associate professor at Istanbul Medipol University, where he heads the Department of Biomedical Engineering and leads the Phi-X lab, which he founded in 2015.
 
-M. Fatih Toy is an Associate Professor of Electrical and Electronics Engineering at Istanbul Medipol University. His research interests include digital holography, quantitative phase imaging, and optical superresolution. He leads the Phi-X group, which develops novel label free microscopy techniques.
+He received his PhD in photonics from EPFL in 2013, working on digital holographic microscopy in Christian Depeursinge’s group, including systems for imaging living cells under simulated microgravity and on parabolic flights. In 2013 he co-founded Nanolive SA, whose 3D Cell Explorer brought holotomography to life-science labs.
 
-
+His awards include the Turkish Academy of Sciences Outstanding Young Scientist Award (TÜBA GEBİP, 2021) and JCI’s Ten Outstanding Young Persons of Turkey (2017).

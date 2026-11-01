@@ -1,0 +1,14 @@
+{{- $p := . -}}
+{{- $type := index ($p.Params.publication_types | default (slice "other")) 0 -}}
+{{- $label := T (printf "type_%s" $type) | default (T "type_other") -}}
+<li class="pub-row" data-type="{{ $type }}" data-text="{{ lower (printf "%s %s %s" $p.Title (delimit ($p.Params.authors | default slice) " ") ($p.Params.publication | default "" | plainify)) }}">
+  <a class="pub-thumb" href="{{ $p.RelPermalink }}" tabindex="-1" aria-hidden="true">
+    {{- with partial "featured.html" $p }}{{ partial "img.html" (dict "img" . "w" 360 "alt" "") }}{{ end -}}
+  </a>
+  <div>
+    <h3><a href="{{ $p.RelPermalink }}">{{ $p.Title }}</a></h3>
+    <p class="auth">{{ partial "authors.html" $p }}</p>
+    <p class="venue">{{ with $p.Params.publication }}{{ . | markdownify }}{{ end }}{{ if $p.Date }}, {{ $p.Date.Format "2006" }}{{ end }}<span class="type">{{ $label }}</span>{{ with $p.Params.cover }}<span class="type cover">{{ T "cover_article" }}</span>{{ end }}</p>
+    {{ partial "pub-links.html" $p }}
+  </div>
+</li>

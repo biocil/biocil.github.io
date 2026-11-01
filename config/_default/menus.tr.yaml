@@ -1,0 +1,25 @@
+# Turkish navigation. Lower weight = further left.
+main:
+  - name: Araştırma
+    url: /research/
+    weight: 10
+  - name: Yayınlar
+    url: /publication/
+    weight: 20
+  - name: Ekip
+    url: /people/
+    weight: 30
+  - name: Haberler
+    url: /post/
+    weight: 40
+  - name: Destekler
+    url: /funding/
+    weight: 50
+  - name: İletişim
+    url: /contact/
+    weight: 60
+  - name: Katılın
+    url: /join/
+    weight: 70
+    params:
+      highlight: true

@@ -1,0 +1,24 @@
+{{- /* In-line (Gabor) holography: reconstruction, the twin image and its iterative removal. */ -}}
+{{- $tr := eq site.Language.Lang "tr" -}}
+<div class="demo inline-ui" id="inline">
+  <ol class="steps two">
+    <li>
+      <div class="step-h"><span class="step-n">1</span><h3>{{ if $tr }}Eksen içi hologram kaydet{{ else }}Record an in-line hologram{{ end }}</h3></div>
+      <div class="screen"><canvas id="il-holo" width="256" height="256" role="img" aria-label="{{ if $tr }}Laboratuvarın anka logosu ve dört boncuğun benzetim eksen içi hologramı{{ else }}Simulated in-line hologram of the lab’s phoenix logo and four beads{{ end }}"></canvas></div>
+      <p class="note">{{ if $tr }}Ayrı bir referans ışını yok: nesnenin yanından geçen ışık, nesnenin saçtığı ışıkla girişim yapar ve kamera kırınım halkaları görür.{{ else }}No separate reference beam: light that passes beside the object interferes with the light it scatters, so the camera sees diffraction rings.{{ end }}</p>
+    </li>
+    <li>
+      <div class="step-h"><span class="step-n">2</span><h3>{{ if $tr }}Nesneye geri yay{{ else }}Propagate back to the object{{ end }}</h3>
+        <span class="seg" role="group" aria-label="{{ if $tr }}Göster{{ else }}Show{{ end }}"><button type="button" data-ilview="amp" aria-pressed="true">{{ if $tr }}Genlik{{ else }}Amplitude{{ end }}</button><button type="button" data-ilview="phase" aria-pressed="false">{{ if $tr }}Faz{{ else }}Phase{{ end }}</button></span></div>
+      <div class="screen"><canvas id="il-rec" width="256" height="256" role="img" aria-label="{{ if $tr }}Geri yayılmış alan{{ else }}Back-propagated field{{ end }}"></canvas></div>
+      <p class="note">{{ if $tr }}Kamera yalnızca şiddeti kaydettiği için rekonstrüksiyon ikiz görüntüyü de içerir: iki kat mesafe kadar odak dışı olan eşlenik dalga.{{ else }}The camera records intensity only, so the reconstruction also contains the twin image: the conjugate wave, out of focus by twice the distance.{{ end }}</p>
+    </li>
+  </ol>
+  <div class="controls">
+    <div class="ctl"><label for="il-z">{{ if $tr }}Nesne–kamera mesafesi{{ else }}Object to camera{{ end }} <output id="il-zOut" for="il-z">600 µm</output></label><input id="il-z" type="range" min="200" max="1200" step="20" value="600"></div>
+    <div class="ctl"><label for="il-s">{{ if $tr }}Rekonstrüksiyon mesafesi{{ else }}Reconstruction distance{{ end }} <output id="il-sOut" for="il-s">600 µm</output></label><input id="il-s" type="range" min="-1200" max="1200" step="10" value="600"></div>
+    <div class="btn-row"><button class="btn btn-ghost" type="button" id="il-focus">{{ if $tr }}Nesneye odakla{{ else }}Focus on the object{{ end }}</button><button class="btn btn-ghost" type="button" id="il-twin">{{ if $tr }}İkize odakla{{ else }}Focus on the twin{{ end }}</button></div>
+    <div class="btn-row"><button class="btn btn-primary" type="button" id="il-remove">{{ if $tr }}İkiz görüntüyü kaldır{{ else }}Remove the twin image{{ end }}</button><button class="btn btn-ghost" type="button" id="il-reset">{{ if $tr }}Sıfırla{{ else }}Reset{{ end }}</button></div>
+  </div>
+  <p class="status" id="il-status" aria-live="polite">{{ if $tr }}Benzetim yükleniyor…{{ else }}Loading the simulation…{{ end }}</p>
+</div>

@@ -1,24 +1,17 @@
 ---
-title: TUBITAK 2209-A Research Project Support Program for Undergraduate Students
+title: "Projection vein finder"
+scheme: "TÜBİTAK 2209-A Undergraduate Research Projects"
 date: 2021-05-15
-#external_link: https://github.com/pandas-dev/pandas
-tags:
-  - TUBITAK
-  - Projection 
-
+team:
+  - Asligul Aksan
+  - Mustafa Ekrem Erakin
+  - Ismail Erdem Bayar
 authors:
-- M. Fatih Toy
-- Asligul Aksan
-- Mustafa Ekrem Erakin
-- Ismail Erdem Bayar
-
+  - M. Fatih Toy
+  - Asligul Aksan
+  - Mustafa Ekrem Erakin
+  - Ismail Erdem Bayar
+tags:
+  - Projection
 ---
 
-**Project Title:** Projection Vein Finder
-
-**Team:** 
-- Asligul Aksan
-- Mustafa Ekrem Erakin
-- Ismail Erdem Bayar
-
-**Year:** 2021

@@ -1,0 +1,15 @@
+{{- /* Responsive image. Params: img (resource), w (largest width), alt, class, sizes, eager, fill ("WxH") */ -}}
+{{- $img := .img -}}
+{{- $w := .w | default 1000 -}}
+{{- if $img -}}
+{{- $big := "" -}}{{- $small := "" -}}
+{{- if .fill -}}
+  {{- $big = $img.Process (printf "fill %s Smart webp q80" .fill) -}}
+{{- else -}}
+  {{- $bw := cond (lt $img.Width $w) $img.Width $w -}}
+  {{- $big = $img.Process (printf "resize %dx webp q80" $bw) -}}
+  {{- $sw := div $bw 2 -}}
+  {{- if gt $sw 240 }}{{ $small = $img.Process (printf "resize %dx webp q78" $sw) }}{{ end -}}
+{{- end -}}
+<img src="{{ $big.RelPermalink }}"{{ with $small }} srcset="{{ .RelPermalink }} {{ .Width }}w, {{ $big.RelPermalink }} {{ $big.Width }}w" sizes="{{ $.sizes | default "(max-width: 860px) 100vw, 50vw" }}"{{ end }} width="{{ $big.Width }}" height="{{ $big.Height }}" alt="{{ .alt }}"{{ with .class }} class="{{ . }}"{{ end }}{{ if not .eager }} loading="lazy" decoding="async"{{ end }}>
+{{- end -}}

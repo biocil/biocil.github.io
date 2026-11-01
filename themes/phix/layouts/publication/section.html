@@ -1,0 +1,24 @@
+{{ define "main" }}
+{{ partial "page-head.html" . }}
+<div class="wrap page-body">
+  {{ $pubs := .Pages.ByDate.Reverse }}
+  {{ $counts := dict }}
+  {{ range $pubs }}{{ $t := index (.Params.publication_types | default (slice "other")) 0 }}{{ $counts = merge $counts (dict $t (add (index $counts $t | default 0) 1)) }}{{ end }}
+  <div class="pub-tools">
+    <div class="specimens" role="group" aria-label="Show">
+      <button class="chip" type="button" data-filter="all" aria-pressed="true">{{ T "all" }} <span>{{ len $pubs }}</span></button>
+      {{ range $k, $label := dict "article-journal" (T "journal_articles") "paper-conference" (T "conference_papers") "patent" (T "patents") }}
+      {{ with index $counts $k }}<button class="chip" type="button" data-filter="{{ $k }}" aria-pressed="false">{{ $label }} <span>{{ . }}</span></button>{{ end }}
+      {{ end }}
+    </div>
+    <div class="search"><label for="pubq" class="sr-only">{{ T "search_publications" }}</label><input id="pubq" type="search" placeholder="{{ T "search_placeholder" }}" data-one="{{ T "result" }}" data-many="{{ T "results" }}"></div>
+  </div>
+  <p class="muted small" id="pubcount" aria-live="polite"></p>
+  {{ range $pubs.GroupByDate "2006" }}
+  <section class="year-group">
+    <h2 class="year">{{ .Key }}</h2>
+    <ol class="pub-list">{{ range .Pages }}{{ partial "pub-item.html" . }}{{ end }}</ol>
+  </section>
+  {{ end }}
+</div>
+{{ end }}

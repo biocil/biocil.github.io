@@ -1,0 +1,55 @@
+{{- /* Holotomography in WebGL (3D). Shown when the browser supports WebGL; otherwise the 2D version below is used. */ -}}
+{{- $tr := eq site.Language.Lang "tr" -}}
+<div class="demo tomo3d-ui" id="t3" hidden>
+  <ol class="steps">
+    <li>
+      <div class="step-h"><span class="step-n">1</span><h3>{{ if $tr }}Aydınlatmayı tara{{ else }}Scan the illumination{{ end }}</h3></div>
+      <div class="screen gl"><canvas id="t3-scan" tabindex="0" aria-label="{{ if $tr }}Eğik bir düzlem dalgayla aydınlatılan hücrenin 3B görünümü. Döndürmek için sürükleyin, yakınlaştırmak için kaydırın.{{ else }}3D view of a cell lit by a tilted plane wave. Drag to rotate, scroll to zoom.{{ end }}"></canvas><div class="gl-labels" id="t3-scan-labels"></div></div>
+      <p class="note">{{ if $tr }}Düzlem dalga dik gelişten başlayarak iki halka boyunca ilerler (aşağıdaki noktalar). Dalga cepheleri hücrenin ışığı yavaşlattığı yerlerde geride kalır. Döndürmek için sürükleyin, yakınlaştırmak için kaydırın.{{ else }}The plane wave steps through normal incidence and two rings of directions (dots below). Its wavefronts lag behind where the cell slows the light. Drag to rotate, scroll to zoom.{{ end }}</p>
+    </li>
+    <li>
+      <div class="step-h"><span class="step-n">2</span><h3>{{ if $tr }}Fourier uzayını doldur{{ else }}Fill Fourier space{{ end }}</h3></div>
+      <div class="screen gl"><canvas id="t3-k" tabindex="0" aria-label="{{ if $tr }}Ewald küresi kapaklarıyla dolan 3B Fourier uzayı. Döndürmek için sürükleyin.{{ else }}3D Fourier space filled by caps of the Ewald sphere. Drag to rotate.{{ end }}"></canvas><div class="gl-labels" id="t3-k-labels"></div></div>
+      <p class="note">{{ if $tr }}Her hologram, −k<sub>in</sub> kadar kaydırılmış Ewald küresinden bir kapak verir (beyaz). Üst üste binen kapaklar daha parlak görünür.{{ else }}Each hologram gives one cap of the Ewald sphere (white), shifted by −k<sub>in</sub>. Overlapping caps glow brighter.{{ end }}</p>
+    </li>
+    <li>
+      <div class="step-h"><span class="step-n">3</span><h3>{{ if $tr }}Rekonstrükte et{{ else }}Reconstruct{{ end }}</h3>
+        <span class="seg" role="group" aria-label="{{ if $tr }}Göster{{ else }}Show{{ end }}"><button type="button" data-t3view="surfaces" aria-pressed="true">{{ if $tr }}Yüzeyler{{ else }}Surfaces{{ end }}</button><button type="button" data-t3view="sections" aria-pressed="false">{{ if $tr }}Kesitler{{ else }}Sections{{ end }}</button></span></div>
+      <div class="screen gl"><canvas id="t3-rec" tabindex="0" aria-label="{{ if $tr }}Kırılma indisinin 3B rekonstrüksiyonu. Döndürmek için sürükleyin.{{ else }}3D reconstruction of the refractive index. Drag to rotate.{{ end }}"></canvas><div class="gl-labels" id="t3-rec-labels"></div></div>
+      <p class="note">{{ if $tr }}Doldurulan hacmin 3B ters Fourier dönüşümü. Yüzeyler: hücre sınırı, yoğun damlacıklar ve çekirdek. Kesitler: x–z ve x–y dilimleri.{{ else }}A 3D inverse Fourier transform of the filled volume. Surfaces: cell outline and the dense droplets and nucleus. Sections: x–z and x–y slices.{{ end }}</p>
+    </li>
+  </ol>
+  <div class="controls">
+    <div class="btn-row"><button class="btn btn-primary" type="button" id="t3-play">{{ if $tr }}Aydınlatmayı tara{{ else }}Scan the illumination{{ end }}</button><button class="btn btn-ghost" type="button" id="t3-reset">{{ if $tr }}Sıfırla{{ else }}Reset{{ end }}</button></div>
+    <div class="ctl"><label for="t3-range">{{ if $tr }}En büyük aydınlatma açısı{{ else }}Maximum illumination angle{{ end }} <output id="t3-rangeOut" for="t3-range">70°</output></label><input id="t3-range" type="range" min="0" max="77" step="1" value="70"></div>
+    <div class="checks"><label class="check"><input type="checkbox" id="t3-single"> {{ if $tr }}Yalnızca geçerli açı{{ else }}Current angle only{{ end }}</label><label class="check"><input type="checkbox" id="t3-link" checked> {{ if $tr }}Görünümleri birlikte döndür{{ else }}Rotate the views together{{ end }}</label></div>
+  </div>
+  <p class="status" id="t3-status" aria-live="polite">{{ if $tr }}3B görünüm yükleniyor…{{ else }}Loading the 3D view…{{ end }}</p>
+</div>
+{{- /* Holotomography in 3D: illumination scan, Fourier-space synthesis from Ewald caps, reconstructed sections. */ -}}
+<div class="demo tomo-ui" id="tomo">
+  {{- /* 2D canvas version, used when WebGL is not available. */ -}}
+  <ol class="steps">
+    <li>
+      <div class="step-h"><span class="step-n">1</span><h3>{{ if $tr }}Aydınlatmayı tara{{ else }}Scan the illumination{{ end }}</h3></div>
+      <div class="screen"><canvas id="tomo-scan" width="512" height="512" tabindex="0" role="img" aria-label="{{ if $tr }}Eğik düzlem dalgayla benzetim bir hücrenin 3B görünümü; noktalar şimdiye kadarki aydınlatma yönlerini gösterir. Döndürmek için sürükleyin ya da ok tuşlarını kullanın.{{ else }}3D view of a simulated cell with a tilted plane wave; dots show the illumination directions used so far. Drag or use the arrow keys to rotate.{{ end }}"></canvas></div>
+      <p class="note">{{ if $tr }}Çekirdeği ve lipit damlacıkları olan benzetim bir hücre. Düzlem dalga dik gelişten başlayarak iki halka boyunca ilerler (aşağıdaki noktalar). Döndürmek için sürükleyin.{{ else }}A simulated cell with a nucleus and lipid droplets. The plane wave steps through normal incidence and two rings of directions (dots below). Drag to rotate.{{ end }}</p>
+    </li>
+    <li>
+      <div class="step-h"><span class="step-n">2</span><h3>{{ if $tr }}Fourier uzayını doldur{{ else }}Fill Fourier space{{ end }}</h3></div>
+      <div class="screen"><canvas id="tomo-k" width="512" height="512" tabindex="0" role="img" aria-label="{{ if $tr }}Ewald küresi kapaklarıyla dolan 3B Fourier uzayı. Döndürmek için sürükleyin ya da ok tuşlarını kullanın.{{ else }}3D Fourier space filled by Ewald sphere caps. Drag or use the arrow keys to rotate.{{ end }}"></canvas></div>
+      <p class="note">{{ if $tr }}Her hologram, −k<sub>in</sub> kadar kaydırılmış Ewald küresinden bir kapak verir; geçerli kapak beyazdır. Döndürmek için sürükleyin.{{ else }}Each hologram gives one cap of the Ewald sphere, shifted by −k<sub>in</sub>; the current cap is white. Drag to rotate.{{ end }}</p>
+    </li>
+    <li>
+      <div class="step-h"><span class="step-n">3</span><h3>{{ if $tr }}Rekonstrükte et{{ else }}Reconstruct{{ end }}</h3></div>
+      <div class="screen"><canvas id="tomo-rec" width="512" height="512" role="img" aria-label="{{ if $tr }}Gerçek ve rekonstrükte kırılma indisi kesitleri, x–z ve x–y{{ else }}True and reconstructed refractive index sections, x–z and x–y{{ end }}"></canvas></div>
+      <p class="note">{{ if $tr }}Doldurulan hacmin 3B ters Fourier dönüşümü kırılma indisini verir. Üstte gerçek hücre, altta rekonstrüksiyon. x–z kesitinde iki damlacığın ayrılmasını izleyin.{{ else }}A 3D inverse Fourier transform of the filled volume gives the refractive index. Top: the true cell; bottom: the reconstruction. Watch the two droplets separate in x–z.{{ end }}</p>
+    </li>
+  </ol>
+  <div class="controls">
+    <div class="btn-row"><button class="btn btn-primary" type="button" id="tomo-play">{{ if $tr }}Aydınlatmayı tara{{ else }}Scan the illumination{{ end }}</button><button class="btn btn-ghost" type="button" id="tomo-reset">{{ if $tr }}Sıfırla{{ else }}Reset{{ end }}</button></div>
+    <div class="ctl"><label for="tomo-range">{{ if $tr }}En büyük aydınlatma açısı{{ else }}Maximum illumination angle{{ end }} <output id="tomo-rangeOut" for="tomo-range">70°</output></label><input id="tomo-range" type="range" min="0" max="77" step="1" value="70"></div>
+    <label class="check"><input type="checkbox" id="tomo-single"> {{ if $tr }}Yalnızca geçerli açıyı göster{{ else }}Show the current angle only{{ end }}</label>
+  </div>
+  <p class="status" id="tomo-status" aria-live="polite">{{ if $tr }}Benzetim yükleniyor…{{ else }}Loading the simulation…{{ end }}</p>
+</div>

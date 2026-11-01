@@ -1,0 +1,16 @@
+{{ define "main" }}
+<header class="page-head">
+  <div class="wrap">
+    <p class="venue-line"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ time.Format "2 January 2006" .Date }}</time>{{ with .Params.kind }}, {{ T (printf "kind_%s" .) | default . }}{{ end }}</p>
+    <h1>{{ .Title }}</h1>
+  </div>
+</header>
+<div class="wrap page-body">
+  <div class="prose">
+    {{ with partial "featured.html" . }}<figure class="lead-fig"><div class="plate">{{ partial "img.html" (dict "img" . "w" 1200 "alt" ($.Params.image.caption | default "") "eager" true) }}</div>{{ with $.Params.image.caption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}</figure>{{ end }}
+    {{ .Content }}
+    {{ with .Params.external_link }}<p><a class="btn btn-line" href="{{ . }}">{{ T "read_original" }}</a></p>{{ end }}
+  </div>
+  <p class="back"><a href="{{ "/post/" | relLangURL }}">{{ T "all_news" }}</a></p>
+</div>
+{{ end }}

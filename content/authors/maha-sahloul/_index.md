@@ -10,8 +10,7 @@ last_name: Sahloul
 superuser: false
 
 # Role/position
-role: Graduate Research Assistant
-
+role: MSc student
 # Organizations/Affiliations
 organizations:
   - name: Istanbul Medipol University

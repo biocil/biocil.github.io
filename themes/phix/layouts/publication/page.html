@@ -1,0 +1,24 @@
+{{ define "main" }}
+{{ $type := index (.Params.publication_types | default (slice "other")) 0 }}
+<header class="page-head">
+  <div class="wrap">
+    <p class="venue-line">{{ with .Params.publication }}{{ . | markdownify }}{{ end }}{{ if .Date }}, {{ .Date.Format "2006" }}{{ end }}</p>
+    <h1>{{ .Title }}</h1>
+    <p class="auth big">{{ partial "authors.html" . }}</p>
+    {{ with .Params.cover }}<p class="cover-note">{{ with $.Params.cover_url }}<a href="{{ . }}">{{ end }}{{ . }}{{ if $.Params.cover_url }}</a>{{ end }}{{ with $.Params.feature_page }}{{ with site.GetPage . }}. <a href="{{ .RelPermalink }}">{{ T "read_the_story" }}</a>{{ end }}{{ end }}</p>{{ end }}
+    {{ partial "pub-links.html" . }}
+  </div>
+</header>
+<div class="wrap page-body">
+  <div class="pub-page">
+    <div class="prose">
+      {{ with .Params.abstract }}<h2>{{ T "abstract" }}</h2><p>{{ . | markdownify }}</p>{{ end }}
+      {{ .Content }}
+    </div>
+    {{ with partial "featured.html" . }}
+    <figure class="lead-fig"><div class="plate">{{ partial "img.html" (dict "img" . "w" 1200 "alt" "Figure from the publication" "eager" true "sizes" "(max-width: 860px) 100vw, 45vw") }}</div>{{ with $.Params.image.caption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}</figure>
+    {{ end }}
+  </div>
+  <p class="back"><a href="{{ "/publication/" | relLangURL }}">{{ T "all_publications" }}</a></p>
+</div>
+{{ end }}

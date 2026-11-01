@@ -1,0 +1,4 @@
+# The phix theme needs Hugo extended 0.146.0 or newer (it uses the newer template layout).
+[module.hugoVersion]
+  extended = true
+  min = "0.146.0"

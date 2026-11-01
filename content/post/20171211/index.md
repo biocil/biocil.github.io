@@ -1,5 +1,6 @@
 ---
 title: Dr. Toy, “Türkiye’nin 10 Başarılı Genç İnsanı” arasında gösterildi (Turkish Content)
+kind: Press
 date: 2017-12-11
 external_link: https://www.hurriyet.com.tr/yerel-haberler/istanbul/dr-toy-turkiyenin-10-basarili-genc-insani-40674617
 ---

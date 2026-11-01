@@ -1,165 +1,36 @@
 ---
-# Leave the homepage title empty to use the site title
-title: 
-date: 2022-10-24
-type: landing
+# Home page. The hero, research, publications, news and people sections are filled in
+# automatically from the rest of the site; edit the texts below to change the wording.
+title: Phi-X
+aliases: [/tour/]
 
-sections:
-  - block: markdown
-    content:
-      title:
-      subtitle: ''
-      text:
-    design:
-      columns: '1'
-      background:
-        image: 
-          filename: lab_name_with_logo.svg 
-          filters:
-            brightness: 1
-          parallax: false
-          position: center
-          size: contain
-          text_color_light: true
-      spacing:
-        padding: ['100px', '50px', '100px', '50px']
-      #css_class: fullscreen
+hero:
+  title: We image living cells by how much they slow down light.
+  lede: >-
+    Our microscopes measure the optical phase delay at every pixel. Transparent,
+    unstained cells and tissue become quantitative maps of thickness, refractive
+    index and birefringence, in 2D, in 3D and over time.
+  buttons:
+    - text: See our research
+      url: /research/
+    - text: Try holography
+      url: '#try'
 
-  - block: hero
-    content:
-      #title: |
-      #  Biophotonics and Computational Imaging Laboratory
-      #video:
-      #  src: video.mp4
-      image:
-       filename: welcome.jpg
-      text: |
-        <br>
-        
-         We are a multidisciplinary research group at [**Istanbul Medipol University**](https://www.medipol.edu.tr/en/)
+# Highlight shown right below the hero. Remove this block to hide it.
+feature:
+  label: On the cover
+  page: /post/20260815
+  links:
+    - text: Read the story
+      url: /post/20260815/
+    - text: Watch the video
+      url: /projects/target-highlighting/
 
-        Our laboratory develops novel techniques in the fields of **Quantitative Phase Imaging (QPI)**, **Digital Holographic Microscopy**, and **Holo-Tomography** to explore the unseen microscopic world.
-
-  - block: slider
-    content:
-      slides:
-      - title: 👋 Welcome to the group
-        content: Take a look at what we're working on...
-        align: center
-        background:
-          image:
-            filename: lab3.jpg
-            filters:
-              brightness: 0.5
-          position: center
-          color: '#666'
-      - title: Lunch & Learn ☕️
-        content: 'Share your knowledge with the group and explore exciting new topics together!'
-        align: left
-        background:
-          image:
-            filename: res.jpg
-            filters:
-              brightness: 0.7
-          position: center
-          color: '#555'
-      - title: World-Class Semiconductor Lab
-        content: 'Just opened last month!'
-        align: right
-        background:
-          image:
-            filename: welcome.jpg
-            filters:
-              brightness: 0.7
-          position: center
-          color: '#333'
-        link:
-          icon: graduation-cap
-          icon_pack: fas
-          text: Join Us
-          url: ../contact/
-    design:
-      # Slide height is automatic unless you force a specific height (e.g. '400px')
-      slide_height: '400px'
-      is_fullscreen: false
-      # Automatically transition through slides?
-      loop: true
-      # Duration of transition between slides (in ms)
-      interval: 5000
-
-  - block: collection
-    content:
-      title: Latest News
-      subtitle:
-      text:
-      count: 5
-      filters:
-        author: ''
-        category: ''
-        exclude_featured: false
-        publication_type: ''
-        tag: ''
-      offset: 0
-      order: desc
-      page_type: post
-    design:
-      view: card
-      columns: '1'
-  
-
-
-#  - block: collection
-#    content:
-#      title: Latest Preprints
-#      text: ""
-#      count: 5
-#      filters:
-#        folders:
-#          - publication
-#        publication_type: 'article'
-#    design:
-#      view: citation
-#      columns: '1'
-
-  - block: collection
-    content:
-      title: Latest Publications
-      text: ""
-      count: 5
-      filters:
-        folders:
-          - publication
-        publication_type: ''
-    design:
-      view: citation
-      columns: '1'
-
-  - block: markdown
-    content:
-      title:
-      subtitle:
-      text: |
-        {{% cta cta_link="./people/" cta_text="Meet the team →" %}}
-    design:
-      columns: '1'
-
-  - block: markdown
-    content:
-      title:
-      subtitle: ''
-      text:
-    design:
-      columns: '1'
-      background:
-        image: 
-          filename: lab3.jpg
-          filters:
-            brightness: 1
-          parallax: false
-          position: center
-          size: contain
-          text_color_light: true
-      spacing:
-        padding: ['200px', '0', '200px', '0']
-      #css_class: fullscreen
+bench:
+  title: Holography in your browser
+  text: >-
+    Five simulations, in the order we teach them: why the complex field beats an
+    intensity image, how holographic microscopes are built, off-axis holography with
+    numerical refocusing and aberration compensation, in-line holography and its twin
+    image, and holotomography from an illumination scan.
 ---

@@ -479,8 +479,6 @@ Maha Sahloul<sup>1,2</sup>, Kaan Akşit<sup>3</sup>, and M. Fatih Toy<sup>1,2</s
 📄 <a href="https://opg.optica.org/optcon/fulltext.cfm?uri=optcon-5-8-2708" target="_blank" rel="noopener">Manuscript</a>
 &nbsp;&nbsp;&nbsp;
 📑 <a href="https://opticapublishing.figshare.com/articles/journal_contribution/Supplementary_document_for_All-Optical_Selective_Target_Highlighting_for_Augmented_Reality_Microscopy_-_7967150_pdf/32886380?file=67315379" target="_blank" rel="noopener">Supplementary Material</a>
-&nbsp;&nbsp;&nbsp;
-🖼️ <a href="YOUR_POSTER_LINK" target="_blank" rel="noopener">Poster</a>
 </p>
 
 <!--  VIDEO -->

@@ -1,0 +1,10 @@
+{{- $ext := .Params.external_link -}}
+{{- $kind := .Params.kind | default (cond (ne $ext nil) "Press" "News") -}}{{- $kl := T (printf "kind_%s" $kind) | default $kind -}}
+<li>
+  <time datetime="{{ .Date.Format "2006-01-02" }}">{{ time.Format "Jan 2006" .Date }}</time>
+  <div>
+    <p class="kind">{{ $kl }}</p>
+    <h3><a href="{{ with $ext }}{{ . }}{{ else }}{{ $.RelPermalink }}{{ end }}">{{ .Title }}</a>{{ with $ext }} <span class="ext" aria-label="{{ T "external_site" }}">↗</span>{{ end }}</h3>
+    {{ with .Params.summary | default .Summary }}<p>{{ . | plainify | truncate 220 }}</p>{{ end }}
+  </div>
+</li>

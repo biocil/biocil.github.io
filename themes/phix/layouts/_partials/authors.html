@@ -1,0 +1,9 @@
+{{- /* Comma-separated author list. Authors with a profile are linked; lab members are marked. */ -}}
+{{- $terms := .GetTerms "authors" -}}
+{{- range $i, $t := $terms -}}
+{{- if $i }}, {{ end -}}
+{{- if $t.File -}}
+{{- $member := false -}}{{- with $t.Params.user_groups -}}{{- if not (and (eq (len .) 1) (in . "External Collaborators")) -}}{{- $member = true -}}{{- end -}}{{- end -}}
+<a href="{{ $t.RelPermalink }}"{{ if $member }} class="member"{{ end }}>{{ $t.LinkTitle }}</a>
+{{- else -}}{{ $t.LinkTitle }}{{- end -}}
+{{- end -}}

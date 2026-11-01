@@ -1,0 +1,7 @@
+{{ define "main" }}
+{{ partial "page-head.html" . }}
+<div class="wrap page-body">
+  {{ with partial "featured.html" . }}{{ if not $.Params.hide_featured }}<figure class="lead-fig"><div class="plate">{{ partial "img.html" (dict "img" . "w" 1400 "alt" ($.Params.image.caption | default "") "eager" true) }}</div>{{ with $.Params.image.caption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}</figure>{{ end }}{{ end }}
+  <div class="prose">{{ .Content }}</div>
+</div>
+{{ end }}

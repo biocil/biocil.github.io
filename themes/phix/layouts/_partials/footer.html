@@ -1,0 +1,18 @@
+{{ $lab := site.Params.lab }}
+<footer class="site-footer">
+  <div class="wrap">
+    <div>
+      <h2>{{ $lab.short }} {{ T "lab_name" }}</h2>
+      <address>{{ range $lab.address }}{{ . }}<br>{{ end }}<a href="mailto:{{ $lab.email }}">{{ $lab.email }}</a></address>
+    </div>
+    <div>
+      <h2>{{ T "elsewhere" }}</h2>
+      <ul>{{ range site.Params.links }}<li><a href="{{ .url }}">{{ .name }}</a></li>{{ end }}</ul>
+    </div>
+    <div>
+      <h2>{{ T "part_of" }}</h2>
+      <ul>{{ range site.Params.part_of }}<li>{{ with .url }}<a href="{{ . }}">{{ end }}{{ .name }}{{ if .url }}</a>{{ end }}</li>{{ end }}</ul>
+    </div>
+    <p class="fine">{{ replace (T "copyright") "{year}" (now.Format "2006") }}</p>
+  </div>
+</footer>

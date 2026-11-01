@@ -1,5 +1,6 @@
 ---
 title: The World of 3D Cells Is Now Open for EPFL Students to Explore (English Content)
+kind: Press
 date: 2019-06-18
 external_link: https://actu.epfl.ch/news/the-world-of-3d-cells-is-now-open-for-epfl-stude-5/
 ---

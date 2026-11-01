@@ -1,12 +1,6 @@
 ---
 title: Publications
-
-# Listing view
-view: card
-#view: citation
-
-# Optional banner image (relative to `assets/media/` folder).
-banner:
-  caption: ''
-  image: ''
+lede: >-
+  Journal articles, conference papers and patents from the lab, together with
+  Fatih Toy’s earlier work at EPFL and Koç University. Lab members are underlined.
 ---

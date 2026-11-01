@@ -1,0 +1,9 @@
+{{- /* Returns the featured image resource of a page (or ""), looking first in the
+       page bundle and then in the page named by `figure_from` (optionally a specific
+       file in that page, named by `figure_file`). */ -}}
+{{- $img := "" -}}
+{{- $p := . -}}
+{{- with .Params.figure_from -}}{{- with site.GetPage . -}}{{- $p = . -}}{{- end -}}{{- end -}}
+{{- with .Resources.GetMatch "featured.*" -}}{{- $img = . -}}{{- else -}}{{- with $p.Resources.GetMatch ($.Params.figure_file | default "featured.*") -}}{{- $img = . -}}{{- end -}}{{- end -}}
+{{- if $img -}}{{- if or (ne $img.MediaType.MainType "image") (eq $img.MediaType.SubType "svg") -}}{{- $img = "" -}}{{- end -}}{{- end -}}
+{{- return $img -}}

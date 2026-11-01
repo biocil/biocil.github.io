@@ -1,0 +1,25 @@
+# Main navigation. Lower weight = further left.
+main:
+  - name: Research
+    url: /research/
+    weight: 10
+  - name: Publications
+    url: /publication/
+    weight: 20
+  - name: People
+    url: /people/
+    weight: 30
+  - name: News
+    url: /post/
+    weight: 40
+  - name: Funding
+    url: /funding/
+    weight: 50
+  - name: Contact
+    url: /contact/
+    weight: 60
+  - name: Join us
+    url: /join/
+    weight: 70
+    params:
+      highlight: true

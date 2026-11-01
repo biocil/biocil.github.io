@@ -1,0 +1,16 @@
+{{ define "main" }}
+<header class="page-head">
+  <div class="wrap">
+    <p class="venue-line">{{ .Params.scheme }}, {{ .Date.Format "2006" }}</p>
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.team }}<p class="lede">{{ T "team" }}: {{ delimit . ", " }}</p>{{ end }}
+  </div>
+</header>
+<div class="wrap page-body">
+  <div class="theme-page">
+    <div class="prose">{{ .Content }}</div>
+    {{ with partial "featured.html" . }}<aside><figure class="lead-fig"><div class="plate">{{ partial "img.html" (dict "img" . "w" 1000 "alt" "" "eager" true) }}</div></figure></aside>{{ end }}
+  </div>
+  <p class="back"><a href="{{ "/research/" | relLangURL }}#sp-title">{{ T "all_student_projects" }}</a></p>
+</div>
+{{ end }}

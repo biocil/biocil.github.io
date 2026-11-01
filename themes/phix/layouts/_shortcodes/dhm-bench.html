@@ -1,0 +1,3 @@
+{{- /* Usage in Markdown: {{< dhm-bench >}} — embeds the interactive hologram reconstruction. */ -}}
+{{- .Page.Store.Set "holo" true -}}
+<div class="bench-embed">{{ partial "dhm-bench.html" . }}</div>

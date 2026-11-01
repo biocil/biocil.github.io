@@ -1,0 +1,16 @@
+{{- /* Links for one publication: DOI, PDF, other url_* fields, extra links, and BibTeX citation. */ -}}
+{{- $p := . -}}
+{{- $doi := $p.Params.doi | default "" | strings.TrimSpace | strings.TrimSuffix "\"" -}}
+<div class="links">
+  {{- with $doi }}<a href="https://doi.org/{{ . }}">DOI</a>{{ end }}
+  {{- range $k, $label := dict "url_pdf" (T "link_pdf") "url_code" (T "link_code") "url_dataset" (T "link_data") "url_poster" (T "link_poster") "url_project" (T "link_project") "url_slides" (T "link_slides") "url_source" (T "link_source") "url_video" (T "link_video") }}
+    {{- with index $p.Params $k }}{{ $u := . }}
+      {{- if strings.HasPrefix $u "http" }}<a href="{{ $u }}">{{ $label }}</a>
+      {{- else }}{{ with $p.Resources.GetMatch (path.Base $u) }}<a href="{{ .RelPermalink }}">{{ $label }}</a>{{ end }}{{ end }}
+    {{- end }}
+  {{- end }}
+  {{- range $p.Params.links }}{{ if .url }}<a href="{{ .url }}">{{ .name | default (T "link_link") }}</a>{{ end }}{{ end }}
+  {{- with $p.Resources.GetMatch "cite.bib" }}
+  <details class="cite"><summary>{{ T "cite" }}</summary><div class="cite-box"><pre>{{ .Content | strings.TrimSpace }}</pre><button type="button" class="copy" data-done="{{ T "copied" }}">{{ T "copy_bibtex" }}</button></div></details>
+  {{- end }}
+</div>

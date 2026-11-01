@@ -1,28 +1,27 @@
 ---
 title: People
-date: 2022-10-24
+lede: >-
+  A small group of engineers and physicists who build optical setups and write the
+  code that turns their raw data into measurements.
 
-type: landing
-
-sections:
-  - block: people
-    content:
-      title: Meet the Team
-      # Choose which groups/teams of users to display.
-      #   Edit `user_groups` in each user's profile to add them to one or more of these groups.
-      user_groups:
-          - Principal Investigator
-          - Researchers
-          - Graduate Research Assistants
-          - Undergraduate Research Assistants
-          - Administration
-          - Visitors
-          - Alumni
-          - External Collaborators
-      sort_by: Params.last_name
-      sort_ascending: true
-    design:
-      show_interests: false
-      show_role: true
-      show_social: true
+# Each person has a profile in content/authors/<name>/_index.md.
+# Their `user_groups` decide which of the groups below they appear in.
+# Groups marked `compact` are shown as a list instead of photo cards.
+groups:
+  - key: Principal Investigator
+    title: Principal investigator
+  - key: Researchers
+    title: Researchers
+  - key: Graduate Research Assistants
+    title: Graduate students
+  - key: Undergraduate Research Assistants
+    title: Undergraduate researchers
+  - key: Visitors
+    title: Visitors
+  - key: Alumni
+    title: Alumni
+    compact: true
+  - key: External Collaborators
+    title: Collaborators
+    compact: true
 ---

@@ -7,7 +7,7 @@ authors:
 author_notes:
 
 date: "2007-12-01T00:00:00Z"
-doi: 10.1109/LPT.2007.908450"
+doi: "10.1109/LPT.2007.908450"
 
 # Schedule page publish date (NOT publication's date).
 publishDate: "2017-01-01T00:00:00Z"

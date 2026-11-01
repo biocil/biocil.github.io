@@ -1,0 +1,148 @@
+{{ define "main" }}
+{{ $lab := site.Params.lab }}
+{{ $hero := .Params.hero }}
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap">
+    <div>
+      <p class="labname">{{ T "labname_line" | safeHTML }}</p>
+      <h1 id="hero-title">{{ $hero.title }}</h1>
+      <p class="lede">{{ $hero.lede }}</p>
+      <div class="cta">
+        {{ range $i, $b := $hero.buttons }}<a class="btn {{ if eq $i 0 }}btn-primary{{ else }}btn-ghost{{ end }}" href="{{ if hasPrefix .url "#" }}{{ .url }}{{ else }}{{ .url | relLangURL }}{{ end }}">{{ .text }}</a>{{ end }}
+      </div>
+    </div>
+    {{ partial "holo-hero.html" . }}
+  </div>
+</section>
+
+
+{{ with .Params.feature }}{{ $f := . }}{{ with site.GetPage $f.page }}{{ $fp := . }}
+<section class="band feature" aria-labelledby="feature-title">
+  <div class="wrap">
+    {{ with partial "featured.html" . }}<a class="plate" href="{{ $fp.RelPermalink }}" tabindex="-1" aria-hidden="true">{{ partial "img.html" (dict "img" . "w" 900 "alt" "") }}</a>{{ end }}
+    <div>
+      {{ with $f.label }}<p class="feature-label">{{ . }}</p>{{ end }}
+      <h2 id="feature-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+      {{ with .Params.summary }}<p>{{ . }}</p>{{ end }}
+      <div class="cta">{{ range $i, $l := $f.links }}<a class="btn {{ if eq $i 0 }}btn-dark{{ else }}btn-line{{ end }}" href="{{ $l.url | relLangURL }}">{{ $l.text }}</a>{{ end }}</div>
+    </div>
+  </div>
+</section>
+{{ end }}{{ end }}
+{{ with site.GetPage "/research" }}
+<section class="band" id="research" aria-labelledby="research-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="research-title">{{ T "research" }}</h2>
+      <p>{{ .Params.lede }}</p>
+    </div>
+    {{ range .Pages.ByWeight }}{{ $t := . }}
+    <article class="theme">
+      <div>
+        <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+        {{ with .Params.summary }}<p>{{ . }}</p>{{ end }}
+        <ul class="refs">
+          {{ range first 3 (.Params.papers | default slice) }}{{ with site.GetPage (printf "/publication/%s" .) }}
+          <li><a href="{{ .RelPermalink }}">{{ .Params.short_title | default .Title }}</a>, {{ .Params.publication_short | default (.Params.publication | markdownify | plainify | htmlUnescape) }} {{ .Date.Format "2006" }}</li>
+          {{ end }}{{ end }}
+        </ul>
+        <p class="more-link"><a href="{{ .RelPermalink }}">{{ printf (T "more_on") (.Params.short | default .Title) }}</a></p>
+      </div>
+      {{ with partial "featured.html" . }}
+      <figure>
+        <div class="plate{{ if $t.Params.dark_plate }} dark{{ end }}">{{ partial "img.html" (dict "img" . "w" 1100 "alt" "") }}</div>
+      </figure>
+      {{ end }}
+    </article>
+    {{ end }}
+  </div>
+</section>
+{{ end }}
+
+<section class="band bench" id="try" aria-labelledby="try-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="try-title">{{ .Params.bench.title | default "Reconstruct a hologram yourself" }}</h2>
+      <p>{{ .Params.bench.text }}</p>
+    </div>
+    {{ partial "demo-tabs.html" . }}
+  </div>
+</section>
+
+<section class="band" id="publications" aria-labelledby="pub-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="pub-title">{{ T "recent_publications" }}</h2>
+      <p>{{ T "recent_publications_lede" }}</p>
+    </div>
+    {{ $journal := where (where site.RegularPages "Section" "publication") "Params.publication_types" "intersect" (slice "article-journal") }}
+    <div class="pubs">
+      {{ range first 3 $journal.ByDate.Reverse }}
+      <article class="pub">
+        <a class="plate" href="{{ .RelPermalink }}" tabindex="-1" aria-hidden="true">{{ with partial "featured.html" . }}{{ partial "img.html" (dict "img" . "w" 700 "alt" "") }}{{ end }}</a>
+        <div>
+          <div class="venue">{{ .Params.publication_short | default (.Params.publication | markdownify | plainify | htmlUnescape) }}, {{ .Date.Format "2006" }}</div>
+          <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+          <div class="auth">{{ partial "authors.html" . }}</div>
+          {{ partial "pub-links.html" . }}
+        </div>
+      </article>
+      {{ end }}
+    </div>
+    <div class="more">
+      <a class="btn btn-line" href="{{ "/publication/" | relLangURL }}">{{ T "all_publications_patents" }}</a>
+      {{ range site.Params.links }}{{ if eq .name "Google Scholar" }}<a class="btn btn-line" href="{{ .url }}">Google Scholar</a>{{ end }}{{ end }}
+    </div>
+  </div>
+</section>
+
+<section class="band alt" id="news" aria-labelledby="news-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="news-title">{{ T "news" }}</h2>
+      <p>{{ T "news_lede" }}</p>
+    </div>
+    <ul class="news">
+      {{ range first 5 (where site.RegularPages "Section" "post").ByDate.Reverse }}{{ partial "news-item.html" . }}{{ end }}
+    </ul>
+    <div class="more"><a class="btn btn-line" href="{{ "/post/" | relLangURL }}">{{ T "all_news" }}</a></div>
+  </div>
+</section>
+
+{{ with site.GetPage "/people" }}
+{{ $current := slice }}
+{{ range .Params.groups }}{{ if not .compact }}{{ $current = $current | append .key }}{{ end }}{{ end }}
+<section class="band" id="people" aria-labelledby="people-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="people-title">{{ T "people" }}</h2>
+      <p>{{ .Params.lede }}</p>
+    </div>
+    <div class="team-strip">
+      {{ range $current }}{{ $g := . }}
+      {{ range (site.GetPage "/authors").Pages.ByParam "last_name" }}{{ if in .Params.user_groups $g }}
+      <a class="mini" href="{{ .RelPermalink }}">
+        {{ partial "avatar.html" (dict "page" . "fill" "320x320" "class" "avatar") }}
+        <span class="name">{{ .Title }}</span><span class="role">{{ .Params.role }}</span>
+      </a>
+      {{ end }}{{ end }}
+      {{ end }}
+    </div>
+    <div class="more"><a class="btn btn-line" href="{{ .RelPermalink }}">{{ T "everyone" }}</a></div>
+  </div>
+</section>
+{{ end }}
+
+{{ with site.GetPage "/join" }}
+<section class="band join" aria-labelledby="join-title">
+  <div class="wrap">
+    {{ with resources.Get "media/welcome.jpg" }}{{ partial "img.html" (dict "img" . "fill" "900x900" "alt" "A holographic microscope setup on an optical table, lit by glowing optical fibres.") }}{{ end }}
+    <div>
+      <h2 id="join-title">{{ T "join_lab" }}</h2>
+      <p>{{ .Params.summary }}</p>
+      <div class="cta"><a class="btn btn-primary" href="{{ .RelPermalink }}">{{ T "how_to_apply" }}</a><a class="btn btn-ghost" href="mailto:{{ site.Params.lab.email }}">{{ printf (T "email_x") site.Params.lab.email }}</a></div>
+    </div>
+  </div>
+</section>
+{{ end }}
+{{ end }}

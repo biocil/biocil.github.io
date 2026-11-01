@@ -1,0 +1,23 @@
+{{ define "main" }}
+{{ partial "page-head.html" . }}
+<div class="wrap page-body">
+  <div class="theme-page">
+    <div class="prose">{{ .Content }}</div>
+    <aside>
+      {{ with partial "featured.html" . }}
+      <figure class="lead-fig"><div class="plate{{ if $.Params.dark_plate }} dark{{ end }}">{{ partial "img.html" (dict "img" . "w" 1100 "alt" ($.Params.figure_alt | default "") "eager" true "sizes" "(max-width: 860px) 100vw, 40vw") }}</div>{{ with $.Params.figure_caption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}</figure>
+      {{ end }}
+      {{ with .Params.funding }}
+      <h2 class="h4">{{ T "funded_by" }}</h2>
+      <ul class="plain">{{ range . }}{{ with site.GetPage (printf "/funding/%s" .) }}<li><a href="{{ .RelPermalink }}">{{ .Title }}</a><span>{{ .Params.scheme }}</span></li>{{ end }}{{ end }}</ul>
+      {{ end }}
+    </aside>
+  </div>
+  {{ with .Params.papers }}
+  <section class="sub" aria-labelledby="papers-title">
+    <h2 id="papers-title">{{ T "key_publications" }}</h2>
+    <ol class="pub-list">{{ range . }}{{ with site.GetPage (printf "/publication/%s" .) }}{{ partial "pub-item.html" . }}{{ end }}{{ end }}</ol>
+  </section>
+  {{ end }}
+</div>
+{{ end }}

@@ -1,0 +1,4 @@
+{{ define "main" }}
+<header class="page-head"><div class="wrap"><h1>{{ T "authors" }}</h1><p class="lede">{{ printf (T "see_people") ("/people/" | relLangURL) | safeHTML }}</p></div></header>
+<div class="wrap page-body"><ul class="compact-people">{{ range .Pages.ByTitle }}<li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>{{ end }}</ul></div>
+{{ end }}
