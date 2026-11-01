@@ -463,45 +463,100 @@ var root=document.getElementById("setups");
 if(!root||root.dataset.ready) return; root.dataset.ready="1";
 var $=function(id){ return document.getElementById(id); };
 var camX=$("su-cam").getContext("2d"), statusEl=$("su-status");
-var U={setup:"mz",tilt:1.5,z:600,arm:"both",playing:!reduceMotion,cells:null,surf:null,inl:null,phi:0,rho:0.8,step:-1,dim:"3d"};
+var U={setup:"mz",tilt:1.5,z:600,arm:"both",playing:!reduceMotion,cells:null,surf:null,inl:null,phi:0,rho:0.8,step:-1,dim:"3d",lambda:633};
 PhiX.scan=U;
-var prop=makePropagator(N,1.12,0.532);
+var prop=null, propL=0;
 function camera(){
-  var I=new Float64Array(N*N), nr=rng(17), lo=Infinity, hi=-Infinity;
+  var I=new Float64Array(N*N), nr=rng(17), lo=Infinity, hi=-Infinity, s=633/U.lambda;   /* shorter wavelength: denser fringes, more phase */
   if(U.setup==="inline"){
     if(!U.inl){
       var re=new Float64Array(N*N), im=new Float64Array(N*N), beads=[[70,80,9],[170,60,6],[120,150,12],[200,190,8],[60,200,7]];
       for(var y=0;y<N;y++) for(var x=0;x<N;x++){ var k=y*N+x, a=1, p=0; beads.forEach(function(b){ var r2=(x-b[0])*(x-b[0])+(y-b[1])*(y-b[1]); if(r2<b[2]*b[2]){ a=0.55; p=1; } }); re[k]=a*Math.cos(p); im[k]=a*Math.sin(p); }
       U.inl=[re,im];
     }
+    if(!prop||propL!==U.lambda){ prop=makePropagator(N,1.12,U.lambda/1000); propL=U.lambda; }
     var r2=new Float64Array(U.inl[0]), i2=new Float64Array(U.inl[1]); prop(r2,i2,U.z);
     for(var q=0;q<N*N;q++){ I[q]=r2[q]*r2[q]+i2[q]*i2[q]+0.01*(nr()-0.5); }
   } else if(U.setup==="tomo"){
     if(!U.cells) U.cells=specimenPhase("cells");
-    var fr=0.16, kxr=TAU*fr*Math.cos(0.7), kyr=TAU*fr*Math.sin(0.7), ill=0.07*U.rho, kxi=TAU*ill*Math.cos(U.phi), kyi=TAU*ill*Math.sin(U.phi);
-    for(var y3=0;y3<N;y3++) for(var x3=0;x3<N;x3++){ var k3=y3*N+x3, a3=0.8; I[k3]=1+a3*a3+2*a3*Math.cos((kxr-kxi)*x3+(kyr-kyi)*y3-U.cells[k3])+0.04*(nr()-0.5); }
+    var fr=0.16*s, kxr=TAU*fr*Math.cos(0.7), kyr=TAU*fr*Math.sin(0.7), ill=0.07*U.rho*s, kxi=TAU*ill*Math.cos(U.phi), kyi=TAU*ill*Math.sin(U.phi);
+    for(var y3=0;y3<N;y3++) for(var x3=0;x3<N;x3++){ var k3=y3*N+x3, a3=0.8; I[k3]=1+a3*a3+2*a3*Math.cos((kxr-kxi)*x3+(kyr-kyi)*y3-s*U.cells[k3])+0.04*(nr()-0.5); }
   } else {
     var ph, amp;
     if(U.setup==="mz"){ if(!U.cells) U.cells=specimenPhase("cells"); ph=U.cells; amp=null; }
     else { if(!U.surf) U.surf=fieldSample("surface"); ph=U.surf.ph; amp=U.surf.amp; }
-    var f=U.tilt/3*0.22, th=40*Math.PI/180, kx=TAU*f*Math.cos(th), ky=TAU*f*Math.sin(th);
-    for(var y2=0;y2<N;y2++) for(var x2=0;x2<N;x2++){ var k2=y2*N+x2, a2=0.8*(amp?amp[k2]:1); I[k2]=1+a2*a2+2*a2*Math.cos(kx*x2+ky*y2-ph[k2])+0.04*(nr()-0.5); }
+    var f=U.tilt/3*0.22*s, th=40*Math.PI/180, kx=TAU*f*Math.cos(th), ky=TAU*f*Math.sin(th);
+    for(var y2=0;y2<N;y2++) for(var x2=0;x2<N;x2++){ var k2=y2*N+x2, a2=0.8*(amp?amp[k2]:1); I[k2]=1+a2*a2+2*a2*Math.cos(kx*x2+ky*y2-s*ph[k2])+0.04*(nr()-0.5); }
   }
   for(var j=0;j<N*N;j++){ if(I[j]<lo) lo=I[j]; if(I[j]>hi) hi=I[j]; }
   paint(camX,N,I,lo,hi,LUT_G);
 }
 var text={
-  mz:L("<b>Mach–Zehnder, in transmission.</b> A beam splitter divides the laser into an object arm, which passes through the sample and the microscope objective, and a reference arm. A second beam splitter recombines them on the camera. The arms are separate, so each can be adjusted on its own; this suits transparent cells, tissue and micro-optics.","<b>Geçirgenlikte Mach–Zehnder.</b> Bir ışın bölücü lazeri, numuneden ve mikroskop objektifinden geçen nesne kolu ile referans kolu olarak ikiye ayırır. İkinci bir ışın bölücü bunları kamerada birleştirir. Kollar ayrı olduğundan her biri tek başına ayarlanabilir; bu düzen saydam hücreler, doku ve mikro-optikler için uygundur."),
-  mi:L("<b>Michelson, in reflection.</b> One beam splitter both divides and recombines the light. The object arm goes through the objective to the sample surface and back, so the phase is 4π h / λ: ideal for surface topography and MEMS metrology. The reference arm reflects off a mirror whose tilt sets the fringes.","<b>Yansımada Michelson.</b> Tek bir ışın bölücü ışığı hem böler hem birleştirir. Nesne kolu objektiften geçip numune yüzeyine gider ve geri döner; bu yüzden faz 4π h / λ olur: yüzey topografisi ve MEMS metrolojisi için idealdir. Referans kolu, eğimi saçakları belirleyen bir aynadan yansır."),
+  mz:L("<b>Mach–Zehnder, in transmission.</b> A beam expander widens the laser, and a beam splitter divides it into an object arm, which passes through the sample and the microscope objective, and a reference arm. A second, slightly tilted beam splitter recombines them right in front of the camera, so the two waves overlap on the sensor at a small angle. The arms are separate, so each can be adjusted on its own; this suits transparent cells, tissue and micro-optics.","<b>Geçirgenlikte Mach–Zehnder.</b> Bir ışın genişletici lazeri genişletir; bir ışın bölücü onu numuneden ve mikroskop objektifinden geçen nesne kolu ile referans kolu olarak ikiye ayırır. Hafifçe eğik ikinci bir ışın bölücü bunları kameranın hemen önünde birleştirir; böylece iki dalga sensörde küçük bir açıyla üst üste biner. Kollar ayrı olduğundan her biri tek başına ayarlanabilir; bu düzen saydam hücreler, doku ve mikro-optikler için uygundur."),
+  mi:L("<b>Michelson, in reflection.</b> One beam splitter both divides and recombines the light. The object arm goes through the tube lens and the objective to the sample surface and back, so the phase is 4π h / λ: ideal for surface topography and MEMS metrology. The reference mirror sits close to the beam splitter and the reference reaches the camera without a lens, so the mirror tilt mostly sets the angle of the reference on the camera, and with it the fringes.","<b>Yansımada Michelson.</b> Tek bir ışın bölücü ışığı hem böler hem birleştirir. Nesne kolu tüp merceğinden ve objektiften geçip numune yüzeyine gider ve geri döner; bu yüzden faz 4π h / λ olur: yüzey topografisi ve MEMS metrolojisi için idealdir. Referans aynası ışın bölücüye yakındır ve referans kameraya mercekten geçmeden ulaşır; böylece aynanın eğimi daha çok referansın kameradaki açısını, dolayısıyla saçakları belirler."),
   tomo:L("<b>Holotomography: a Mach–Zehnder with scanning illumination.</b> The fixed mirror in the object arm becomes a galvo mirror. A relay lens and the condenser image it onto the sample, so tilting the galvo tilts the plane wave at the sample without moving the lit spot. Here the beam traces a circle in the condenser pupil; the camera records one hologram per angle, and its carrier fringes turn as the illumination turns. Tab 5 shows how these holograms fill Fourier space.","<b>Holotomografi: taramalı aydınlatmalı bir Mach–Zehnder.</b> Nesne kolundaki sabit ayna galvo aynaya dönüşür. Röle merceği ve kondansör onu numune üzerine görüntüler; böylece galvo eğildiğinde numunedeki düzlem dalga eğilir ama aydınlatılan nokta yerinde kalır. Burada ışın kondansör göz bebeğinde bir daire çizer; kamera her açı için bir hologram kaydeder ve aydınlatma döndükçe taşıyıcı saçaklar da döner. Bu hologramların Fourier uzayını nasıl doldurduğunu 5. sekme gösterir."),
   inline:L("<b>In-line and lens-free.</b> No reference arm and no lenses: a partially coherent LED behind a pinhole lights the sample, which sits a millimetre or less above the image sensor. Light that passes beside the object is the reference. The field of view is the whole sensor, many millimetres wide, but the reconstruction carries the twin image.","<b>Eksen içi ve merceksiz.</b> Referans kolu ve mercek yok: iğne deliğinin arkasındaki kısmen koherent bir LED, görüntü sensörünün bir milimetre ya da daha az üstündeki numuneyi aydınlatır. Nesnenin yanından geçen ışık referans görevi görür. Görüş alanı milimetrelerce genişlikteki sensörün tamamıdır, ancak rekonstrüksiyon ikiz görüntüyü de taşır.")
 };
 function describe(){
   var extra="";
-  if(U.setup==="tomo") extra="";
-  else if(U.setup!=="inline") extra=U.tilt<0.15?L(" With the reference untilted, the camera shows on-axis fringes that follow the phase directly; tilt the mirror to add the carrier that off-axis reconstruction needs."," Referans eğik değilken kamera, fazı doğrudan izleyen eksen içi saçaklar gösterir; eksen dışı rekonstrüksiyonun gerektirdiği taşıyıcıyı eklemek için aynayı eğin."):L(" The reference arrives at "," Referans, nesne dalgasına ")+U.tilt.toFixed(1)+L("° to the object wave; the tilt adds the straight carrier fringes that the sample bends.","° açıyla gelir; eğim, numunenin büktüğü düz taşıyıcı saçakları ekler.");
-  else extra=" At "+U.z+L(" µm from the sensor, each object casts its own diffraction rings."," µm uzaklıkta her nesne kendi kırınım halkalarını oluşturur.");
+  if(U.setup==="mz"||U.setup==="mi") extra=U.tilt<0.15?L(" With the reference untilted, the camera shows on-axis fringes that follow the phase directly; tilt it to add the carrier that off-axis reconstruction needs."," Referans eğik değilken kamera, fazı doğrudan izleyen eksen içi saçaklar gösterir; eksen dışı rekonstrüksiyonun gerektirdiği taşıyıcıyı eklemek için eğin."):L(" The reference arrives at "," Referans, nesne dalgasına ")+U.tilt.toFixed(1)+L("° to the object wave; the tilt adds the straight carrier fringes that the sample bends.","° açıyla gelir; eğim, numunenin büktüğü düz taşıyıcı saçakları ekler.");
+  else if(U.setup==="inline") extra=" z = "+U.z+L(" µm: each object casts its own diffraction rings."," µm: her nesne kendi kırınım halkalarını oluşturur.");
+  extra+=L(" Wavelength "," Dalga boyu ")+U.lambda+" nm.";
   statusEl.innerHTML=text[U.setup]+extra;
+}
+/* ---- drawing helpers for wide beams ---- */
+function pt(p){ return p[0].toFixed(1)+","+p[1].toFixed(1); }
+function band(pts,w){ var s=pts.map(pt).join(" "); return '<polyline class="band" stroke-width="'+w+'" points="'+s+'"/><polyline class="flow" points="'+s+'"/>'; }
+function cone(x1,x2,y,w1,w2){ return '<polygon class="cone" points="'+x1+','+(y-w1/2)+' '+x2+','+(y-w2/2)+' '+x2+','+(y+w2/2)+' '+x1+','+(y+w1/2)+'"/><polyline class="flow" points="'+x1+','+y+' '+x2+','+y+'"/>'; }
+function source(y,x2,w){ return band([[86,y],[104,y]],6)+cone(104,140,y,6,w)+band([[140,y],[x2,y]],w); }
+function rot(v,a){ var c=Math.cos(a), s=Math.sin(a); return [v[0]*c-v[1]*s, v[0]*s+v[1]*c]; }          /* SVG rotate(a): clockwise on screen */
+function refl(d,n){ var k=2*(d[0]*n[0]+d[1]*n[1]); return [d[0]-k*n[0], d[1]-k*n[1]]; }
+var R2=Math.SQRT1_2, DEG=Math.PI/180;
+/* a tilted combining cube at (bx,80) turns the reference (travelling up) by twice its tilt; return where it meets the camera at camX */
+function combiner(bx,a,camX){ var n=rot([R2,R2],a), o=refl([0,-1],n); return [camX, 80+o[1]/o[0]*(camX-bx)]; }
+function drawBeams(){
+  var g=root.querySelector('[data-beams="'+U.setup+'"]'); if(!g) return;
+  var W=26, h="";
+  if(U.setup==="mz"){
+    var a=U.tilt*1.6*DEG, hit=combiner(520,a,582);
+    $("mz-bs2").setAttribute("transform","rotate("+(a/DEG).toFixed(2)+" 520 80)");
+    h='<g class="arm src">'+source(280,180,W)+'</g>'+
+      '<g class="arm obj">'+band([[180,280],[180,80],[582,80]],W)+'</g>'+
+      '<g class="arm ref">'+band([[180,280],[520,280],[520,80],hit],W)+'</g>';
+  } else if(U.setup==="mi"){
+    var am=U.tilt*0.8*DEG, n=rot([-1,0],am), back=refl([1,0],n), m=[356,230], nb=[R2,R2];
+    var t=((300-m[0])*nb[0]+(230-m[1])*nb[1])/(back[0]*nb[0]+back[1]*nb[1]), b=[m[0]+back[0]*t, m[1]+back[1]*t], dn=refl(back,nb), c=[b[0]+dn[0]*(290-b[1])/dn[1], 290];
+    $("mi-mirror").setAttribute("transform","rotate("+(am/DEG).toFixed(2)+" 356 230)");
+    h='<g class="arm src">'+source(230,300,W)+'</g>'+
+      '<g class="arm obj">'+band([[300,230],[300,74]],W)+band([[300,74],[300,290]],W)+'</g>'+
+      '<g class="arm ref">'+band([[300,230],[356,230]],W)+band([m,b,c],W)+'</g>';
+  } else if(U.setup==="tomo"){
+    W=22;
+    var u=U.rho*Math.cos(U.phi), h1=30*u, h2=-0.75*h1, hit2=combiner(530,2.5*DEG,582);
+    var ray=[[180,80],[240,80+h1],[336,80+h1],[374,80],[418,80+h2],[482,80+h2],[582,80]];
+    h='<g class="arm src">'+source(280,180,W)+'</g>'+
+      '<g class="arm obj">'+band([[180,280],[180,80]],W)+band(ray,W)+'</g>'+
+      '<g class="arm ref">'+band([[180,280],[530,280],[530,80],hit2],W)+'</g>';
+    $("gt-bs2").setAttribute("transform","rotate(2.5 530 80)");
+    /* law of reflection at the galvo: its normal bisects the incoming (up) and outgoing beams */
+    var dx=60, dy=h1, L0=Math.hypot(dx,dy), nx=dx/L0-0, ny=dy/L0+1, nl=Math.hypot(nx,ny); nx/=nl; ny/=nl;
+    $("gt-galvo").setAttribute("x1",(180-ny*17).toFixed(1)); $("gt-galvo").setAttribute("y1",(80+nx*17).toFixed(1));
+    $("gt-galvo").setAttribute("x2",(180+ny*17).toFixed(1)); $("gt-galvo").setAttribute("y2",(80-nx*17).toFixed(1));
+    var ux=38, uy=-h1, Lw=Math.hypot(ux,uy); ux/=Lw; uy/=Lw; var w="", t0=((performance.now()/40)%10);
+    for(var k=0;k<4;k++){ var tt=6+k*10+t0; if(tt>Lw-2) continue; var cx=336+ux*tt, cy=80+h1+uy*tt; w+='<line class="wf" x1="'+(cx-uy*11).toFixed(1)+'" y1="'+(cy+ux*11).toFixed(1)+'" x2="'+(cx+uy*11).toFixed(1)+'" y2="'+(cy-ux*11).toFixed(1)+'"/>'; }
+    $("gt-wave").innerHTML=w;
+  }
+  g.innerHTML=h;
+}
+function setColour(){
+  var c=waveRGBjs(U.lambda), hi=c.map(function(v){ return Math.round(v+(255-v)*0.45); });
+  root.style.setProperty("--beam","rgb("+c.join(",")+")"); root.style.setProperty("--beam-hi","rgb("+hi.join(",")+")");
+}
+function waveRGBjs(nm){
+  var r=0,g=0,b=0;
+  if(nm<440){ r=(440-nm)/60; b=1; } else if(nm<490){ g=(nm-440)/50; b=1; } else if(nm<510){ g=1; b=(510-nm)/20; } else if(nm<580){ r=(nm-510)/70; g=1; } else if(nm<645){ r=1; g=(645-nm)/65; } else r=1;
+  var f=nm<420?0.55+0.45*(nm-380)/40:nm>680?0.55+0.45*(750-nm)/70:1;
+  return [r,g,b].map(function(c){ return Math.round(255*Math.pow(Math.max(0,c*f),0.8)); });
 }
 function show(){
   function hide(el,h){ if(h) el.setAttribute("hidden",""); else el.removeAttribute("hidden"); }
@@ -510,12 +565,10 @@ function show(){
   hide(root.querySelector(".screen.schematic"),!!use3d); hide($("su-3d"),!use3d); hide($("su-dim"),!PhiX.setup3d);
   if(PhiX.setup3d){ if(use3d) PhiX.setup3d.start(U.setup); else PhiX.setup3d.stop(); }
   hide($("su-tilt-wrap"),U.setup==="inline"||U.setup==="tomo"); hide($("su-z-wrap"),U.setup!=="inline"); hide($("su-arm-wrap"),U.setup==="inline");
-  placeSample(); if(U.setup==="tomo") galvo(true);
-  var deg=U.tilt*2.2;
-  root.querySelectorAll("[data-tilt]").forEach(function(g){ g.setAttribute("transform","rotate("+(g.getAttribute("data-tilt")==="-"?-deg:deg)+" "+g.getAttribute("data-pivot")+")"); });
-  root.querySelectorAll("[data-refout]").forEach(function(l){ var ax=l.getAttribute("data-axis")||"y", base=+l.getAttribute("data-base"); l.setAttribute(ax+"2",base-U.tilt*7); });
+  placeSample(); drawBeams(); setColour();
+  if(U.setup==="tomo") galvo(true);
   root.setAttribute("data-arm",U.arm);
-  $("su-note").textContent=U.setup==="tomo"?L("Schematic, not to scale. The galvo is imaged onto the sample by the relay lens and condenser, so only the illumination angle changes.","Şematik, ölçekli değil. Galvo, röle merceği ve kondansörle numune üzerine görüntülenir; bu yüzden yalnızca aydınlatma açısı değişir."):U.setup==="inline"?L("Schematic, not to scale. Arcs are wavefronts from the pinhole; the cells scatter wavelets (accent colour) that interfere with the unscattered light on the sensor.","Şematik, ölçekli değil. Yaylar iğne deliğinden çıkan dalga cepheleridir; hücreler, sensörde saçılmamış ışıkla girişim yapan dalgacıklar saçar (vurgu rengi)."):L("Schematic, not to scale. Light flows along the beams; the object arm is shown in the accent colour.","Şematik, ölçekli değil. Işık ışınlar boyunca akar; nesne kolu vurgu rengiyle gösterilir.");
+  $("su-note").textContent=U.setup==="tomo"?L("Schematic, not to scale. The galvo is imaged onto the sample by the relay lens and condenser, so only the illumination angle changes. Both arms carry the same laser light; use Object and Reference to pick out each arm.","Şematik, ölçekli değil. Galvo, röle merceği ve kondansörle numune üzerine görüntülenir; bu yüzden yalnızca aydınlatma açısı değişir. İki kol da aynı lazer ışığını taşır; kolları ayırt etmek için Nesne ve Referans düğmelerini kullanın."):U.setup==="inline"?L("Schematic, not to scale. Arcs are wavefronts from the pinhole; the cells scatter wavelets that interfere with the unscattered light on the sensor.","Şematik, ölçekli değil. Yaylar iğne deliğinden çıkan dalga cepheleridir; hücreler, sensörde saçılmamış ışıkla girişim yapan dalgacıklar saçar."):L("Schematic, not to scale. The expander widens the beam so that both waves overlap on the camera. Both arms carry the same laser light; use Object and Reference to pick out each arm.","Şematik, ölçekli değil. Genişletici ışını genişletir; böylece iki dalga kamerada üst üste biner. İki kol da aynı lazer ışığını taşır; kolları ayırt etmek için Nesne ve Referans düğmelerini kullanın.");
   camera(); describe();
 }
 root.querySelectorAll("[data-setup]").forEach(function(btn){
@@ -527,7 +580,7 @@ root.querySelectorAll("[data-setup]").forEach(function(btn){
 root.querySelectorAll("[data-arm-btn]").forEach(function(btn){
   btn.addEventListener("click",function(){
     root.querySelectorAll("[data-arm-btn]").forEach(function(b){ b.setAttribute("aria-pressed",b===btn?"true":"false"); });
-    U.arm=btn.getAttribute("data-arm-btn"); show();
+    U.arm=btn.getAttribute("data-arm-btn"); root.setAttribute("data-arm",U.arm);
   });
 });
 /* In-line: move the sample in the drawing with the sample-to-sensor distance. */
@@ -541,24 +594,18 @@ function placeSample(){
   $("il-dim1").setAttribute("x2",sx); $("il-dim1t").setAttribute("x",(118+sx)/2);
   $("il-dim2").setAttribute("x1",sx+8); $("il-dim2t").setAttribute("x",(sx+8+530)/2); $("il-dim2t").textContent="z = "+U.z+" µm";
 }
-/* Holotomography set-up: the galvo traces a circle in the condenser pupil; draw the central ray through the 4f relay. */
-var pts=[];
+/* Holotomography: the galvo traces a circle in the condenser pupil. */
 function galvo(force){
-  var u=U.rho*Math.cos(U.phi), h1=30*u, yMO=80-1.05*h1;
-  var P=[[170,80],[230,80+h1],[330,80+h1],[370,80],[412,yMO],[470,yMO],[598,80]].map(function(p){ return p[0].toFixed(1)+","+p[1].toFixed(1); }).join(" ");
-  $("gt-ray").setAttribute("points",P); $("gt-flow").setAttribute("points",P);
-  $("gt-galvo").setAttribute("transform","rotate("+(Math.atan2(h1,60)*90/Math.PI).toFixed(2)+" 170 80)");
-  var dx=40, dy=-h1, L=Math.hypot(dx,dy), ux=dx/L, uy=dy/L, w="", t0=((performance.now()/40)%10);
-  for(var n=0;n<4;n++){ var t=8+n*10+t0, cx=330+ux*t, cy=80+h1+uy*t; w+='<line class="wf" x1="'+(cx-uy*13).toFixed(1)+'" y1="'+(cy+ux*13).toFixed(1)+'" x2="'+(cx+uy*13).toFixed(1)+'" y2="'+(cy-ux*13).toFixed(1)+'"/>'; }
-  $("gt-wave").innerHTML=w;
-  var dxp=40*U.rho*Math.sin(U.phi), dyp=40*U.rho*Math.cos(U.phi);
+  drawBeams();
+  var dxp=34*U.rho*Math.sin(U.phi), dyp=34*U.rho*Math.cos(U.phi);
   $("gt-dot").setAttribute("cx",dxp.toFixed(1)); $("gt-dot").setAttribute("cy",(-dyp).toFixed(1));
   $("gt-angle").textContent="θ = "+Math.round(70*U.rho)+"°, φ = "+Math.round(((U.phi*180/Math.PI)%360+360)%360)+"°";
+  if(!$("gt-trace").childElementCount) $("gt-trace").innerHTML='<circle class="trace" cx="0" cy="0" r="'+(34*U.rho)+'"/>';
   var step=Math.floor(((U.phi/TAU)%1+1)%1*32);
-  if(step!==U.step||force){ U.step=step; if(!$("gt-trace").childElementCount){ $("gt-trace").innerHTML='<circle class="trace" cx="0" cy="0" r="'+(40*U.rho)+'"/>'; } camera(); }
+  if(step!==U.step||force){ U.step=step; camera(); }
 }
 function loop(){
-  if(U.setup==="tomo"&&U.playing&&root.offsetParent!==null){ U.phi+=0.012; galvo(false); }
+  if(U.setup==="tomo"&&U.playing&&root.offsetParent!==null){ U.phi+=0.012; if(U.dim!=="3d"||!PhiX.setup3d) galvo(false); else { var st=Math.floor(((U.phi/TAU)%1+1)%1*32); if(st!==U.step){ U.step=st; camera(); } } }
   requestAnimationFrame(loop);
 }
 root.querySelectorAll("[data-dim]").forEach(function(btn){
@@ -570,6 +617,7 @@ root.querySelectorAll("[data-dim]").forEach(function(btn){
 PhiX.setupsShow=show;
 $("su-tilt").addEventListener("input",function(){ U.tilt=+this.value; $("su-tiltOut").textContent=(+this.value).toFixed(1)+"°"; show(); });
 $("su-z").addEventListener("input",function(){ U.z=+this.value; $("su-zOut").textContent=this.value+" µm"; show(); });
+$("su-lambda").addEventListener("input",function(){ U.lambda=+this.value; $("su-lambdaOut").textContent=this.value+" nm"; setColour(); camera(); describe(); });
 var playBtn=$("su-play");
 function setPlay(p){ U.playing=p; root.classList.toggle("paused",!p); playBtn.textContent=p?L("Pause the light","Işığı durdur"):L("Play the light","Işığı oynat"); playBtn.setAttribute("aria-pressed",p?"true":"false"); }
 playBtn.addEventListener("click",function(){ setPlay(!U.playing); });

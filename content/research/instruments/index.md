@@ -28,4 +28,8 @@ Much of our work ends up as a physical instrument. Some examples:
 - **Fabrication with holographic feedback.** Maskless lithography that checks the part being made with holography during fabrication, for producing optical elements.
 - **Microscope autofocus** (WO 2024/208601), and real-time holographic tracking and control of microrobots.
 
+## Equipment
+
+We build these instruments in our optical lab, which has lasers, spatial light modulators, liquid crystal filters and retarders, an electro-optic modulator, galvanometric scanners, cameras, a spectrometer, a Zortrax M200 3D printer for custom parts, and microscopes including a Nanolive 3D Cell Explorer and a Zeiss Axio Observer 7. See [the full list of lab equipment](/facilities/).
+
 Undergraduate teams build working devices too; see the [student projects](/research/#sp-title).

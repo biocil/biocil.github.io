@@ -1,0 +1,6 @@
+{{- /* Surname-first sort key with Turkish letters folded to ASCII, so that Ö, Ş, Ç… sort with O, S, C. */ -}}
+{{- $s := lower (printf "%s %s" (strings.TrimSpace (.Params.last_name | default .Title)) (strings.TrimSpace (.Params.first_name | default ""))) -}}
+{{- range slice (slice "i̇" "i") (slice "ı" "i") (slice "ç" "c") (slice "ğ" "g") (slice "ö" "o") (slice "ş" "s") (slice "ü" "u") (slice "â" "a") (slice "î" "i") (slice "û" "u") -}}
+{{- $s = replace $s (index . 0) (index . 1) -}}
+{{- end -}}
+{{- return $s -}}

@@ -1,0 +1,96 @@
+# Lab equipment shown on /facilities/. Edit freely: add a model, a count, or new items.
+# Fields per item: name, name_tr, note, note_tr, and optionally model, count, link, contributed_by (a page path).
+- id: microscopes
+  title: Microscopes
+  title_tr: Mikroskoplar
+  items:
+    - name: Nanolive 3D Cell Explorer
+      name_tr: Nanolive 3D Cell Explorer
+      note: Holotomographic microscope for label-free 3D refractive-index imaging of living cells.
+      note_tr: Canlı hücrelerin etiketsiz 3B kırılma indisi görüntülemesi için holotomografik mikroskop.
+      contributed_by: /funding/nanolive
+    - name: Zeiss Axio Observer 7
+      name_tr: Zeiss Axio Observer 7
+      note: Inverted research microscope; the base of our augmented-reality microscopy set-up.
+      note_tr: Ters araştırma mikroskobu; artırılmış gerçeklik mikroskopisi düzeneğimizin temeli.
+      link: /research/optical-computing/
+    - name: Microscope objectives
+      name_tr: Mikroskop objektifleri
+      note: A range of magnifications and numerical apertures for the lab-built holographic microscopes.
+      note_tr: Laboratuvarda kurulan holografik mikroskoplar için farklı büyütme ve sayısal açıklıklarda objektifler.
+- id: sources
+  title: Light sources
+  title_tr: Işık kaynakları
+  items:
+    - name: Lasers
+      name_tr: Lazerler
+      note: Coherent sources for holography and interferometry.
+      note_tr: Holografi ve interferometri için koherent kaynaklar.
+    - name: Laser controllers
+      name_tr: Lazer sürücüleri
+      note: Current and temperature control for stable laser output.
+      note_tr: Kararlı lazer çıkışı için akım ve sıcaklık kontrolü.
+- id: modulation
+  title: Light control and modulation
+  title_tr: Işık kontrolü ve modülasyonu
+  items:
+    - name: Spatial light modulator
+      name_tr: Uzaysal ışık modülatörü
+      note: Displays phase patterns that shape the light; used for optical computing in augmented-reality microscopy.
+      note_tr: Işığı şekillendiren faz desenlerini gösterir; artırılmış gerçeklik mikroskopisinde optik hesaplama için kullanılır.
+      link: /research/optical-computing/
+    - name: 2D galvanometric mirrors
+      name_tr: 2B galvanometrik aynalar
+      note: Fast two-axis beam steering, for scanning the illumination angle in holotomography.
+      note_tr: Holotomografide aydınlatma açısını taramak için hızlı iki eksenli ışın yönlendirme.
+      link: /research/holotomography/
+    - name: Liquid crystal tunable filter
+      name_tr: Sıvı kristal ayarlanabilir filtre
+      note: Selects the transmitted wavelength electronically, for multi-wavelength imaging.
+      note_tr: Çok dalga boylu görüntüleme için geçen dalga boyunu elektronik olarak seçer.
+    - name: Liquid crystal variable retarder
+      name_tr: Sıvı kristal değişken geciktirici
+      note: Sets the polarization state of light electronically.
+      note_tr: Işığın polarizasyon durumunu elektronik olarak ayarlar.
+    - name: Electro-optic modulator
+      name_tr: Elektro-optik modülatör
+      note: Fast electronic control of the phase or polarization of light.
+      note_tr: Işığın fazının ya da polarizasyonunun hızlı elektronik kontrolü.
+- id: detection
+  title: Detection and measurement
+  title_tr: Algılama ve ölçüm
+  items:
+    - name: Cameras
+      name_tr: Kameralar
+      note: CMOS cameras that record the holograms, including two Basler cameras contributed by Nanolive SA.
+      note_tr: Hologramları kaydeden CMOS kameralar; aralarında Nanolive SA’nın katkısıyla gelen iki Basler kamera da var.
+      contributed_by: /funding/nanolive
+    - name: Optical spectrometer
+      name_tr: Optik spektrometre
+      note: Measures the spectrum of light sources and samples.
+      note_tr: Işık kaynaklarının ve numunelerin spektrumunu ölçer.
+    - name: Optical power meter
+      name_tr: Optik güç ölçer
+      note: Measures beam power for alignment and calibration.
+      note_tr: Hizalama ve kalibrasyon için ışın gücünü ölçer.
+- id: fabrication
+  title: Prototyping
+  title_tr: Prototipleme
+  items:
+    - name: 3D printer
+      name_tr: 3B yazıcı
+      model: Zortrax M200
+      note: Prints custom mounts, holders and housings for our set-ups.
+      note_tr: Düzeneklerimiz için özel bağlantı parçaları, tutucular ve muhafazalar basar.
+- id: infrastructure
+  title: Infrastructure
+  title_tr: Altyapı
+  items:
+    - name: Optical tables
+      name_tr: Optik masalar
+      note: Vibration-isolated tables for interferometric set-ups.
+      note_tr: İnterferometrik düzenekler için titreşim yalıtımlı masalar.
+    - name: Computers
+      name_tr: Bilgisayarlar
+      note: Workstations for hologram reconstruction, simulation and instrument control.
+      note_tr: Hologram rekonstrüksiyonu, benzetim ve cihaz kontrolü için iş istasyonları.

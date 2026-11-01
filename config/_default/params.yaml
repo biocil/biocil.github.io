@@ -1,6 +1,7 @@
-# Colour palette: glass (bottle green and brass), tint (aubergine and magenta,
-# after the sensitive-tint colours of polarized light) or phoenix (the lab’s red).
-palette: glass
+# Default colour palette: medipol (Medipol navy and blue), glass (bottle green and brass),
+# tint (aubergine and magenta, after the sensitive-tint colours of polarized light)
+# or phoenix (the lab’s red). Visitors can switch with the button in the menu bar.
+palette: medipol
 
 # Lab details used across the site (header, footer, contact page, SEO).
 
@@ -46,3 +47,8 @@ copyright: '© {year} Phi-X. Text licensed under CC BY-NC-ND 4.0; figures from p
 
 # Image used when pages are shared on social media (in assets/media/).
 share_image: media/share.jpg
+
+# Industry partners, listed in the footer.
+partners:
+  - name: Nanolive SA
+    url: https://www.nanolive.com

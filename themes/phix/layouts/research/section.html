@@ -13,6 +13,16 @@
   </article>
   {{ end }}
 
+  {{ with site.GetPage "/facilities" }}
+  <section class="sub fac-teaser" aria-labelledby="fac-title">
+    <div class="sec-head">
+      <h2 id="fac-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+      <p>{{ .Params.lede }}</p>
+    </div>
+    <p class="more-link"><a href="{{ .RelPermalink }}">{{ T "see_all_equipment" }}</a></p>
+  </section>
+  {{ end }}
+
   {{ with site.GetPage "/student_projects" }}
   <section class="sub" aria-labelledby="sp-title">
     <div class="sec-head">

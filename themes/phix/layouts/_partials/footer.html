@@ -12,6 +12,7 @@
     <div>
       <h2>{{ T "part_of" }}</h2>
       <ul>{{ range site.Params.part_of }}<li>{{ with .url }}<a href="{{ . }}">{{ end }}{{ .name }}{{ if .url }}</a>{{ end }}</li>{{ end }}</ul>
+      {{ with site.Params.partners }}<h2 class="sub-h">{{ T "industry_partner" }}</h2><ul>{{ range . }}<li><a href="{{ .url }}">{{ .name }}</a></li>{{ end }}</ul>{{ end }}
     </div>
     <p class="fine">{{ replace (T "copyright") "{year}" (now.Format "2006") }}</p>
   </div>

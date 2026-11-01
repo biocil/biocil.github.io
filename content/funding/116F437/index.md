@@ -6,7 +6,7 @@ code: "116F437"
 kind: "grant"
 start: 2017-09-15
 end: 2019-09-15
-budget: "577,000 TL"
+budget: 577000
 date: 2017-09-15
 aliases: ["/research/116f437/"]
 authors:
@@ -14,5 +14,7 @@ authors:
 - Bilal E. Kerman
 - Tuba Oguz
 - Toprak Ozil
+usd_rate: 3.4389
+rate_date: 2017-09-15
 ---
 

@@ -3,13 +3,20 @@
 <div class="wrap page-body">
   {{ $people := (site.GetPage "/authors").Pages.ByParam "last_name" }}
   {{ range .Params.groups }}{{ $g := . }}
-  {{ $members := slice }}{{ range $people }}{{ if in .Params.user_groups $g.key }}{{ $members = $members | append . }}{{ end }}{{ end }}
+  {{- /* Alumni: most recent first, by the year they finished (those without a year last), then by surname.
+         Every other group: by weight if set, then by surname. Surnames sort with Turkish letters folded to ASCII. */}}
+  {{ $rows := slice }}
+  {{ range $people }}{{ if in .Params.user_groups $g.key }}
+    {{ $first := cond (eq $g.key "Alumni") (sub 9999 (int (.Params.year | default 0))) (int (.Params.weight | default 5000)) }}
+    {{ $rows = $rows | append (dict "k" (printf "%05d %s" $first (partial "sortkey.html" .)) "p" .) }}
+  {{ end }}{{ end }}
+  {{ $members := slice }}{{ range sort $rows "k" }}{{ $members = $members | append .p }}{{ end }}
   {{ if $members }}
   <section class="sub people-group" aria-labelledby="g-{{ $g.key | anchorize }}">
     <h2 id="g-{{ $g.key | anchorize }}">{{ $g.title | default $g.key }}</h2>
     {{ if $g.compact }}
     <ul class="compact-people">
-      {{ range $members }}<li>{{ if or .Content .Params.bio .Params.role }}<a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ else }}{{ .Title }}{{ end }}<span>{{ with .Params.alumni_note }}{{ . }}{{ else }}{{ .Params.role }}{{ with .Params.organizations }}{{ with index . 0 }}{{ with .name }}, {{ . }}{{ end }}{{ end }}{{ end }}{{ end }}</span></li>{{ end }}
+      {{ range $members }}<li>{{ if or .Content .Params.bio .Params.role }}<a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ else }}{{ .Title }}{{ end }}<span>{{ with .Params.alumni_note }}{{ . }}{{ else }}{{ .Params.role }}{{ with .Params.organizations }}{{ with index . 0 }}{{ with .name }}, {{ . }}{{ end }}{{ end }}{{ end }}{{ end }}{{ if eq $g.key "Alumni" }}{{ with .Params.year }} · {{ . }}{{ end }}{{ end }}</span></li>{{ end }}
     </ul>
     {{ else }}
     <div class="team {{ if eq $g.key "Principal Investigator" }}pi-row{{ end }}">

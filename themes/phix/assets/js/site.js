@@ -69,3 +69,10 @@
   });
   document.addEventListener("click", function(e){ if(!menu.hidden && !menu.contains(e.target)) open(false); });
 })();
+
+/* Lab panorama on phones: start the view on the optical tables rather than the curtain. */
+(function(){
+  var p = document.querySelector(".pano-scroll"); if(!p) return;
+  function centre(){ if(p.scrollWidth > p.clientWidth + 4) p.scrollLeft = (p.scrollWidth - p.clientWidth) * 0.72; }
+  var img = p.querySelector("img"); if(img && !img.complete) img.addEventListener("load", centre); else centre();
+})();

@@ -27,4 +27,6 @@ email: ''
 user_groups:
   - Alumni
  
+year: 2022
+
 ---

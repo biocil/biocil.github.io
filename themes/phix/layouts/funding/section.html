@@ -3,11 +3,12 @@
 <div class="wrap page-body">
   {{ with .Content }}<div class="prose intro">{{ . }}</div>{{ end }}
   {{ $items := .Pages.ByParam "start" }}
+  {{ partial "funding-total.html" $items }}
   {{ $a0 := float (.Params.axis_start | default 2015) }}{{ $a1 := float (.Params.axis_end | default 2027) }}{{ $span := sub $a1 $a0 }}
   <div class="gantt" role="list" aria-label="{{ T "timeline_label" }}">
     <div class="g-axis" aria-hidden="true"><span></span><div class="ticks" style="--cols:{{ $span }}">{{ range seq (int $a0) 2 (int $a1) }}<span style="left:{{ mul (div (sub (float .) $a0) $span) 100 }}%">{{ . }}</span>{{ end }}</div></div>
     {{- /* one row per project, network and award, newest at the top */}}
-    {{ range $items.Reverse }}
+    {{ range $items.Reverse }}{{ if .Params.start }}
       {{ $kind := .Params.kind | default "grant" }}
       {{ $s := partial "yearfrac.html" .Params.start }}
       {{ $isNow := and .Params.end (gt (time.AsTime .Params.end).Unix (now.AddDate 0 -1 0).Unix) }}
@@ -15,27 +16,34 @@
       <div class="g-row g-{{ $kind }}" role="listitem">
         <div class="g-label"><a href="{{ .RelPermalink }}">{{ if eq $kind "grant" }}{{ .Title }}{{ else }}{{ .Params.short | default .Title }}{{ end }}</a><span>{{ .Params.scheme }}, {{ (time.AsTime .Params.start).Format "2006" }}{{ if .Params.end }}–{{ (time.AsTime .Params.end).Format "2006" }}{{ else if eq $kind "grant" }}–{{ T "present" }}{{ end }}</span></div>
         <div class="track">
-          {{- if or .Params.end (eq $kind "grant") }}{{ $e := partial "yearfrac.html" (.Params.end | default now) }}<span class="bar{{ if ne $kind "grant" }} soft{{ end }}{{ if $isNow }} now{{ end }}" style="left:{{ mul (div (sub $s $a0) $span) 100 }}%;width:{{ mul (div (sub $e $s) $span) 100 }}%"></span>{{ end }}
-          {{- if eq $kind "award" }}<span class="pt" style="left:{{ mul (div (sub $s $a0) $span) 100 }}%"></span>{{ end }}
+          {{- if or .Params.end (eq $kind "grant") }}{{ $e := partial "yearfrac.html" (.Params.end | default now) }}<span class="bar {{ $kind }}" style="left:{{ mul (div (sub $s $a0) $span) 100 }}%;width:{{ mul (div (sub $e $s) $span) 100 }}%"></span>{{ end }}
+          {{- if eq $kind "award" }}<span class="pt{{ if .Params.student }} student{{ end }}" style="left:{{ mul (div (sub $s $a0) $span) 100 }}%"></span>{{ end }}
+          {{- if eq $kind "industry" }}<span class="pt industry" style="left:{{ mul (div (sub $s $a0) $span) 100 }}%"></span>{{ end }}
         </div>
       </div>
-    {{ end }}
-    <p class="g-legend" aria-hidden="true"><span><i class="lg-bar"></i>{{ T "research_projects" }}</span><span><i class="lg-soft"></i>{{ T "european_networks" }}</span><span><i class="lg-pt"></i>{{ T "awards" }}</span></p>
+    {{ end }}{{ end }}
+    <p class="g-legend" aria-hidden="true"><span><i class="lg grant"></i>{{ T "research_projects" }}</span><span><i class="lg network"></i>{{ T "european_networks" }}</span><span><i class="lg pt"></i>{{ T "awards" }}</span><span><i class="lg award"></i>{{ T "award_funding" }}</span><span><i class="lg pt student"></i>{{ T "student_awards" }}</span>{{ if where (where $items "Params.kind" "industry") "Params.start" "!=" nil }}<span><i class="lg pt industry"></i>{{ T "industry_support" }}</span>{{ end }}</p>
   </div>
 
-  {{ range slice (slice "grant" (T "research_projects")) (slice "network" (T "european_networks")) (slice "award" (T "awards")) }}
-  {{ $kind := index . 0 }}{{ $label := index . 1 }}
-  {{ $group := where $items.Reverse "Params.kind" $kind }}
+  {{ $groups := slice
+      (slice (T "research_projects") (where $items.Reverse "Params.kind" "grant"))
+      (slice (T "european_networks") (where $items.Reverse "Params.kind" "network"))
+      (slice (T "awards") (where (where $items.Reverse "Params.kind" "award") "Params.student" "!=" true))
+      (slice (T "student_awards") (where (where $items.Reverse "Params.kind" "award") "Params.student" true))
+      (slice (T "industry_support") (where .Pages "Params.kind" "industry")) }}
+  {{ range $groups }}
+  {{ $label := index . 0 }}{{ $group := index . 1 }}
   {{ if $group }}
   <section class="sub">
     <h2>{{ $label }}</h2>
     <ul class="fund-list">
       {{ range $group }}
       <li>
-        <div class="when">{{ (time.AsTime .Params.start).Format "2006" }}{{ with .Params.end }}–{{ (time.AsTime .).Format "2006" }}{{ end }}</div>
+        <div class="when">{{ with .Params.start }}{{ (time.AsTime .).Format "2006" }}{{ end }}{{ with .Params.end }}–{{ (time.AsTime .).Format "2006" }}{{ end }}</div>
         <div>
           <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-          <p class="muted">{{ .Params.scheme }}{{ with .Params.code }}, {{ printf (T "project_no") . }}{{ end }}{{ with .Params.budget }}, {{ printf (T "budget_x") . }}{{ end }}{{ with .Params.role }}. {{ . }}{{ end }}</p>
+          <p class="muted">{{ .Params.scheme }}{{ with .Params.code }}, {{ printf (T "project_no") . }}{{ end }}{{ with .Params.role }}. {{ . }}{{ end }}</p>
+          {{ if or .Params.budget .Params.budget_parts }}<p class="muted budget">{{ T "budget" }}: {{ partial "budget.html" . }}</p>{{ end }}
         </div>
       </li>
       {{ end }}

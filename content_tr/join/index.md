@@ -26,6 +26,8 @@ openings:
 
 Masada optik düzenekler kuracak ve bunların ham verisini ölçümlere dönüştüren rekonstrüksiyon kodunu yazacaksınız. Projelerin çoğu optik, elektronik ve programlamayı biyolojik ya da tıbbi bir soruyla birleştirir ve çoğu, ilk yazarı sizin olduğunuz bir makaleyle sonuçlanır.
 
+Lazerlerden uzaysal ışık modülatörlerine ve holotomografik mikroskoba kadar [optik laboratuvarımızdaki ekipmanla](/tr/facilities/) çalışacaksınız.
+
 ## Neler yardımcı olur
 
 Python ya da MATLAB’de rahat olmak, biraz Fourier optiği ve biyolojiye merak. İlk günden her şeyi bilmeniz gerekmiyor; gerisini biz öğretiriz.

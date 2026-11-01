@@ -6,13 +6,15 @@ code: "123N774"
 kind: "grant"
 start: 2024-01-15
 end: 2026-09-15
-budget: "1,720,000 TL"
+budget: 1720000
 date: 2024-01-15
 aliases: ["/research/123n774/"]
 authors:
 - M. Fatih Toy
 - Mohammad M TR Hussein
 - Maha Sahloul
+usd_rate: 30.1
+rate_date: 2024-01-15
 ---
 
 The project brought together our lab and colleagues in Moldova to develop polarization-sensitive digital holographic microscopy. It was financed under the 4th joint call of TÜBİTAK and NARD.

@@ -15,61 +15,43 @@
         <span class="seg" id="su-arm-wrap" role="group" aria-label="{{ if $tr }}Vurgula{{ else }}Highlight{{ end }}"><button type="button" data-arm-btn="both" aria-pressed="true">{{ if $tr }}İki kol{{ else }}Both arms{{ end }}</button><button type="button" data-arm-btn="obj" aria-pressed="false">{{ if $tr }}Nesne{{ else }}Object{{ end }}</button><button type="button" data-arm-btn="ref" aria-pressed="false">{{ if $tr }}Referans{{ else }}Reference{{ end }}</button></span></div>
       <div class="screen schematic">
         <svg data-setup-svg="mz" viewBox="0 0 640 360" role="img" aria-label="{{ if $tr }}Geçirgenlikte Mach–Zehnder dijital holografik mikroskop{{ else }}Mach–Zehnder digital holographic microscope in transmission{{ end }}">
-          <rect class="comp" x="16" y="262" width="92" height="36" rx="4"/><text class="lbl in" x="62" y="285">{{ if $tr }}Lazer{{ else }}Laser{{ end }}</text>
-          <line class="beam src" x1="108" y1="280" x2="170" y2="280"/><line class="flow src" x1="108" y1="280" x2="170" y2="280"/>
-          <g class="arm obj">
-            <line class="beam" x1="170" y1="280" x2="170" y2="80"/><line class="flow" x1="170" y1="280" x2="170" y2="80"/>
-            <line class="beam" x1="170" y1="80" x2="520" y2="80"/><line class="flow" x1="170" y1="80" x2="520" y2="80"/>
-            <line class="beam" x1="520" y1="80" x2="598" y2="80"/><line class="flow" x1="520" y1="80" x2="598" y2="80"/>
-          </g>
-          <g class="arm ref">
-            <line class="beam" x1="170" y1="280" x2="520" y2="280"/><line class="flow" x1="170" y1="280" x2="520" y2="280"/>
-            <line class="beam" x1="520" y1="280" x2="520" y2="80"/><line class="flow" x1="520" y1="280" x2="520" y2="80"/>
-            <line class="beam" x1="520" y1="80" x2="598" y2="72" data-refout data-axis="y" data-base="80"/><line class="flow" x1="520" y1="80" x2="598" y2="72" data-refout data-axis="y" data-base="80"/>
-          </g>
-          <rect class="bs" x="154" y="264" width="32" height="32"/><line class="bsd" x1="154" y1="296" x2="186" y2="264"/>
-          <line class="mirror" x1="156" y1="94" x2="184" y2="66"/>
-          <rect class="slide" x="236" y="48" width="8" height="64"/><circle class="cell" cx="240" cy="72" r="4"/><circle class="cell" cx="240" cy="90" r="3"/>
-          <polygon class="comp" points="284,62 330,48 330,112 284,98"/>
-          <ellipse class="comp" cx="430" cy="80" rx="6" ry="26"/>
-          <ellipse class="comp" cx="300" cy="280" rx="5" ry="16"/><ellipse class="comp" cx="380" cy="280" rx="7" ry="22"/>
-          <g data-tilt="+" data-pivot="520 280"><line class="mirror" x1="506" y1="294" x2="534" y2="266"/></g>
-          <rect class="bs" x="504" y="64" width="32" height="32"/><line class="bsd" x1="504" y1="96" x2="536" y2="64"/>
-          <rect class="comp cam" x="598" y="50" width="26" height="60" rx="3"/>
-          <text class="lbl" x="170" y="320">{{ if $tr }}Işın bölücü{{ else }}Beam splitter{{ end }}</text><text class="lbl" x="170" y="50">{{ if $tr }}Ayna{{ else }}Mirror{{ end }}</text>
-          <text class="lbl" x="240" y="136">{{ if $tr }}Numune{{ else }}Sample{{ end }}</text><text class="lbl" x="306" y="128">{{ if $tr }}Objektif{{ else }}Objective{{ end }}</text><text class="lbl" x="430" y="128">{{ if $tr }}Tüp merceği{{ else }}Tube lens{{ end }}</text>
-          <text class="lbl" x="340" y="318">{{ if $tr }}Referans kolu, ışın genişletici{{ else }}Reference arm, beam expander{{ end }}</text><text class="lbl" x="350" y="40">{{ if $tr }}Nesne kolu{{ else }}Object arm{{ end }}</text>
-          <text class="lbl" x="560" y="300">{{ if $tr }}Eğik ayna{{ else }}Tilted mirror{{ end }}</text><text class="lbl" x="611" y="132">{{ if $tr }}Kamera{{ else }}Camera{{ end }}</text>
+          <g class="beams" data-beams="mz"></g>
+          <rect class="comp" x="14" y="267" width="72" height="26" rx="4"/><text class="lbl in" x="50" y="284">{{ if $tr }}Lazer{{ else }}Laser{{ end }}</text>
+          <ellipse class="comp" cx="104" cy="280" rx="4" ry="9"/><ellipse class="comp" cx="140" cy="280" rx="6" ry="20"/>
+          <rect class="bs" x="164" y="264" width="32" height="32"/><line class="bsd" x1="164" y1="296" x2="196" y2="264"/>
+          <line class="mirror" x1="166" y1="94" x2="194" y2="66"/>
+          <rect class="slide" x="242" y="40" width="8" height="80"/><circle class="cell" cx="246" cy="72" r="4"/><circle class="cell" cx="246" cy="90" r="3"/>
+          <polygon class="comp" points="288,60 336,44 336,116 288,100"/>
+          <ellipse class="comp" cx="436" cy="80" rx="7" ry="30"/>
+          <line class="mirror" x1="506" y1="294" x2="534" y2="266"/>
+          <g id="mz-bs2"><rect class="bs" x="504" y="64" width="32" height="32"/><line class="bsd" x1="504" y1="96" x2="536" y2="64"/></g>
+          <rect class="comp cam" x="582" y="40" width="26" height="80" rx="3"/>
+          <text class="lbl" x="114" y="318">{{ if $tr }}Işın genişletici{{ else }}Beam expander{{ end }}</text><text class="lbl" x="214" y="318">{{ if $tr }}Işın bölücü{{ else }}Beam splitter{{ end }}</text><text class="lbl" x="180" y="48">{{ if $tr }}Ayna{{ else }}Mirror{{ end }}</text>
+          <text class="lbl" x="246" y="138">{{ if $tr }}Numune{{ else }}Sample{{ end }}</text><text class="lbl" x="312" y="136">{{ if $tr }}Objektif{{ else }}Objective{{ end }}</text><text class="lbl" x="436" y="128">{{ if $tr }}Tüp merceği{{ else }}Tube lens{{ end }}</text>
+          <text class="lbl" x="350" y="250">{{ if $tr }}Referans kolu{{ else }}Reference arm{{ end }}</text><text class="lbl" x="372" y="30">{{ if $tr }}Nesne kolu{{ else }}Object arm{{ end }}</text>
+          <text class="lbl" x="568" y="306">{{ if $tr }}Ayna{{ else }}Mirror{{ end }}</text><text class="lbl" x="498" y="154">{{ if $tr }}Eğik ışın bölücü{{ else }}Tilted beam splitter{{ end }}</text><text class="lbl" x="595" y="140">{{ if $tr }}Kamera{{ else }}Camera{{ end }}</text>
         </svg>
         <svg data-setup-svg="mi" viewBox="0 0 640 360" role="img" aria-label="{{ if $tr }}Yansımada Michelson dijital holografik mikroskop{{ else }}Michelson digital holographic microscope in reflection{{ end }}" hidden>
-          <rect class="comp" x="16" y="182" width="92" height="36" rx="4"/><text class="lbl in" x="62" y="205">{{ if $tr }}Lazer{{ else }}Laser{{ end }}</text>
-          <line class="beam src" x1="108" y1="200" x2="300" y2="200"/><line class="flow src" x1="108" y1="200" x2="300" y2="200"/>
-          <ellipse class="comp" cx="200" cy="200" rx="6" ry="18"/>
-          <g class="arm obj">
-            <line class="beam" x1="296" y1="200" x2="296" y2="48"/><line class="flow" x1="296" y1="200" x2="296" y2="48"/>
-            <line class="beam" x1="304" y1="48" x2="304" y2="330"/><line class="flow" x1="304" y1="48" x2="304" y2="330"/>
-          </g>
-          <g class="arm ref">
-            <line class="beam" x1="300" y1="196" x2="520" y2="196"/><line class="flow" x1="300" y1="196" x2="520" y2="196"/>
-            <line class="beam" x1="520" y1="204" x2="300" y2="204"/><line class="flow" x1="520" y1="204" x2="300" y2="204"/>
-            <line class="beam" x1="296" y1="204" x2="288" y2="330" data-refout data-axis="x" data-base="296"/><line class="flow" x1="296" y1="204" x2="288" y2="330" data-refout data-axis="x" data-base="296"/>
-          </g>
-          <rect class="bs" x="284" y="184" width="32" height="32"/><line class="bsd" x1="284" y1="216" x2="316" y2="184"/>
-          <polygon class="comp" points="282,152 318,152 308,112 292,112"/>
-          <path class="surface" d="M230 44 H270 q6 -8 12 0 H312 q8 -10 16 0 H370"/><rect class="slide" x="230" y="30" width="140" height="14"/>
-          <g data-tilt="+" data-pivot="526 200"><line class="mirror" x1="526" y1="172" x2="526" y2="228"/></g>
-          <ellipse class="comp" cx="300" cy="268" rx="26" ry="6"/>
-          <rect class="comp cam" x="272" y="330" width="56" height="22" rx="3"/>
-          <text class="lbl" x="200" y="236">{{ if $tr }}Genişletici{{ else }}Expander{{ end }}</text><text class="lbl" x="350" y="236">{{ if $tr }}Işın bölücü{{ else }}Beam splitter{{ end }}</text><text class="lbl" x="352" y="134">{{ if $tr }}Objektif{{ else }}Objective{{ end }}</text>
-          <text class="lbl" x="420" y="22">{{ if $tr }}Yansıtıcı numune{{ else }}Reflective sample{{ end }}</text><text class="lbl" x="560" y="160">{{ if $tr }}Referans aynası{{ else }}Reference mirror{{ end }}</text>
-          <text class="lbl" x="372" y="272">{{ if $tr }}Tüp merceği{{ else }}Tube lens{{ end }}</text><text class="lbl" x="372" y="346">{{ if $tr }}Kamera{{ else }}Camera{{ end }}</text>
+          <g class="beams" data-beams="mi"></g>
+          <rect class="comp" x="14" y="217" width="72" height="26" rx="4"/><text class="lbl in" x="50" y="234">{{ if $tr }}Lazer{{ else }}Laser{{ end }}</text>
+          <ellipse class="comp" cx="104" cy="230" rx="4" ry="9"/><ellipse class="comp" cx="140" cy="230" rx="6" ry="20"/>
+          <rect class="bs" x="284" y="214" width="32" height="32"/><line class="bsd" x1="284" y1="246" x2="316" y2="214"/>
+          <ellipse class="comp" cx="300" cy="178" rx="30" ry="7"/>
+          <polygon class="comp" points="276,150 324,150 318,104 282,104"/>
+          <path class="surface" d="M240 74 H272 q6 -8 12 0 H306 q8 -10 16 0 H360"/><rect class="slide" x="240" y="60" width="120" height="14"/>
+          <g id="mi-mirror"><line class="mirror" x1="356" y1="208" x2="356" y2="252"/></g>
+          <rect class="comp cam" x="264" y="290" width="72" height="22" rx="3"/>
+          <text class="lbl" x="122" y="268">{{ if $tr }}Işın genişletici{{ else }}Beam expander{{ end }}</text><text class="lbl" x="232" y="272">{{ if $tr }}Işın bölücü{{ else }}Beam splitter{{ end }}</text>
+          <text class="lbl" x="390" y="132">{{ if $tr }}Objektif{{ else }}Objective{{ end }}</text><text class="lbl" x="388" y="182">{{ if $tr }}Tüp merceği{{ else }}Tube lens{{ end }}</text>
+          <text class="lbl" x="420" y="56">{{ if $tr }}Yansıtıcı numune{{ else }}Reflective sample{{ end }}</text><text class="lbl" x="424" y="216">{{ if $tr }}Referans aynası{{ else }}Reference mirror{{ end }}</text>
+          <text class="lbl" x="390" y="306">{{ if $tr }}Kamera{{ else }}Camera{{ end }}</text>
         </svg>
         <svg data-setup-svg="inline" viewBox="0 0 640 360" role="img" aria-label="{{ if $tr }}Eksen içi merceksiz holografik mikroskop{{ else }}In-line lens-free holographic microscope{{ end }}" hidden>
           <defs>
             <clipPath id="cone"><polygon id="il-coneclip" points="118,180 440,30 440,330"/></clipPath>
             <clipPath id="gap"><rect id="il-gapclip" x="426" y="30" width="30" height="300"/></clipPath>
           </defs>
-          <polygon class="cone" id="il-cone" points="118,180 418,40 418,320"/>
+          <polygon class="il-cone" id="il-cone" points="118,180 418,40 418,320"/>
           <g clip-path="url(#cone)">
             <circle class="wave" cx="118" cy="180" r="340" style="animation-delay:0s"/><circle class="wave" cx="118" cy="180" r="340" style="animation-delay:-0.6s"/>
             <circle class="wave" cx="118" cy="180" r="340" style="animation-delay:-1.2s"/><circle class="wave" cx="118" cy="180" r="340" style="animation-delay:-1.8s"/>
@@ -90,38 +72,29 @@
         </svg>
 
         <svg data-setup-svg="tomo" viewBox="0 0 640 360" role="img" aria-label="{{ if $tr }}Holotomografi: aydınlatmayı eğen tarayıcı galvo aynalı Mach–Zehnder mikroskop{{ else }}Holotomography: Mach–Zehnder microscope with a scanning galvo mirror that tilts the illumination{{ end }}" hidden>
-          <rect class="comp" x="16" y="262" width="92" height="36" rx="4"/><text class="lbl in" x="62" y="285">{{ if $tr }}Lazer{{ else }}Laser{{ end }}</text>
-          <line class="beam src" x1="108" y1="280" x2="170" y2="280"/><line class="flow src" x1="108" y1="280" x2="170" y2="280"/>
-          <g class="arm obj">
-            <line class="beam" x1="170" y1="280" x2="170" y2="80"/><line class="flow" x1="170" y1="280" x2="170" y2="80"/>
-            <polyline class="beam" id="gt-ray" points="170,80 230,80 330,80 370,80 400,80 470,80 520,80 598,80" fill="none"/>
-            <polyline class="flow" id="gt-flow" points="170,80 230,80 330,80 370,80 400,80 470,80 520,80 598,80" fill="none"/>
-            <g id="gt-wave"></g>
-          </g>
-          <g class="arm ref">
-            <line class="beam" x1="170" y1="280" x2="520" y2="280"/><line class="flow" x1="170" y1="280" x2="520" y2="280"/>
-            <line class="beam" x1="520" y1="280" x2="520" y2="80"/><line class="flow" x1="520" y1="280" x2="520" y2="80"/>
-            <line class="beam" x1="520" y1="80" x2="598" y2="72"/><line class="flow" x1="520" y1="80" x2="598" y2="72"/>
-          </g>
-          <rect class="bs" x="154" y="264" width="32" height="32"/><line class="bsd" x1="154" y1="296" x2="186" y2="264"/>
-          <g id="gt-galvo"><line class="mirror galvo" x1="158" y1="92" x2="182" y2="68"/></g>
-          <ellipse class="comp" cx="230" cy="80" rx="6" ry="30"/>
-          <ellipse class="comp" cx="330" cy="80" rx="7" ry="34"/>
-          <rect class="slide" x="366" y="46" width="8" height="68"/><circle class="cell" cx="370" cy="80" r="4"/>
-          <polygon class="comp objective" points="386,48 440,36 440,124 386,112"/>
-          <ellipse class="comp" cx="470" cy="80" rx="7" ry="34"/>
-          <line class="mirror" x1="506" y1="294" x2="534" y2="266"/>
-          <rect class="bs" x="504" y="64" width="32" height="32"/><line class="bsd" x1="504" y1="96" x2="536" y2="64"/>
-          <rect class="comp cam" x="598" y="50" width="26" height="60" rx="3"/>
-          <text class="lbl" x="170" y="50">{{ if $tr }}Galvo ayna{{ else }}Galvo mirror{{ end }}</text><text class="lbl" x="230" y="132">{{ if $tr }}Röle merceği{{ else }}Relay lens{{ end }}</text><text class="lbl" x="330" y="136">{{ if $tr }}Kondansör{{ else }}Condenser{{ end }}</text>
-          <text class="lbl" x="370" y="30">{{ if $tr }}Numune{{ else }}Sample{{ end }}</text><text class="lbl" x="412" y="128">{{ if $tr }}Objektif{{ else }}Objective{{ end }}</text><text class="lbl" x="470" y="128">{{ if $tr }}Tüp merceği{{ else }}Tube lens{{ end }}</text>
-          <text class="lbl" x="611" y="132">{{ if $tr }}Kamera{{ else }}Camera{{ end }}</text><text class="lbl" x="340" y="318">{{ if $tr }}Referans kolu{{ else }}Reference arm{{ end }}</text>
-          <g transform="translate(250 196)">
-            <circle class="pupil" cx="0" cy="0" r="40"/><circle class="pupil-in" cx="0" cy="0" r="20"/>
+          <g class="beams" data-beams="tomo"></g>
+          <g id="gt-wave"></g>
+          <rect class="comp" x="14" y="267" width="72" height="26" rx="4"/><text class="lbl in" x="50" y="284">{{ if $tr }}Lazer{{ else }}Laser{{ end }}</text>
+          <ellipse class="comp" cx="104" cy="280" rx="4" ry="9"/><ellipse class="comp" cx="140" cy="280" rx="6" ry="20"/>
+          <rect class="bs" x="164" y="264" width="32" height="32"/><line class="bsd" x1="164" y1="296" x2="196" y2="264"/>
+          <line class="mirror galvo" id="gt-galvo" x1="166" y1="94" x2="194" y2="66"/><circle class="pivot" cx="180" cy="80" r="3"/>
+          <ellipse class="comp" cx="240" cy="80" rx="6" ry="38"/>
+          <ellipse class="comp" cx="336" cy="80" rx="8" ry="42"/>
+          <rect class="slide" x="370" y="42" width="8" height="76"/><circle class="cell" cx="374" cy="80" r="4"/>
+          <polygon class="comp objective" points="390,48 446,32 446,128 390,112"/>
+          <ellipse class="comp" cx="482" cy="80" rx="7" ry="40"/>
+          <line class="mirror" x1="516" y1="294" x2="544" y2="266"/>
+          <g id="gt-bs2"><rect class="bs" x="514" y="64" width="32" height="32"/><line class="bsd" x1="514" y1="96" x2="546" y2="64"/></g>
+          <rect class="comp cam" x="582" y="40" width="26" height="80" rx="3"/>
+          <text class="lbl" x="180" y="40">{{ if $tr }}Galvo ayna{{ else }}Galvo mirror{{ end }}</text><text class="lbl" x="240" y="136">{{ if $tr }}Röle merceği{{ else }}Relay lens{{ end }}</text><text class="lbl" x="336" y="142">{{ if $tr }}Kondansör{{ else }}Condenser{{ end }}</text>
+          <text class="lbl" x="374" y="30">{{ if $tr }}Numune{{ else }}Sample{{ end }}</text><text class="lbl" x="418" y="146">{{ if $tr }}Objektif{{ else }}Objective{{ end }}</text><text class="lbl" x="482" y="138">{{ if $tr }}Tüp merceği{{ else }}Tube lens{{ end }}</text>
+          <text class="lbl" x="595" y="140">{{ if $tr }}Kamera{{ else }}Camera{{ end }}</text><text class="lbl" x="440" y="262">{{ if $tr }}Referans kolu{{ else }}Reference arm{{ end }}</text>
+          <g transform="translate(270 200)">
+            <circle class="pupil" cx="0" cy="0" r="34"/><circle class="pupil-in" cx="0" cy="0" r="17"/>
             <g id="gt-trace"></g><circle class="led" id="gt-dot" cx="0" cy="0" r="5"/>
-            <text class="lbl" x="0" y="58">{{ if $tr }}Kondansör göz bebeği{{ else }}Condenser pupil{{ end }}</text>
+            <text class="lbl" x="0" y="52">{{ if $tr }}Kondansör göz bebeği{{ else }}Condenser pupil{{ end }}</text>
           </g>
-          <text class="lbl in" id="gt-angle" x="370" y="186">θ = 0°</text>
+          <text class="lbl in" id="gt-angle" x="374" y="186">θ = 0°</text>
         </svg>
       </div>
       <div class="screen schematic3d" id="su-3d" hidden><canvas id="su-3d-canvas" aria-label="{{ if $tr }}Optik masa üzerindeki 3B düzenek modeli. Etrafa bakmak için sürükleyin, yakınlaştırmak için kaydırın, ne işe yaradığını öğrenmek için bir parçaya tıklayın.{{ else }}3D model of the scanning holotomography set-up on an optical table. Drag to look around, scroll to zoom, click a part to learn what it does.{{ end }}"></canvas><div class="gl-labels" id="su-3d-labels"></div></div>
@@ -136,6 +109,7 @@
   <div class="controls">
     <div class="ctl" id="su-tilt-wrap"><label for="su-tilt">{{ if $tr }}Referans eğimi{{ else }}Reference tilt{{ end }} <output id="su-tiltOut" for="su-tilt">1.5°</output></label><input id="su-tilt" type="range" min="0" max="3" step="0.1" value="1.5"></div>
     <div class="ctl" id="su-z-wrap" hidden><label for="su-z">{{ if $tr }}Numune–sensör mesafesi{{ else }}Sample to sensor{{ end }} <output id="su-zOut" for="su-z">600 µm</output></label><input id="su-z" type="range" min="100" max="1500" step="20" value="600"></div>
+    <div class="ctl" id="su-lambda-wrap"><label for="su-lambda">{{ if $tr }}Dalga boyu{{ else }}Wavelength{{ end }} <output id="su-lambdaOut" for="su-lambda">633 nm</output></label><input id="su-lambda" type="range" min="400" max="700" step="1" value="633"><span class="spectrum" aria-hidden="true"></span></div>
     <div class="btn-row"><button class="btn btn-ghost" type="button" id="su-play" aria-pressed="true">{{ if $tr }}Işığı durdur{{ else }}Pause the light{{ end }}</button></div>
   </div>
   <p class="status" id="su-status" aria-live="polite">{{ if $tr }}Şema yükleniyor…{{ else }}Loading the schematic…{{ end }}</p>

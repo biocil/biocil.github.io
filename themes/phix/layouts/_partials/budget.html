@@ -1,0 +1,13 @@
+{{- /* A budget in Turkish lira with its US-dollar equivalent at the reference rate on the award date.
+       Either budget + usd_rate + rate_date, or budget_parts: a list of {amount, date, usd_rate}. Param: the funding page. */ -}}
+{{- with .Params.budget_parts -}}
+  {{- $tl := 0.0 }}{{ $usd := 0.0 }}{{ $bits := slice -}}
+  {{- range . }}{{ $tl = add $tl (float .amount) }}{{ $usd = add $usd (div (float .amount) (float .usd_rate)) }}{{ $bits = $bits | append (printf "%s TL (%s)" (lang.FormatNumber 0 .amount) (time.Format "2006" (time.AsTime .date))) }}{{ end -}}
+  {{- lang.FormatNumber 0 $tl }} TL <span class="usd">{{ printf (T "budget_parts") (lang.FormatNumber 0 (mul (math.Round (div $usd 100)) 100)) (delimit $bits ", ") }}</span>
+{{- else -}}
+{{- $b := .Params.budget -}}
+{{- if .Params.usd_rate -}}
+{{- $usd := mul (math.Round (div (div (float $b) (float .Params.usd_rate)) 100)) 100 -}}
+{{- lang.FormatNumber 0 $b }} TL <span class="usd">{{ printf (T "budget_usd") (lang.FormatNumber 0 $usd) (lang.FormatNumber 2 .Params.usd_rate) (time.Format "2 January 2006" (time.AsTime .Params.rate_date)) }}</span>
+{{- else -}}{{ $b }}{{- end -}}
+{{- end -}}

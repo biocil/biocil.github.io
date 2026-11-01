@@ -34,6 +34,8 @@ openings:
 
 You will build optical setups on the bench and write the reconstruction code that turns their raw data into measurements. Most projects combine optics, electronics and programming with a biological or medical question, and most end in a paper with your name first.
 
+You would work with [the equipment in our optical lab](/facilities/), from lasers and spatial light modulators to a holotomographic microscope.
+
 ## What helps
 
 Comfort with Python or MATLAB, some Fourier optics, and curiosity about biology. You do not need to know everything on day one; we will teach you the rest.

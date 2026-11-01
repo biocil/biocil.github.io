@@ -34,7 +34,7 @@ Her aydınlatma açısı, Fourier uzayına Ewald küresinden bir kapak ekler. A�
 
 EPFL’de birçok aydınlatma yönünden hologram kaydettik ve karmaşık alanı mikroskobun ölçülen koherent aktarım fonksiyonuyla ters evrişime tabi tuttuk. Böylece herhangi bir işaretleyici olmadan 90 nm yanal çözünürlüğe ulaştık; bu, nöronlardaki canlı dendritik dikenlerin dinamiğini izlemeye, bakterileri görüntülemeye ve diyatome kabuklarının nano ölçekli gözeneklerini çözmeye yetti. Çalışma Nature Photonics’te *marker-free phase nanoscopy* (işaretleyicisiz faz nanoskopisi) olarak yayımlandı.
 
-Bu çalışma, Fatih Toy’un 2013’te kurucuları arasında yer aldığı Nanolive SA’nın holotomografik mikroskobu 3D Cell Explorer’a temel oluşturdu.
+Bu çalışma, Fatih Toy’un 2013’te kurucuları arasında yer aldığı ve hâlâ maaş almadan danışmanlık yaptığı Nanolive SA’nın holotomografik mikroskobu 3D Cell Explorer’a temel oluşturdu. Laboratuvarda artık [Nanolive katkısıyla](/tr/funding/nanolive/) bir 3D Cell Explorer bulunuyor.
 
 ## Boyasız miyelin
 

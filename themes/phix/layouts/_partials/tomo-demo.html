@@ -21,7 +21,7 @@
   </ol>
   <div class="controls">
     <div class="btn-row"><button class="btn btn-primary" type="button" id="t3-play">{{ if $tr }}Aydınlatmayı tara{{ else }}Scan the illumination{{ end }}</button><button class="btn btn-ghost" type="button" id="t3-reset">{{ if $tr }}Sıfırla{{ else }}Reset{{ end }}</button></div>
-    <div class="ctl"><label for="t3-range">{{ if $tr }}En büyük aydınlatma açısı{{ else }}Maximum illumination angle{{ end }} <output id="t3-rangeOut" for="t3-range">70°</output></label><input id="t3-range" type="range" min="0" max="77" step="1" value="70"></div>
+    <div class="ctl"><label for="t3-range">{{ if $tr }}En büyük aydınlatma açısı{{ else }}Maximum illumination angle{{ end }} <output id="t3-rangeOut" for="t3-range">70°</output></label><input id="t3-range" type="range" min="0" max="70" step="1" value="70"></div>
     <div class="checks"><label class="check"><input type="checkbox" id="t3-single"> {{ if $tr }}Yalnızca geçerli açı{{ else }}Current angle only{{ end }}</label><label class="check"><input type="checkbox" id="t3-link" checked> {{ if $tr }}Görünümleri birlikte döndür{{ else }}Rotate the views together{{ end }}</label></div>
   </div>
   <p class="status" id="t3-status" aria-live="polite">{{ if $tr }}3B görünüm yükleniyor…{{ else }}Loading the 3D view…{{ end }}</p>

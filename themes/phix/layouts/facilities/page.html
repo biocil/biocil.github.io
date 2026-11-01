@@ -1,0 +1,36 @@
+{{ define "main" }}
+{{ $tr := eq site.Language.Lang "tr" }}
+{{ partial "page-head.html" . }}
+<div class="wrap page-body">
+  {{ with .Params.panorama }}{{ with $.Resources.Get . }}
+  {{ $sm := .Resize "1600x webp q82" }}{{ $lg := .Resize "3200x webp q80" }}
+  <figure class="pano">
+    <div class="pano-scroll" tabindex="0" aria-label="{{ $.Params.panorama_caption }}">
+      <img src="{{ $sm.RelPermalink }}" srcset="{{ $sm.RelPermalink }} 1600w, {{ $lg.RelPermalink }} 3200w" sizes="(max-width: 820px) 1100px, 100vw" width="{{ $lg.Width }}" height="{{ $lg.Height }}" alt="{{ $.Params.panorama_caption }}">
+    </div>
+    <figcaption>{{ $.Params.panorama_caption }}<span class="pano-hint"> {{ T "swipe_pano" }}</span></figcaption>
+  </figure>
+  {{ end }}{{ end }}
+  {{ with .Content }}<div class="prose intro">{{ . }}</div>{{ end }}
+  {{ $groups := hugo.Data.equipment }}
+  <nav class="fac-jump" aria-label="{{ T "equipment_categories" }}">
+    {{ range $groups }}<a href="#{{ .id }}">{{ if and $tr .title_tr }}{{ .title_tr }}{{ else }}{{ .title }}{{ end }}</a>{{ end }}
+  </nav>
+  {{ range $groups }}
+  <section class="sub fac-group" id="{{ .id }}" aria-labelledby="{{ .id }}-t">
+    <h2 id="{{ .id }}-t">{{ if and $tr .title_tr }}{{ .title_tr }}{{ else }}{{ .title }}{{ end }}</h2>
+    <ul class="fac-list">
+      {{ range .items }}
+      <li>
+        <h3>{{ if and $tr .name_tr }}{{ .name_tr }}{{ else }}{{ .name }}{{ end }}{{ with .count }} <span class="count">× {{ . }}</span>{{ end }}</h3>
+        {{ with .model }}<p class="model">{{ . }}</p>{{ end }}
+        <p>{{ if and $tr .note_tr }}{{ .note_tr }}{{ else }}{{ .note }}{{ end }}</p>
+        {{ with .contributed_by }}{{ with site.GetPage . }}<p class="tag-line"><a href="{{ .RelPermalink }}">{{ T "contributed_by_nanolive" }}</a></p>{{ end }}{{ else }}{{ with .link }}<p class="tag-line"><a href="{{ . | relLangURL }}">{{ T "see_research" }}</a></p>{{ end }}{{ end }}
+      </li>
+      {{ end }}
+    </ul>
+  </section>
+  {{ end }}
+  <p class="back"><a href="{{ "/research/instruments/" | relLangURL }}">{{ T "instruments_we_build" }}</a></p>
+</div>
+{{ end }}

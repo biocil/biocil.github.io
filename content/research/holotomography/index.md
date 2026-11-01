@@ -34,7 +34,7 @@ Each illumination angle contributes one cap of the Ewald sphere in Fourier space
 
 At EPFL we recorded holograms from many illumination directions and deconvolved the complex field with the measured coherent transfer function of the microscope. This reached a lateral resolution of 90 nm without any label, enough to follow the dynamics of living dendritic spines in neurons, image bacteria and resolve the nanoscale pores of diatom shells. The work was published as *marker-free phase nanoscopy* in Nature Photonics.
 
-This work fed into the 3D Cell Explorer, the holotomographic microscope of Nanolive SA, which Fatih Toy co-founded in 2013.
+This work fed into the 3D Cell Explorer, the holotomographic microscope of Nanolive SA, which Fatih Toy co-founded in 2013 and still advises without a salary. The lab now has a 3D Cell Explorer of its own, [contributed by Nanolive](/funding/nanolive/).
 
 ## Myelin without stains
 

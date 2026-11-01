@@ -59,6 +59,7 @@ highlight_name: false
 #   Set this to `[]` or comment out if you are not using People widget.
 user_groups:
   - Graduate Research Assistants
+
 ---
 Mohammad M. T. R. Hussein defended his MSc thesis in Biomedical Engineering at Istanbul Medipol University on 13 August 2026, on polarization-sensitive digital holographic microscopy with structured illumination. He developed dual-shot polarization DHM for full-field Jones matrix imaging, published in Biomedical Optics Express.
 

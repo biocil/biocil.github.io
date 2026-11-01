@@ -62,5 +62,7 @@ highlight_name: false
 user_groups:
   - Alumni
  
-alumni_note: Now a PhD student at Princeton University
+alumni_note: MSc; now a PhD student at Princeton University
+year: 2022
+
 ---

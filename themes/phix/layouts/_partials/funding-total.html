@@ -1,0 +1,10 @@
+{{- /* Sum of all budgets in TL, and of their US-dollar equivalents, each converted at its own award-date rate. Param: list of funding pages. */ -}}
+{{- $tl := 0.0 }}{{ $usd := 0.0 }}{{ $n := 0 -}}
+{{- range . -}}
+  {{- if .Params.budget_parts }}{{ $n = add $n 1 }}{{ range .Params.budget_parts }}{{ $tl = add $tl (float .amount) }}{{ $usd = add $usd (div (float .amount) (float .usd_rate)) }}{{ end -}}
+  {{- else if and .Params.budget .Params.usd_rate }}{{ $n = add $n 1 }}{{ $tl = add $tl (float .Params.budget) }}{{ $usd = add $usd (div (float .Params.budget) (float .Params.usd_rate)) }}{{ end -}}
+{{- end -}}
+<div class="fund-total">
+  <p class="big"><span>{{ T "total_funding" }}</span> {{ lang.FormatNumber 0 $tl }} TL <span class="usd">≈ {{ printf (T "usd_amount") (lang.FormatNumber 0 (mul (math.Round (div $usd 100)) 100)) }}</span></p>
+  <p class="muted">{{ printf (T "total_note") $n }}</p>
+</div>

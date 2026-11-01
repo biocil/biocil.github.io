@@ -5,12 +5,14 @@ funder: "Istanbul Development Agency (İSTKA)"
 kind: "grant"
 start: 2016-12-15
 end: 2017-12-15
-budget: "1,500,000 TL"
+budget: 1500000
 date: 2016-12-15
 aliases: ["/research/istka/"]
 authors:
 - M. Fatih Toy
 - Bahadır K. Gunturk
 - Baturay Ozgurun
+usd_rate: 3.5358
+rate_date: 2016-12-15
 ---
 

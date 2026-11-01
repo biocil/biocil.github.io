@@ -22,7 +22,7 @@
         <button type="button" class="pal-btn" id="pal-btn" aria-haspopup="true" aria-expanded="false" aria-controls="pal-menu" title="{{ T "colour_scheme" }}"><span class="pal-dot" aria-hidden="true"></span><span class="sr-only">{{ T "colour_scheme" }}</span></button>
         <div class="pal-menu" id="pal-menu" role="menu" hidden>
           <p>{{ T "colour_scheme" }}</p>
-          {{- range slice (slice "glass" "#10302A" "#E0B252") (slice "medipol" "#0A2D57" "#5BC2EE") (slice "tint" "#261C3A" "#F4A340") (slice "phoenix" "#6E140F" "#FFFFFF") }}
+          {{- range slice (slice "medipol" "#0A2D57" "#5BC2EE") (slice "glass" "#10302A" "#E0B252") (slice "tint" "#261C3A" "#F4A340") (slice "phoenix" "#6E140F" "#FFFFFF") }}
           <button type="button" role="menuitemradio" data-pal="{{ index . 0 }}" aria-checked="false"><span class="sw" style="background:linear-gradient(135deg,{{ index . 1 | safeCSS }} 55%,{{ index . 2 | safeCSS }} 55%)"></span>{{ T (printf "palette_%s" (index . 0)) }}</button>
           {{- end }}
         </div>

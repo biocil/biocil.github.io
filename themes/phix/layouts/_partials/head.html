@@ -21,7 +21,7 @@
 <meta property="og:image" content="{{ . }}">
 <meta name="twitter:card" content="summary_large_image">
 {{- end }}
-<meta name="theme-color" content="{{ index (dict "glass" "#10302A" "tint" "#261C3A" "phoenix" "#6E140F") (site.Params.palette | default "glass") | default "#10302A" }}">
+<meta name="theme-color" content="{{ index (dict "medipol" "#0A2D57" "glass" "#10302A" "tint" "#261C3A" "phoenix" "#6E140F") (site.Params.palette | default "glass") | default "#10302A" }}">
 <link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">
 {{- with resources.Get "media/icon.png" }}
 <link rel="apple-touch-icon" href="{{ (.Resize "180x180 png").RelPermalink }}">

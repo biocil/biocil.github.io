@@ -28,4 +28,8 @@ tags: [Instrumentation]
 - **Holografik geri beslemeli üretim.** Üretilen parçayı üretim sırasında holografiyle denetleyen, optik eleman üretimine yönelik maskesiz litografi.
 - **Mikroskop otomatik odaklama** (WO 2024/208601) ile mikrorobotların gerçek zamanlı holografik takibi ve kontrolü.
 
+## Ekipman
+
+Bu cihazları; lazerler, uzaysal ışık modülatörleri, sıvı kristal filtre ve geciktiriciler, elektro-optik modülatör, galvanometrik tarayıcılar, kameralar, spektrometre, özel parçalar için bir Zortrax M200 3B yazıcı ve aralarında Nanolive 3D Cell Explorer ile Zeiss Axio Observer 7’nin de bulunduğu mikroskoplarla donatılmış optik laboratuvarımızda geliştiriyoruz. [Laboratuvar ekipmanının tam listesine](/tr/facilities/) bakın.
+
 Lisans ekipleri de çalışan cihazlar geliştiriyor; bkz. [öğrenci projeleri](/tr/research/#sp-title).
