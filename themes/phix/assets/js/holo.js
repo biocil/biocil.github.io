@@ -188,19 +188,23 @@ function buildHero(){
   hc.width=W; hc.height=H; lastW=cw;
   var phi=new Float32Array(W*H);
   paintCells(phi,W,H,makeCells(W,H,11,7,Math.min(W,H)*0.16));
+  /* Transparent cells: the amplitude stays almost flat and the phase does the work.
+     Cell bodies delay the light by about 2–3.5 rad and nuclei by a further ~2 rad, up to about one
+     fringe in total, and the fringes are wide enough on screen that their bends are easy to see. */
+  var PH=2.4, PMAX=2.9*PH;
   var lap=laplacianNorm(phi,W,H,Math.max(2,Math.round(2.5*s)));
-  var period=8*s, th=38*Math.PI/180, kx=TAU*Math.cos(th)/period, ky=TAU*Math.sin(th)/period;
-  var nr=rng(11), hol=new ImageData(W,H), ph=new ImageData(W,H), hd=hol.data, pd=ph.data, a0=0.78, norm=1/((1+a0*1.5)*(1+a0*1.5));
+  var period=13*s, th=38*Math.PI/180, kx=TAU*Math.cos(th)/period, ky=TAU*Math.sin(th)/period;
+  var nr=rng(11), hol=new ImageData(W,H), ph=new ImageData(W,H), hd=hol.data, pd=ph.data, a0=0.8, norm=1/((1+a0*1.1)*(1+a0*1.1));
   for(var y=0;y<H;y++){
     var ny=(y/H-0.5)*2;
     for(var x=0;x<W;x++){
-      var i=y*W+x, p=phi[i], nx=(x/W-0.5)*2;
+      var i=y*W+x, p=phi[i]*PH, nx=(x/W-0.5)*2;
       var env=0.6+0.4*Math.exp(-(nx*nx*0.4+ny*ny*0.5));
-      var A=a0*(1+0.45*lap[i])*(1-0.04*p);
-      var I=(1+A*A+2*A*Math.cos(kx*x+ky*y-p))*norm*env*1.35+(nr()-0.5)*0.05;
+      var A=a0*(1+0.08*lap[i]);
+      var I=(1+A*A+2*A*Math.cos(kx*x+ky*y-p))*norm*env*1.15+(nr()-0.5)*0.04;
       var hi=Math.max(0,Math.min(255,Math.round(I*255)))*3, o=i*4;
       hd[o]=LUT_H[hi]; hd[o+1]=LUT_H[hi+1]; hd[o+2]=LUT_H[hi+2]; hd[o+3]=255;
-      var t=Math.max(0,Math.min(255,Math.round((p+0.1)/2.85*255)))*3;
+      var t=Math.max(0,Math.min(255,Math.round((p+0.2)/PMAX*255)))*3;
       pd[o]=LUT_P[t]; pd[o+1]=LUT_P[t+1]; pd[o+2]=LUT_P[t+2]; pd[o+3]=255;
     }
   }
