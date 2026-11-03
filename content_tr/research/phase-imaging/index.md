@@ -19,6 +19,11 @@ papers:
   - 2022_SPIEPE_Gurcan_a
 funding: [120F099, ISTKA]
 tags: [Digital Holographic Microscopy, Quantitative Phase Imaging]
+demos: [field, setups, offaxis, inline]
+demos_intro: >-
+  Bu sayfadaki yöntemlerin dört benzetimi: karmaşık alanın şiddet görüntüsünden neden daha
+  fazlasını söylediği, holografik mikroskopların nasıl kurulduğu, sayısal yeniden odaklama ve
+  aberasyon düzeltmeli eksen dışı holografi, ve ikiz görüntü giderimli eksen içi holografi.
 ---
 
 Hücrelerin çoğu neredeyse saydamdır. Geleneksel bir mikroskopta görünür olmaları için boyalara ya da floresan işaretleyicilere ihtiyaç duyarlar; bu işaretleyiciler ise incelenen şeyi değiştirebilir ya da ona zarar verebilir. Bir hücreden geçen ışık pek sönümlenmez ama gecikir, çünkü hücrenin kırılma indisi çevresindeki ortamınkinden biraz yüksektir. Nicel faz görüntüleme bu gecikmeyi her pikselde ölçer.
@@ -36,27 +41,3 @@ Dijital holografik mikroskopi hızlıdır ve tarama gerektirmez; bu da onu zorlu
 ## Her laboratuvar için faz görüntüleme
 
 Holografi genellikle özel bir interferometre gerektirir. Standart bir mikroskobun görüntüleme yoluna yerleştirilen bir kama prizma, ışının bir kısmını eğik bir referansa çevirerek sıradan bir cihazı nicel faz mikroskobuna dönüştürür. Yöntemi ayrıca tüm doku kesitlerinin etiketsiz görüntülenmesi için makro ölçeğe ve hücrelerin bir yüzeyle buluştuğu bölgeyi görüntülemek için tam iç yansıma holografisine taşıdık.
-
-## Deneyin: şiddet ve karmaşık alan
-
-Sıradan bir kamera yalnızca ışığı soğuranı görür. Holografi genliği ve fazı kaydeder; faz, saydam hücrelerin kalınlığına, mikro-optiklerin biçimine ya da yansıtıcı bir yüzeyin yüksekliğine dönüşür.
-
-{{< field-demo >}}
-
-## Mikroskoplar nasıl kurulur
-
-Tipik holografik mikroskoplar, animasyonlu olarak: geçirgenlikte Mach–Zehnder interferometresi, yansımada Michelson, merceksiz eksen içi düzenek ve taramalı holotomografi.
-
-{{< setups >}}
-
-## Deneyin: eksen dışı holografi
-
-Aşağıdaki demo, laboratuvarda kullandığımız rekonstrüksiyon adımlarını sayısal yeniden odaklama ve aberasyon düzeltme dahil olmak üzere benzetim bir hologram üzerinde çalıştırır.
-
-{{< dhm-bench >}}
-
-## Deneyin: eksen içi holografi
-
-Ayrı bir referans ışını olmadığında düzenek merceksiz ve kompakt hâle gelir, ancak kamera fazı kaybeder ve ikiz görüntü ortaya çıkar. Fiziksel kısıtlarla yinelemeli faz geri kazanımı ikiz görüntüyü giderir.
-
-{{< inline-holo >}}

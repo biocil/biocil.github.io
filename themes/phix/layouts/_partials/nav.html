@@ -1,7 +1,7 @@
 <header class="nav">
   <div class="wrap">
     <a class="brand" href="{{ "/" | relLangURL }}" aria-label="{{ site.Params.lab.short }} {{ T "home" }}">{{ partial "logo.html" . }}<span>{{ site.Params.lab.short }}</span></a>
-    <nav aria-label="Main">
+    <nav aria-label="Main" id="site-nav">
       <ul>
         {{- $cur := . }}
         {{- range site.Menus.main }}
@@ -11,6 +11,7 @@
       </ul>
     </nav>
     <div class="nav-tools">
+      {{- range site.Menus.main }}{{ if .Params.highlight }}<a class="join-m" href="{{ .URL | relLangURL }}">{{ .Name }}</a>{{ end }}{{ end }}
       {{- if hugo.IsMultilingual }}
       {{- $cur := . }}
       {{- range site.Home.AllTranslations }}{{ if ne .Language.Lang site.Language.Lang }}
@@ -27,6 +28,7 @@
           {{- end }}
         </div>
       </div>
+      <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="site-nav"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span class="sr-only">{{ T "menu" }}</span></button>
     </div>
   </div>
 </header>

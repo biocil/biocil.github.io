@@ -18,16 +18,14 @@ papers:
   - 2011_FIO_Cotte
 funding: [116F437]
 tags: [Holotomography, Optical Diffraction Tomography]
+demos: [tomo]
+demos_intro: >-
+  Her aydınlatma açısı, Fourier uzayına Ewald küresinden bir kapak ekler. Açıyı taramak Fourier
+  uzayında bir hacmi doldurur ve bu hacmin kz yönündeki genişliği holotomografiye optik eksen
+  boyunca kesit alma yeteneğini kazandırır.
 ---
 
 Tek bir hologram, ışık yolu boyunca integre edilmiş faz gecikmesini verir. Aydınlatma birçok açı boyunca yönlendirilirken hologramlar kaydetmek ve bunları ışığın nasıl saçıldığına dair bir modelle birleştirmek, numunenin kırılma indisini üç boyutta geri kazandırır. Kırılma indisi proteinlerin ve lipitlerin yerel derişimini izler; bu yüzden bir holotomogram organelleri, zarları ve lipitçe zengin yapıları işaretleyici kullanmadan gösterir.
-
-## Deneyin: aydınlatma taramasından kesite
-
-Her aydınlatma açısı, Fourier uzayına Ewald küresinden bir kapak ekler. Açıyı taramak Fourier uzayında bir hacmi doldurur ve bu hacmin kz yönündeki genişliği holotomografiye optik eksen boyunca kesit alma yeteneğini kazandırır.
-
-{{< tomo-demo >}}
-
 {{< video src="video.mp4" caption="Bir hücrenin holotomografik rekonstrüksiyonunun 3B görselleştirmesi." >}}
 
 ## İşaretleyicisiz faz nanoskopisi

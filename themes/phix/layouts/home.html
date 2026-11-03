@@ -109,6 +109,7 @@
   </div>
 </section>
 
+
 {{ with site.GetPage "/people" }}
 {{ $current := slice }}
 {{ range .Params.groups }}{{ if not .compact }}{{ $current = $current | append .key }}{{ end }}{{ end }}

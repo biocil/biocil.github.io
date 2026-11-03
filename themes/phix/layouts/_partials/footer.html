@@ -4,6 +4,7 @@
     <div>
       <h2>{{ $lab.short }} {{ T "lab_name" }}</h2>
       <address>{{ range $lab.address }}{{ . }}<br>{{ end }}<a href="mailto:{{ $lab.email }}">{{ $lab.email }}</a></address>
+      {{ with site.GetPage "/fun" }}<p class="fun-link"><a href="{{ .RelPermalink }}">{{ .Title }}</a></p>{{ end }}
     </div>
     <div>
       <h2>{{ T "elsewhere" }}</h2>

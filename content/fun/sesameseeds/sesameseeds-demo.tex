@@ -1,0 +1,192 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=2.7cm]{geometry}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+
+\usepackage[mess=medium, randomseed=1525]{sesameseeds}
+
+\title{On the Stochastic Deposition of \emph{Sesamum indicum} Seeds\\
+       on Scholarly Manuscripts}
+\author{A.~Hungry Academic\thanks{Who read the first draft on the
+        Kadıköy--Karaköy ferry, simit in hand.}\\[2pt]
+        \small Department of Breakfast Studies}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+Coffee is not the only thing academics spill on papers. We present
+\texttt{sesameseeds}, a \LaTeX{} package that decorates every page of a
+document with the debris left behind by a simit -- the Turkish sesame-crusted
+bread ring -- eaten over the manuscript: oven-roasted sesame seeds and
+crumbs of caramelised crust. Deposition is random but reproducible, so the
+mess is identical on every compilation and survives peer review. Users can
+also sprinkle seeds by hand, protect a page with a napkin, and leave the ring
+of debris shed by a simit that was put down on the page during a phone
+call.
+\end{abstract}
+
+\section{Introduction}
+
+The coffee stain has long been the canonical marker of a manuscript that was
+actually read. In Istanbul, however, the reading snack of choice is the
+simit, sold from red carts on every ferry pier. Before baking, the dough
+ring is dipped in \emph{pekmez} (grape molasses) and rolled in sesame: the
+pekmez makes the seeds stick and caramelises in the oven into the dark,
+glossy crust, while the seeds roast to a deep golden brown. The finished
+simit is dry and leaves no stain, but it is structurally incapable of being
+eaten without shedding seeds onto whatever lies beneath it. Reviewers,
+supervisors and thesis committees who annotate printouts over breakfast know
+the result well: a drift of roasted seeds collecting in the margins, a few
+over-roasted ones, and crumbs of crust lodged next to the equation that took
+the longest to understand.
+
+This package brings that authenticity to digital documents. Unlike a coffee
+stain, sesame seeds are not a single event: they accumulate on every page,
+cluster where the simit was held, and occasionally bounce into the most
+inconvenient place possible.
+
+\section{Usage}
+
+Load the package in the preamble. Every page then receives its share of
+seeds automatically; no second compilation is needed for this.
+\begin{verbatim}
+\usepackage[mess=medium]{sesameseeds}
+\end{verbatim}
+Settings can be changed later with \verb|\sesamesetup{...}|, which affects all
+pages shipped out afterwards. A page is kept clean with \verb|\nosesame|, and the
+automatic mess is stopped and resumed with \verb|\sesameoff| and
+\verb|\sesameon|. Debris can also be placed by hand; coordinates are measured
+from the lower-left corner of the page, and these commands use TikZ's
+\texttt{remember picture}, so compile twice:
+\begin{verbatim}
+\sesamesprinkle[count=25, spread=1.5cm]{14cm}{6cm}
+\simitring[radius=6cm]{10.5cm}{15cm}
+\sesameseed[angle=30, roast=0.9]{3cm}{3cm}
+\end{verbatim}
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Key & Default & Meaning\\
+\midrule
+\texttt{mess}        & \texttt{medium} & \texttt{none}, \texttt{light}, \texttt{medium}, \texttt{heavy}, \texttt{catastrophic}\\
+\texttt{off}         & --              & disable everything, hand-placed debris included\\
+\texttt{seeds}       & --              & fixed number of seeds per page\\
+\texttt{probability} & 0.8             & chance that a page gets anything at all\\
+\texttt{randomseed}  & 1525            & change it for a different, still reproducible, mess\\
+\texttt{crumbs}      & \texttt{true}   & crust crumbs\\
+\texttt{layer}       & \texttt{foreground} & seeds over (\texttt{foreground}) or under the text\\
+\texttt{firstpage}   & \texttt{true}   & allow mess on the title page\\
+\texttt{size}        & 1               & seed size multiplier\\
+\texttt{spread}      & 2.5cm           & size of the fall-out zone\\
+\texttt{stray}       & 0.2             & fraction of seeds that bounced away\\
+\texttt{roast}       & 0.5             & golden (0) to deep-brown (1) roast\\
+\texttt{black}       & 0               & fraction of black sesame seeds\\
+\texttt{crumbratio}  & 0.35            & crumbs per seed\\
+\texttt{shadow}      & 0.28            & shadow opacity\\
+\midrule
+\texttt{count}       & 15 / 60         & seeds per \verb|\sesamesprinkle| / \verb|\simitring|\\
+\texttt{radius}      & 6.5cm           & radius of a \verb|\simitring|\\
+\texttt{angle}       & \texttt{random} & orientation of a \verb|\sesameseed|\\
+\bottomrule
+\end{tabular}
+\caption{Options, usable in \texttt{\textbackslash usepackage[...]},
+\texttt{\textbackslash sesamesetup} and the optional argument of the manual
+commands.}
+\label{tab:options}
+\end{table}
+
+\section{The deposition model}
+
+Let $W\times H$ be the paper size. For each page $p$ the package seeds its
+own pseudo-random stream with $s_0$ (the \texttt{randomseed}) and $p$, so the
+debris does not depend on how many random numbers the rest of the document
+consumed. With probability $\pi$ (\texttt{probability}) the page is eaten
+over at all, in which case the number of seeds is
+\begin{equation}
+  N \sim \mathcal{U}\{n_{\min},\dots,n_{\max}\},
+\end{equation}
+with the bounds set by \texttt{mess}. A fraction $\approx\sigma_s$
+(\texttt{stray}) of them bounces off and lands uniformly anywhere on the page.
+The rest fall in one or, with probability $0.3$, two fall-out zones, centred
+at $\mathbf{c}$. Because the simit moves while it is being eaten, each zone is
+an elongated Gaussian with a random orientation $\theta$:
+\begin{equation}
+  \mathbf{x}_i = \mathbf{c} + R(\theta)
+  \begin{pmatrix} a\,\xi_i \\ b\,\eta_i \end{pmatrix},
+  \qquad \xi_i,\eta_i \sim \mathcal{N}(0,1),
+\end{equation}
+where $a$ and $b$ are random multiples of \texttt{spread}. Seeds that were
+baked together onto the caramelised crust come off in pairs with probability
+$0.08$, and about one seed in sixteen sat on the hot tray and is clearly
+darker. Each seed is drawn with a random orientation, size, aspect ratio
+(seeds resting on a crumb look narrower) and degree of roasting, together
+with a soft contact shadow. Crumbs of crust, some showing the soft white
+inside, are scattered around the same centres, slightly closer to the hand.
+
+\clearpage
+\section{Results}
+
+\simitring{10.5cm}{9.5cm}%
+Figure-free evidence is provided by the present page, on which the author
+put the simit down to answer a phone call. Since a baked simit is dry, it
+leaves no stain; what remains (\verb|\simitring|) is a ring of seeds and
+crumbs that came off where it touched the paper and when it was picked up
+again. Note that a hand-made simit is never perfectly round; the package
+accounts for this with a small random ellipticity.
+
+The deposition is robust across engines: pdf\LaTeX, Xe\LaTeX{} and
+Lua\LaTeX{} place the same debris in the same spots. Pages that a reviewer printed in
+black and white will show grey seeds, which is also realistic.
+
+\clearpage
+\nosesame
+\section{Protecting a page}
+This page was read with a napkin underneath. It carries a single
+\verb|\nosesame| and therefore no seeds at all. The command works like
+\verb|\thispagestyle|: it applies to the page on which \TeX{} is working when
+the command is read, so put it near the top of the page you want to protect.
+
+A whole section can be protected with \verb|\sesameoff| \dots\ \verb|\sesameon|.
+The package option \texttt{off} disables everything, hand-placed debris
+included, which is recommended for the camera-ready version. Or not.
+
+\section{Conclusion}
+
+We have shown that sesame seeds are a viable, reproducible and culturally
+specific alternative to coffee stains. Future work includes the
+\emph{açma} and \emph{poğaça} extensions, butter fingerprints, and a
+\texttt{tea} option that leaves a small ring under a tulip-shaped glass.
+
+\paragraph{Acknowledgements.} The author thanks the simit seller at the
+ferry pier, and the seagulls, who removed most of the evidence.
+
+\clearpage
+\sesamesetup{mess=catastrophic, spread=3cm}
+\appendix
+\section{Reading while the ferry crosses a wake}
+
+\sesamesprinkle[count=30, spread=1.2cm]{15cm}{5cm}%
+When the ferry meets the wake of a passing tanker, the reader's hand makes a
+sudden, involuntary motion and the simit releases a large fraction of its
+remaining seeds at once. This appendix was typeset with
+\begin{verbatim}
+\sesamesetup{mess=catastrophic, spread=3cm}
+\end{verbatim}
+plus one extra \verb|\sesamesprinkle| near the bottom right corner, where the
+seagull was looking.
+
+Readers who need an even messier document can combine
+\texttt{mess=catastrophic} with \texttt{black=0.2} for a simit that was sold
+next to a black-sesame one, or with \texttt{layer=background} if the seeds
+were already on the desk before the paper was put down.
+
+\end{document}

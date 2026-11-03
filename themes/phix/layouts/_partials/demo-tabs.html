@@ -1,31 +1,54 @@
-{{- /* Tabbed set of the holography demos, in teaching order. */ -}}
+{{- /* Tabbed holography demos, in teaching order.
+       Called with the page (all five demos) or with (dict "page" . "only" (slice "field" "setups")) for a subset. */ -}}
 {{- $tr := eq site.Language.Lang "tr" -}}
-<div class="demo-tabs" data-demo-tabs>
+{{- $p := . }}{{ $only := slice "field" "setups" "offaxis" "inline" "tomo" -}}
+{{- if reflect.IsMap . }}{{ $p = .page }}{{ $only = .only }}{{ end -}}
+<div class="demo-tabs{{ if eq (len $only) 1 }} single{{ end }}" data-demo-tabs>
   <div class="tablist" role="tablist" aria-label="{{ if $tr }}Holografi demoları{{ else }}Holography demos{{ end }}">
-    <button type="button" role="tab" id="tab-field" aria-controls="panel-field" aria-selected="true" data-demo="field"><span class="tn">1</span>{{ if $tr }}Şiddet ve karmaşık alan{{ else }}Intensity vs. complex field{{ end }}</button>
-    <button type="button" role="tab" id="tab-setups" aria-controls="panel-setups" aria-selected="false" tabindex="-1" data-demo="setups"><span class="tn">2</span>{{ if $tr }}Düzenekler{{ else }}Set-ups{{ end }}</button>
-    <button type="button" role="tab" id="tab-offaxis" aria-controls="panel-offaxis" aria-selected="false" tabindex="-1" data-demo="offaxis"><span class="tn">3</span>{{ if $tr }}Eksen dışı holografi{{ else }}Off-axis holography{{ end }}</button>
-    <button type="button" role="tab" id="tab-inline" aria-controls="panel-inline" aria-selected="false" tabindex="-1" data-demo="inline"><span class="tn">4</span>{{ if $tr }}Eksen içi holografi{{ else }}In-line holography{{ end }}</button>
-    <button type="button" role="tab" id="tab-tomo" aria-controls="panel-tomo" aria-selected="false" tabindex="-1" data-demo="tomo"><span class="tn">5</span>{{ if $tr }}Holotomografi{{ else }}Holotomography{{ end }}</button>
+    {{- with (in $only "field") }}{{ $n := 0 }}{{ range $i, $d := $only }}{{ if eq $d "field" }}{{ $n = $i }}{{ end }}{{ end }}
+    <button type="button" role="tab" id="tab-field" aria-controls="panel-field" aria-selected="{{ if eq $n 0 }}true{{ else }}false{{ end }}"{{ if ne $n 0 }} tabindex="-1"{{ end }} data-demo="field"><span class="tn">{{ add $n 1 }}</span>{{ if $tr }}Şiddet ve karmaşık alan{{ else }}Intensity vs. complex field{{ end }}</button>
+    {{- end }}
+    {{- with (in $only "setups") }}{{ $n := 0 }}{{ range $i, $d := $only }}{{ if eq $d "setups" }}{{ $n = $i }}{{ end }}{{ end }}
+    <button type="button" role="tab" id="tab-setups" aria-controls="panel-setups" aria-selected="{{ if eq $n 0 }}true{{ else }}false{{ end }}"{{ if ne $n 0 }} tabindex="-1"{{ end }} data-demo="setups"><span class="tn">{{ add $n 1 }}</span>{{ if $tr }}Düzenekler{{ else }}Set-ups{{ end }}</button>
+    {{- end }}
+    {{- with (in $only "offaxis") }}{{ $n := 0 }}{{ range $i, $d := $only }}{{ if eq $d "offaxis" }}{{ $n = $i }}{{ end }}{{ end }}
+    <button type="button" role="tab" id="tab-offaxis" aria-controls="panel-offaxis" aria-selected="{{ if eq $n 0 }}true{{ else }}false{{ end }}"{{ if ne $n 0 }} tabindex="-1"{{ end }} data-demo="offaxis"><span class="tn">{{ add $n 1 }}</span>{{ if $tr }}Eksen dışı holografi{{ else }}Off-axis holography{{ end }}</button>
+    {{- end }}
+    {{- with (in $only "inline") }}{{ $n := 0 }}{{ range $i, $d := $only }}{{ if eq $d "inline" }}{{ $n = $i }}{{ end }}{{ end }}
+    <button type="button" role="tab" id="tab-inline" aria-controls="panel-inline" aria-selected="{{ if eq $n 0 }}true{{ else }}false{{ end }}"{{ if ne $n 0 }} tabindex="-1"{{ end }} data-demo="inline"><span class="tn">{{ add $n 1 }}</span>{{ if $tr }}Eksen içi holografi{{ else }}In-line holography{{ end }}</button>
+    {{- end }}
+    {{- with (in $only "tomo") }}{{ $n := 0 }}{{ range $i, $d := $only }}{{ if eq $d "tomo" }}{{ $n = $i }}{{ end }}{{ end }}
+    <button type="button" role="tab" id="tab-tomo" aria-controls="panel-tomo" aria-selected="{{ if eq $n 0 }}true{{ else }}false{{ end }}"{{ if ne $n 0 }} tabindex="-1"{{ end }} data-demo="tomo"><span class="tn">{{ add $n 1 }}</span>{{ if $tr }}Holotomografi{{ else }}Holotomography{{ end }}</button>
+    {{- end }}
   </div>
-  <div class="tabpanel" role="tabpanel" id="panel-field" aria-labelledby="tab-field">
+  {{- with (in $only "field") }}{{ $n := 0 }}{{ range $i, $d := $only }}{{ if eq $d "field" }}{{ $n = $i }}{{ end }}{{ end }}
+  <div class="tabpanel" role="tabpanel" id="panel-field" aria-labelledby="tab-field"{{ if ne $n 0 }} hidden{{ end }}>
     <p class="demo-intro">{{ if $tr }}Sıradan bir kamera şiddeti kaydeder; bu yüzden yalnızca ışığı soğuranı görür. Holografi karmaşık alanı kaydeder: soğurmayı anlatan genliği ve ışığın ne kadar geciktiğini anlatan fazı. Faz kalınlığa ya da yüksekliğe dönüşür; böylece saydam hücreleri görüntüler, mikro-optikleri ve yüzeyleri ölçer.{{ else }}An ordinary camera records intensity, so it only sees what absorbs light. Holography records the complex field: amplitude, which tells you about absorption, and phase, which tells you how much the light was delayed. Phase turns into thickness or height, so it images transparent cells and measures micro-optics and surfaces.{{ end }}</p>
-    {{ partial "field-demo.html" . }}
+    {{ partial "field-demo.html" $p }}
   </div>
-  <div class="tabpanel" role="tabpanel" id="panel-setups" aria-labelledby="tab-setups" hidden>
+  {{- end }}
+  {{- with (in $only "setups") }}{{ $n := 0 }}{{ range $i, $d := $only }}{{ if eq $d "setups" }}{{ $n = $i }}{{ end }}{{ end }}
+  <div class="tabpanel" role="tabpanel" id="panel-setups" aria-labelledby="tab-setups"{{ if ne $n 0 }} hidden{{ end }}>
     <p class="demo-intro">{{ if $tr }}Karmaşık alan nasıl kaydedilir? Tipik holografik mikroskoplar: geçirgenlik için Mach–Zehnder interferometresi, yansıma için Michelson, merceksiz eksen içi düzenek ve taramalı holotomografi.{{ else }}How the complex field is recorded. Three typical holographic microscopes: a Mach–Zehnder interferometer for transmission, a Michelson for reflection, and a lens-free in-line set-up.{{ end }}</p>
-    {{ partial "setups.html" . }}
+    {{ partial "setups.html" $p }}
   </div>
-  <div class="tabpanel" role="tabpanel" id="panel-offaxis" aria-labelledby="tab-offaxis" hidden>
+  {{- end }}
+  {{- with (in $only "offaxis") }}{{ $n := 0 }}{{ range $i, $d := $only }}{{ if eq $d "offaxis" }}{{ $n = $i }}{{ end }}{{ end }}
+  <div class="tabpanel" role="tabpanel" id="panel-offaxis" aria-labelledby="tab-offaxis"{{ if ne $n 0 }} hidden{{ end }}>
     <p class="demo-intro">{{ if $tr }}Eğik bir referans ışını, nesne dalgasını Fourier uzayında diğer her şeyden ayırır. Onu filtreleyin, ardından sayısal olarak yeniden odaklayın ve objektifin aberasyonlarını sonradan giderin.{{ else }}A tilted reference beam separates the object wave from everything else in Fourier space. Filter it out, then refocus numerically and remove the objective’s aberrations, all after the fact.{{ end }}</p>
-    {{ partial "dhm-bench.html" . }}
+    {{ partial "dhm-bench.html" $p }}
   </div>
-  <div class="tabpanel" role="tabpanel" id="panel-inline" aria-labelledby="tab-inline" hidden>
+  {{- end }}
+  {{- with (in $only "inline") }}{{ $n := 0 }}{{ range $i, $d := $only }}{{ if eq $d "inline" }}{{ $n = $i }}{{ end }}{{ end }}
+  <div class="tabpanel" role="tabpanel" id="panel-inline" aria-labelledby="tab-inline"{{ if ne $n 0 }} hidden{{ end }}>
     <p class="demo-intro">{{ if $tr }}Gabor’un özgün, merceksiz holografisi. Basit ve kompakttır, ancak kamera fazı kaybeder ve kayıp faz ikiz görüntü olarak geri döner.{{ else }}Gabor’s original, lens-free holography. It is simple and compact, but the camera loses the phase, and the missing phase returns as a twin image.{{ end }}</p>
-    {{ partial "inline-holo.html" . }}
+    {{ partial "inline-holo.html" $p }}
   </div>
-  <div class="tabpanel" role="tabpanel" id="panel-tomo" aria-labelledby="tab-tomo" hidden>
+  {{- end }}
+  {{- with (in $only "tomo") }}{{ $n := 0 }}{{ range $i, $d := $only }}{{ if eq $d "tomo" }}{{ $n = $i }}{{ end }}{{ end }}
+  <div class="tabpanel" role="tabpanel" id="panel-tomo" aria-labelledby="tab-tomo"{{ if ne $n 0 }} hidden{{ end }}>
     <p class="demo-intro">{{ if $tr }}Tek bir hologram, bir şeyin ışın boyunca ne kadar uzakta olduğunu söyleyemez. Aydınlatma açısını tarayıp hologramları Fourier uzayında birleştirmek üçüncü boyutu geri kazandırır.{{ else }}One hologram cannot tell how far along the beam something sits. Scanning the illumination angle and combining the holograms in Fourier space recovers the third dimension.{{ end }}</p>
-    {{ partial "tomo-demo.html" . }}
+    {{ partial "tomo-demo.html" $p }}
   </div>
+  {{- end }}
 </div>

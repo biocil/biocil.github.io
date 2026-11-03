@@ -76,3 +76,14 @@
   function centre(){ if(p.scrollWidth > p.clientWidth + 4) p.scrollLeft = (p.scrollWidth - p.clientWidth) * 0.72; }
   var img = p.querySelector("img"); if(img && !img.complete) img.addEventListener("load", centre); else centre();
 })();
+
+/* Phone menu */
+(function(){
+  var nav = document.querySelector("header.nav"), btn = document.getElementById("menu-btn");
+  if(!nav || !btn) return;
+  function set(o){ nav.classList.toggle("open", o); btn.setAttribute("aria-expanded", o ? "true" : "false"); }
+  btn.addEventListener("click", function(){ set(!nav.classList.contains("open")); });
+  nav.querySelectorAll("#site-nav a").forEach(function(a){ a.addEventListener("click", function(){ set(false); }); });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape" && nav.classList.contains("open")){ set(false); btn.focus(); } });
+  window.addEventListener("resize", function(){ if(window.innerWidth > 820) set(false); });
+})();

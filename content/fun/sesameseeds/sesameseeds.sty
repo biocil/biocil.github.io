@@ -1,0 +1,449 @@
+%% sesameseeds.sty
+%% ---------------------------------------------------------------------------
+%% Sesame seeds and simit crumbs for LaTeX documents.
+%%
+%% In the spirit of the `coffee stains' package: makes your manuscript look
+%% like it was read by an academic eating a simit (Turkish sesame bagel) over
+%% it.  Every shipped page may receive a random, reproducible scatter of
+%% oven-roasted sesame seeds and crumbs of crust (caramelised by the pekmez
+%% the simit was dipped in before baking); you can also place sprinkles,
+%% single seeds and the ring of debris left where a simit was put down.
+%%
+%% Usage:   \usepackage[<options>]{sesameseeds}
+%%
+%% Package options / \sesamesetup{<keys>}
+%%   mess = none | light | medium | heavy | catastrophic   (default: medium)
+%%          (the bare words light, medium, ... also work)
+%%   off                  disable everything, hand-placed debris included
+%%                        (for the camera-ready version)
+%%   seeds = <n>          fixed number of seeds per page (overrides mess)
+%%   probability = <0..1> chance that a page gets anything at all (0.8)
+%%   randomseed = <int>   change for a different (still reproducible) mess
+%%   crumbs = true|false  simit crust crumbs                     (true)
+%%   layer = foreground|background  seeds over or under the text (foreground)
+%%   firstpage = true|false  allow mess on the first (title) page (true)
+%%   size = <factor>      seed size multiplier                   (1)
+%%   spread = <length>    size of the fall-out zone              (2.5cm)
+%%   stray = <0..1>       fraction of seeds that bounced away    (0.2)
+%%   roast = <0..1>       golden (0) to deep-brown (1) roast     (0.5)
+%%   black = <0..1>       fraction of black sesame seeds         (0)
+%%   crumbratio = <x>     crumbs per seed                        (0.35)
+%%   shadow = <0..1>      shadow opacity                         (0.28)
+%%
+%% Commands (positions are measured from the bottom-left corner of the page;
+%% the manual commands use `remember picture', so compile twice):
+%%   \sesamesetup{<keys>}
+%%   \nosesame                    keep the current page clean
+%%   \sesameoff, \sesameon        stop / resume the automatic mess
+%%   \sesamesprinkle[<keys>]{<x>}{<y>}  a handful of seeds (keys: count, spread...)
+%%   \simitring[<keys>]{<x>}{<y>}       ring of debris where a simit was put down
+%%                                      (keys: radius, count, ...)
+%%   \sesameseed[<keys>]{<x>}{<y>}      one single seed (keys: angle, roast, size)
+%%
+%% Requires LaTeX 2020-10-01 or newer, TikZ and pgfopts.  Tested with pdfLaTeX,
+%% XeLaTeX and LuaLaTeX.
+%% Released under the LaTeX Project Public License 1.3c.  Afiyet olsun.
+%% ---------------------------------------------------------------------------
+\NeedsTeXFormat{LaTeX2e}[2020/10/01]
+\ProvidesPackage{sesameseeds}[2026/11/03 v1.1 Sesame seeds and simit crumbs on your pages]
+
+\RequirePackage{tikz}
+\RequirePackage{pgfopts}
+
+%% ------------------------------------------------------------------ colours
+% Sesame seeds on a simit are roasted in the oven together with the dough.
+\definecolor{sesame@golden}{HTML}{D29A4E}    % lightly roasted seed
+\definecolor{sesame@roast}{HTML}{9C5A22}     % deeply roasted seed
+\definecolor{sesame@dark}{HTML}{55290B}      % over-roasted / outline
+\definecolor{sesame@belly}{HTML}{EEC98A}     % lighter centre of the seed
+\definecolor{sesame@blackbody}{HTML}{2B2522} % black sesame
+% The crust is dark because the pekmez caramelises during baking.
+\definecolor{sesame@crustA}{HTML}{9E4E1C}    % simit crust, reddish brown
+\definecolor{sesame@crustB}{HTML}{55230A}    % simit crust, dark caramel
+\definecolor{sesame@crumb}{HTML}{EBD5A8}     % soft inside of the simit
+\definecolor{sesame@shadow}{HTML}{3B2B1C}
+
+%% ------------------------------------------------------------------ options
+\newif\ifsesame@active    \sesame@activetrue
+\newif\ifsesame@enabled   \sesame@enabledtrue
+\newif\ifsesame@crumbs    \sesame@crumbstrue
+\newif\ifsesame@fg        \sesame@fgtrue
+\newif\ifsesame@firstpage \sesame@firstpagetrue
+\newif\ifsesame@skipthis
+
+\def\sesame@min{10}
+\def\sesame@max{22}
+\def\sesame@prob{0.8}
+\def\sesame@seed{1525}% simit shows up in Istanbul court records around 1525
+\def\sesame@size{1}
+\def\sesame@spread{2.5cm}
+\def\sesame@stray{0.2}
+\def\sesame@black{0}
+\def\sesame@toastlevel{0.5}
+\def\sesame@crumbratio{0.35}
+\def\sesame@shadowop{0.28}
+% keys meant for the manual commands
+\def\sesame@count{15}
+\def\sesame@ringcount{60}
+\def\sesame@radius{6.5cm}
+\def\sesame@angle{random}
+\def\sesame@randomword{random}
+
+\pgfkeys{
+  /sesame/.is family, /sesame,
+  mess/.is choice,
+  mess/none/.code         = {\sesame@activefalse},
+  mess/light/.code        = {\sesame@activetrue\def\sesame@min{3}\def\sesame@max{9}},
+  mess/medium/.code       = {\sesame@activetrue\def\sesame@min{10}\def\sesame@max{22}},
+  mess/heavy/.code        = {\sesame@activetrue\def\sesame@min{25}\def\sesame@max{45}},
+  mess/catastrophic/.code = {\sesame@activetrue\def\sesame@min{70}\def\sesame@max{120}},
+  none/.style         = {mess=none},
+  off/.code           = {\sesame@activefalse\sesame@enabledfalse},
+  on/.code            = {\sesame@activetrue\sesame@enabledtrue},
+  light/.style        = {mess=light},
+  medium/.style       = {mess=medium},
+  heavy/.style        = {mess=heavy},
+  catastrophic/.style = {mess=catastrophic},
+  seeds/.code         = {\sesame@activetrue\def\sesame@min{#1}\def\sesame@max{#1}},
+  probability/.store in = \sesame@prob,
+  randomseed/.store in  = \sesame@seed,
+  crumbs/.is if         = sesame@crumbs,
+  crumbs/.default       = true,
+  layer/.is choice,
+  layer/foreground/.code = {\sesame@fgtrue},
+  layer/background/.code = {\sesame@fgfalse},
+  foreground/.style     = {layer=foreground},
+  background/.style     = {layer=background},
+  firstpage/.is if      = sesame@firstpage,
+  firstpage/.default    = true,
+  size/.store in        = \sesame@size,
+  spread/.store in      = \sesame@spread,
+  stray/.store in       = \sesame@stray,
+  black/.store in       = \sesame@black,
+  roast/.store in       = \sesame@toastlevel,
+  toast/.store in       = \sesame@toastlevel,% alias
+  crumbratio/.store in  = \sesame@crumbratio,
+  shadow/.store in      = \sesame@shadowop,
+  count/.store in       = \sesame@count,
+  radius/.store in      = \sesame@radius,
+  angle/.store in       = \sesame@angle,
+}
+\ProcessPgfPackageOptions{/sesame}
+
+\newcommand\sesamesetup[1]{\pgfkeys{/sesame/.cd,#1}}
+\newcommand\nosesame{\global\sesame@skipthistrue}
+\newcommand\sesameoff{\global\sesame@activefalse}
+\newcommand\sesameon{\global\sesame@activetrue}
+
+%% ------------------------------------------------------- random utilities
+%% Each page / each manual call gets its own deterministic random stream, so
+%% the mess is identical on every compilation and does not depend on how many
+%% random numbers the rest of the document used.  The global pgf state is
+%% saved and restored around our drawing.
+\def\sesame@reseed#1{%
+  \edef\pgfmath@rnd@z{\number\numexpr \sesame@seed*977 + #1 + 12345\relax}%
+  \pgfmathparse{rnd}\pgfmathparse{rnd}\pgfmathparse{rnd}\pgfmathparse{rnd}%
+}
+\def\sesame@savestate{\let\sesame@savedz\pgfmath@rnd@z}
+\def\sesame@restorestate{\global\let\pgfmath@rnd@z\sesame@savedz}
+
+% Box--Muller: \sesame@gx, \sesame@gy ~ N(0,1), radius capped at ~3.4 sigma
+\def\sesame@gauss{%
+  \pgfmathsetmacro\sesame@u{max(rnd,0.003)}%
+  \pgfmathsetmacro\sesame@r{sqrt(-2*ln(\sesame@u))}%
+  \pgfmathsetmacro\sesame@phi{360*rnd}%
+  \pgfmathsetmacro\sesame@gx{\sesame@r*cos(\sesame@phi)}%
+  \pgfmathsetmacro\sesame@gy{\sesame@r*sin(\sesame@phi)}%
+}
+
+%% ------------------------------------------------------------ the seed
+%% Outline of a hulled sesame seed in millimetres: flat, ovate, with a
+%% slightly pointed hilum end at +x.  About 3.2 mm x 1.8 mm.
+\tikzset{
+  sesame@seedpath/.style = {insert path = {
+    (1.62,0) .. controls (1.48,0.26) and (0.95,0.84) .. (-0.15,0.90)
+             .. controls (-1.10,0.94) and (-1.62,0.55) .. (-1.62,0)
+             .. controls (-1.62,-0.55) and (-1.10,-0.94) .. (-0.15,-0.90)
+             .. controls (0.95,-0.84) and (1.48,-0.26) .. (1.62,0) -- cycle}},
+}
+
+% \sesame@drawseed{x}{y} -- x, y in pt (plain numbers), page coordinates
+\def\sesame@drawseed#1#2{%
+  \begingroup
+  \ifx\sesame@angle\sesame@randomword
+    \pgfmathsetmacro\sesame@a{360*rnd}%
+  \else
+    \edef\sesame@a{\sesame@angle}%
+  \fi
+  \pgfmathsetmacro\sesame@s{\sesame@size*(0.88+0.24*rnd)}%
+  \pgfmathsetmacro\sesame@sx{0.94+0.12*rnd}%
+  % a few seeds lie tilted on a crumb and look narrower
+  \pgfmathsetmacro\sesame@sy{rnd<0.14 ? 0.62+0.2*rnd : 0.92+0.14*rnd}%
+  % colour of this particular seed
+  \pgfmathtruncatemacro\sesame@isblack{rnd<\sesame@black ? 1 : 0}%
+  \ifnum\sesame@isblack=1
+    \pgfmathtruncatemacro\sesame@t{100*rnd}%
+    \colorlet{sesame@body}{sesame@blackbody!\sesame@t!black}%
+    \colorlet{sesame@hi}{sesame@body!70!white}%
+    \colorlet{sesame@edge}{black}%
+  \else
+    \pgfmathtruncatemacro\sesame@burnt{rnd<0.06 ? 1 : 0}%
+    \ifnum\sesame@burnt=1 % sat right at the hot bottom of the tray
+      \pgfmathtruncatemacro\sesame@t{25+35*rnd}%
+      \colorlet{sesame@body}{sesame@dark!\sesame@t!sesame@roast}%
+    \else
+      \pgfmathtruncatemacro\sesame@t{max(0,min(100,100*\sesame@toastlevel+70*(rnd-0.5)))}%
+      \colorlet{sesame@body}{sesame@roast!\sesame@t!sesame@golden}%
+    \fi
+    \colorlet{sesame@hi}{sesame@body!50!sesame@belly}%
+    \colorlet{sesame@edge}{sesame@body!45!sesame@dark}%
+  \fi
+  % soft contact shadow, offset towards the lower right in page space
+  \pgfmathsetmacro\sesame@shx{#1+0.30*\sesame@s}%
+  \pgfmathsetmacro\sesame@shy{#2-0.40*\sesame@s}%
+  \begin{scope}[shift={(\sesame@shx pt,\sesame@shy pt)}, rotate=\sesame@a,
+                x=\sesame@s mm, y=\sesame@s mm,
+                xscale=\sesame@sx, yscale=\sesame@sy]
+    \fill[sesame@shadow, opacity=0.5*\sesame@shadowop, scale=1.10][sesame@seedpath];
+    \fill[sesame@shadow, opacity=\sesame@shadowop, scale=1.02][sesame@seedpath];
+  \end{scope}
+  % the seed itself
+  \begin{scope}[shift={(#1 pt,#2 pt)}, rotate=\sesame@a,
+                x=\sesame@s mm, y=\sesame@s mm,
+                xscale=\sesame@sx, yscale=\sesame@sy]
+    \shade[inner color=sesame@hi, outer color=sesame@body][sesame@seedpath];
+    \draw[sesame@edge, opacity=0.22, line width=0.05mm, scale=0.86][sesame@seedpath];
+    \draw[sesame@edge, opacity=0.35, line width=0.05mm]
+      (1.45,0) .. controls (0.90,0.03) .. (0.20,0.03);
+    \fill[white, opacity=0.12] (-0.55,0.32) ellipse [x radius=0.60, y radius=0.22];
+    \fill[white, opacity=0.16] (-0.55,0.32) ellipse [x radius=0.38, y radius=0.12];
+    \draw[sesame@edge, opacity=0.85, line width=0.07mm][sesame@seedpath];
+  \end{scope}
+  \endgroup
+}
+
+%% --------------------------------------------------------- crust crumbs
+\def\sesame@drawcrumb#1#2{%
+  \begingroup
+  \pgfmathsetmacro\sesame@a{360*rnd}%
+  \pgfmathsetmacro\sesame@s{\sesame@size*(0.35+1.5*rnd*rnd*rnd)}% many tiny, few big
+  \foreach \sesame@k in {a,b,c,d,e,f,g}{%
+    \pgfmathsetmacro\sesame@tmp{0.5+0.5*rnd}%
+    \expandafter\xdef\csname sesame@r\sesame@k\endcsname{\sesame@tmp}%
+  }%
+  \pgfmathtruncatemacro\sesame@t{100*rnd}%
+  \colorlet{sesame@cr}{sesame@crustB!\sesame@t!sesame@crustA}%
+  \pgfmathtruncatemacro\sesame@soft{rnd<0.4 ? 1 : 0}%
+  \pgfmathsetmacro\sesame@shx{#1+0.30*\sesame@s}%
+  \pgfmathsetmacro\sesame@shy{#2-0.40*\sesame@s}%
+  \begin{scope}[shift={(\sesame@shx pt,\sesame@shy pt)}, rotate=\sesame@a,
+                x=\sesame@s mm, y=\sesame@s mm]
+    \fill[sesame@shadow, opacity=\sesame@shadowop, rounded corners=0.08mm]
+      (0:\sesame@ra) -- (52:\sesame@rb) -- (103:\sesame@rc) -- (155:\sesame@rd)
+      -- (207:\sesame@re) -- (258:\sesame@rf) -- (310:\sesame@rg) -- cycle;
+  \end{scope}
+  \begin{scope}[shift={(#1 pt,#2 pt)}, rotate=\sesame@a,
+                x=\sesame@s mm, y=\sesame@s mm]
+    \fill[sesame@cr, rounded corners=0.08mm]
+      (0:\sesame@ra) -- (52:\sesame@rb) -- (103:\sesame@rc) -- (155:\sesame@rd)
+      -- (207:\sesame@re) -- (258:\sesame@rf) -- (310:\sesame@rg) -- cycle;
+    \ifnum\sesame@soft=1 % the crumb broke off and shows the soft inside
+      \fill[sesame@crumb, rounded corners=0.06mm]
+        (-30:0.85*\sesame@ra) -- (20:0.9*\sesame@ra) -- (60:0.8*\sesame@rb)
+        -- (95:0.15) -- (300:0.2) -- cycle;
+      \fill[sesame@golden, opacity=0.5] (25:0.55*\sesame@ra) circle [radius=0.06];
+    \fi
+    \fill[white, opacity=0.12] (140:0.35) ellipse [x radius=0.35, y radius=0.18];
+    \fill[white, opacity=0.12] (140:0.35) ellipse [x radius=0.20, y radius=0.10];
+    \fill[sesame@dark, opacity=0.45] (200:0.4) circle [radius=0.06]
+                                     (250:0.2) circle [radius=0.045];
+  \end{scope}
+  \endgroup
+}
+
+%% ------------------------------------------------------------- clusters
+% \sesame@cluster{cx}{cy}{#seeds}{spread}   all in pt (numbers)
+% Seeds fall in an elongated Gaussian patch (the simit moves while you eat).
+\def\sesame@cluster#1#2#3#4{%
+  \begingroup
+  \pgfmathsetmacro\sesame@cth{180*rnd}%
+  \pgfmathsetmacro\sesame@cax{#4*(1+0.8*rnd)}%
+  \pgfmathsetmacro\sesame@cay{#4*(0.45+0.4*rnd)}%
+  \pgfmathsetmacro\sesame@ccos{cos(\sesame@cth)}%
+  \pgfmathsetmacro\sesame@csin{sin(\sesame@cth)}%
+  \pgfmathtruncatemacro\sesame@n{#3}%
+  \ifsesame@crumbs
+    \pgfmathtruncatemacro\sesame@nc{round(\sesame@n*\sesame@crumbratio*(0.5+rnd))}%
+    \ifnum\sesame@nc>0
+      \foreach \sesame@j in {1,...,\sesame@nc}{%
+        \sesame@gauss
+        \pgfmathsetmacro\sesame@x{#1+0.8*(\sesame@cax*\sesame@gx*\sesame@ccos-\sesame@cay*\sesame@gy*\sesame@csin)}%
+        \pgfmathsetmacro\sesame@y{#2+0.8*(\sesame@cax*\sesame@gx*\sesame@csin+\sesame@cay*\sesame@gy*\sesame@ccos)}%
+        \sesame@drawcrumb\sesame@x\sesame@y
+      }%
+    \fi
+  \fi
+  \ifnum\sesame@n>0
+    \foreach \sesame@j in {1,...,\sesame@n}{%
+      \sesame@gauss
+      \pgfmathsetmacro\sesame@x{#1+\sesame@cax*\sesame@gx*\sesame@ccos-\sesame@cay*\sesame@gy*\sesame@csin}%
+      \pgfmathsetmacro\sesame@y{#2+\sesame@cax*\sesame@gx*\sesame@csin+\sesame@cay*\sesame@gy*\sesame@ccos}%
+      \sesame@drawseed\sesame@x\sesame@y
+      % seeds baked together onto the caramelised crust come off in pairs
+      \pgfmathtruncatemacro\sesame@pair{rnd<0.08 ? 1 : 0}%
+      \ifnum\sesame@pair=1
+        \pgfmathsetmacro\sesame@pa{360*rnd}%
+        \pgfmathsetmacro\sesame@x{\sesame@x+4.6*\sesame@size*cos(\sesame@pa)}%
+        \pgfmathsetmacro\sesame@y{\sesame@y+4.6*\sesame@size*sin(\sesame@pa)}%
+        \sesame@drawseed\sesame@x\sesame@y
+      \fi
+    }%
+  \fi
+  \endgroup
+}
+
+% stray seeds that bounced off somewhere on the page
+\def\sesame@strays#1{%
+  \pgfmathtruncatemacro\sesame@nst{#1}%
+  \ifnum\sesame@nst>0
+    \foreach \sesame@j in {1,...,\sesame@nst}{%
+      \pgfmathsetmacro\sesame@x{\sesame@W*(0.03+0.94*rnd)}%
+      \pgfmathsetmacro\sesame@y{\sesame@H*(0.03+0.94*rnd)}%
+      \sesame@drawseed\sesame@x\sesame@y
+    }%
+  \fi
+}
+
+%% ------------------------------------------------- automatic page mess
+% #1: tikz options placing the origin at the lower-left corner of the page
+\def\sesame@page#1{%
+  \begingroup
+  \sesame@savestate
+  \sesame@reseed{\ReadonlyShipoutCounter*7919}%
+  \pgfmathsetmacro\sesame@W{\paperwidth}%
+  \pgfmathsetmacro\sesame@H{\paperheight}%
+  \pgfmathsetmacro\sesame@sp{\sesame@spread}%
+  \pgfmathtruncatemacro\sesame@go{rnd<\sesame@prob ? 1 : 0}%
+  \ifnum\sesame@go=1
+    \pgfmathrandominteger\sesame@N{\sesame@min}{\sesame@max}%
+    \pgfmathtruncatemacro\sesame@Nst{round(\sesame@N*\sesame@stray*(0.5+rnd))}%
+    \pgfmathtruncatemacro\sesame@Ncl{max(0,\sesame@N-\sesame@Nst)}%
+    \pgfmathtruncatemacro\sesame@two{(rnd<0.3) && (\sesame@Ncl>5) ? 1 : 0}%
+    \pgfmathsetmacro\sesame@cxa{\sesame@W*(0.12+0.76*rnd)}%
+    \pgfmathsetmacro\sesame@cya{\sesame@H*(0.08+0.84*rnd)}%
+    \pgfmathsetmacro\sesame@cxb{\sesame@W*(0.12+0.76*rnd)}%
+    \pgfmathsetmacro\sesame@cyb{\sesame@H*(0.08+0.84*rnd)}%
+    \begin{tikzpicture}[overlay]
+      \begin{scope}[#1]
+        \ifnum\sesame@two=1
+          \pgfmathtruncatemacro\sesame@Na{round(\sesame@Ncl*(0.5+0.25*rnd))}%
+          \pgfmathtruncatemacro\sesame@Nb{\sesame@Ncl-\sesame@Na}%
+          \sesame@cluster\sesame@cxa\sesame@cya\sesame@Na\sesame@sp
+          \sesame@cluster\sesame@cxb\sesame@cyb\sesame@Nb\sesame@sp
+        \else
+          \sesame@cluster\sesame@cxa\sesame@cya\sesame@Ncl\sesame@sp
+        \fi
+        \sesame@strays\sesame@Nst
+      \end{scope}
+    \end{tikzpicture}%
+  \fi
+  \sesame@restorestate
+  \endgroup
+}
+
+\def\sesame@shipout{%
+  \ifsesame@enabled\ifsesame@active
+    \ifsesame@skipthis\else
+      \ifsesame@firstpage
+        \sesame@doit
+      \else
+        \ifnum\ReadonlyShipoutCounter>1 \sesame@doit\fi
+      \fi
+    \fi
+  \fi\fi
+}
+% shipout hooks run inside a picture with its origin at the top-left corner
+\def\sesame@doit{\put(0,0){\sesame@page{shift={(0pt,-\paperheight)}}}}
+
+\AddToHook{shipout/background}{\ifsesame@fg\else\sesame@shipout\fi}
+\AddToHook{shipout/foreground}{\ifsesame@fg\sesame@shipout\fi
+                               \global\sesame@skipthisfalse}
+
+%% ------------------------------------------------------ manual commands
+\newcount\sesame@calls
+\def\sesame@manual#1#2{% #1 keys, #2 drawing code
+  \begingroup
+  \pgfkeys{/sesame/.cd,#1}%
+  \ifsesame@enabled
+  \global\advance\sesame@calls by 1
+  \sesame@savestate
+  \sesame@reseed{\sesame@calls*104729}%
+  \pgfmathsetmacro\sesame@W{\paperwidth}%
+  \pgfmathsetmacro\sesame@H{\paperheight}%
+  \pgfmathsetmacro\sesame@sp{\sesame@spread}%
+  \begin{tikzpicture}[remember picture, overlay]
+    \begin{scope}[shift={(current page.south west)}]
+      #2%
+    \end{scope}
+  \end{tikzpicture}%
+  \sesame@restorestate
+  \fi
+  \endgroup
+  \ignorespaces
+}
+
+% \sesamesprinkle[keys]{x}{y}
+\newcommand\sesamesprinkle[3][]{%
+  \sesame@manual{#1}{%
+    \pgfmathsetmacro\sesame@cx{#2}%
+    \pgfmathsetmacro\sesame@cy{#3}%
+    \sesame@cluster\sesame@cx\sesame@cy\sesame@count\sesame@sp
+  }}
+
+% \sesameseed[keys]{x}{y}
+\newcommand\sesameseed[3][]{%
+  \sesame@manual{#1}{%
+    \pgfmathsetmacro\sesame@cx{#2}%
+    \pgfmathsetmacro\sesame@cy{#3}%
+    \sesame@drawseed\sesame@cx\sesame@cy
+  }}
+
+% \simitring[keys]{x}{y}: the simit was put down here for a while and left
+% a ring of seeds and crumbs behind when it was picked up again
+\newcommand\simitring[3][]{%
+  \sesame@manual{count=\sesame@ringcount,#1}{%
+    \pgfmathsetmacro\sesame@cx{#2}%
+    \pgfmathsetmacro\sesame@cy{#3}%
+    \pgfmathsetmacro\sesame@R{\sesame@radius}%
+    \pgfmathsetmacro\sesame@w{0.17*\sesame@R}% half thickness of the ring
+    % hand-made, so not perfectly round
+    \pgfmathsetmacro\sesame@ex{1+0.04*rand}%
+    \pgfmathsetmacro\sesame@ey{1+0.04*rand}%
+    \pgfmathsetmacro\sesame@rot{180*rnd}%
+    \pgfmathtruncatemacro\sesame@n{\sesame@count}%
+    \ifsesame@crumbs
+      \pgfmathtruncatemacro\sesame@nc{round(\sesame@n*\sesame@crumbratio)}%
+      \ifnum\sesame@nc>0
+        \foreach \sesame@j in {1,...,\sesame@nc}{%
+          \sesame@gauss
+          \pgfmathsetmacro\sesame@th{360*rnd}%
+          \pgfmathsetmacro\sesame@rr{\sesame@R+0.75*\sesame@w*\sesame@gx}%
+          \pgfmathsetmacro\sesame@x{\sesame@cx+\sesame@ex*\sesame@rr*cos(\sesame@th+\sesame@rot)}%
+          \pgfmathsetmacro\sesame@y{\sesame@cy+\sesame@ey*\sesame@rr*sin(\sesame@th+\sesame@rot)}%
+          \sesame@drawcrumb\sesame@x\sesame@y
+        }%
+      \fi
+    \fi
+    \ifnum\sesame@n>0
+      \foreach \sesame@j in {1,...,\sesame@n}{%
+        \sesame@gauss
+        \pgfmathsetmacro\sesame@th{360*rnd}%
+        \pgfmathsetmacro\sesame@rr{\sesame@R+0.55*\sesame@w*\sesame@gx}%
+        \pgfmathsetmacro\sesame@x{\sesame@cx+\sesame@ex*\sesame@rr*cos(\sesame@th+\sesame@rot)}%
+        \pgfmathsetmacro\sesame@y{\sesame@cy+\sesame@ey*\sesame@rr*sin(\sesame@th+\sesame@rot)}%
+        \sesame@drawseed\sesame@x\sesame@y
+      }%
+    \fi
+  }}
+
+\endinput

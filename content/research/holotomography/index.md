@@ -18,16 +18,14 @@ papers:
   - 2011_FIO_Cotte
 funding: [116F437]
 tags: [Holotomography, Optical Diffraction Tomography]
+demos: [tomo]
+demos_intro: >-
+  Each illumination angle contributes one cap of the Ewald sphere in Fourier space. Scanning the
+  angle fills a volume of Fourier space, and its extent along kz is what gives holotomography its
+  sectioning along the optical axis.
 ---
 
 A single hologram gives the phase delay integrated along the light path. Recording holograms while the illumination is steered through many angles, and combining them with a model of how light scatters, recovers the refractive index of the specimen in three dimensions. Refractive index tracks the local concentration of proteins and lipids, so a holotomogram shows organelles, membranes and lipid-rich structures without labels.
-
-## Try it: from an illumination scan to a section
-
-Each illumination angle contributes one cap of the Ewald sphere in Fourier space. Scanning the angle fills a volume of Fourier space, and its extent along kz is what gives holotomography its sectioning along the optical axis.
-
-{{< tomo-demo >}}
-
 {{< video src="video.mp4" caption="3D rendering of a holotomographic reconstruction of a cell." >}}
 
 ## Marker-free phase nanoscopy

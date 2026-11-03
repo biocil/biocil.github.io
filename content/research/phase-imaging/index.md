@@ -20,6 +20,11 @@ papers:
   - 2022_SPIEPE_Gurcan_a
 funding: [120F099, ISTKA]
 tags: [Digital Holographic Microscopy, Quantitative Phase Imaging]
+demos: [field, setups, offaxis, inline]
+demos_intro: >-
+  Four simulations of the methods on this page: why the complex field tells you more than an
+  intensity image, how holographic microscopes are built, off-axis holography with numerical
+  refocusing and aberration compensation, and in-line holography with twin-image removal.
 ---
 
 Most cells are almost transparent. In a conventional microscope they need stains or fluorescent labels to be seen, and those labels can change or harm the very thing being studied. Light passing through a cell is not dimmed much, but it is delayed, because the cell has a slightly higher refractive index than the medium around it. Quantitative phase imaging measures that delay at every pixel.
@@ -37,27 +42,3 @@ Digital holographic microscopy is fast and needs no scanning, which makes it rob
 ## Phase imaging for every lab
 
 Holography usually needs a dedicated interferometer. A wedge prism placed in the imaging path of a standard microscope turns part of the beam into a tilted reference, making an ordinary instrument a quantitative phase microscope. We have also taken the method to the macroscale for label-free imaging of whole tissue sections, and to total internal reflection holography for imaging how cells meet a surface.
-
-## Try it: intensity versus complex field
-
-An ordinary camera sees only what absorbs light. Holography records amplitude and phase; the phase converts into the thickness of transparent cells, the shape of micro-optics, or the height of a reflective surface.
-
-{{< field-demo >}}
-
-## How the microscopes are built
-
-Three typical holographic microscopes, animated: a Mach–Zehnder interferometer in transmission, a Michelson in reflection, and a lens-free in-line set-up.
-
-{{< setups >}}
-
-## Try it: off-axis holography
-
-The demo below runs the same reconstruction steps we use in the lab on a simulated hologram, including numerical refocusing and aberration compensation.
-
-{{< dhm-bench >}}
-
-## Try it: in-line holography
-
-Without a separate reference beam the set-up becomes lens-free and compact, but the camera loses the phase and a twin image appears. Iterative phase retrieval with physical constraints removes it.
-
-{{< inline-holo >}}

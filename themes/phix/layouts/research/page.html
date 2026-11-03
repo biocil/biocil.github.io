@@ -13,6 +13,19 @@
       {{ end }}
     </aside>
   </div>
+</div>
+{{ with .Params.demos }}{{ $.Store.Set "holo" true }}
+<section class="band bench" id="try" aria-labelledby="try-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="try-title">{{ T "try_in_browser" }}</h2>
+      {{ with $.Params.demos_intro }}<p>{{ . }}</p>{{ end }}
+    </div>
+    {{ partial "demo-tabs.html" (dict "page" $ "only" .) }}
+  </div>
+</section>
+{{ end }}
+<div class="wrap page-body">
   {{ with .Params.papers }}
   <section class="sub" aria-labelledby="papers-title">
     <h2 id="papers-title">{{ T "key_publications" }}</h2>
