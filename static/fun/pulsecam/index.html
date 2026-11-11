@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Browser-based remote photoplethysmography: measure pulse from a webcam or phone front camera.">
+<title>Pulse Cam</title>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #fcfcfb; --raised: #ffffff;
+  --ink: #0b0b0b; --ink2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s6: #008300; --s8: #e34948;
+  --good: #0ca30c; --warn: #fab219; --serious: #ec835a; --crit: #d03b3b;
+  --tip-bg: #ffffff; --btn: #f0efec; --btn-ink: #0b0b0b; --accent: #2a78d6; --accent-ink: #ffffff;
+  --radius: 14px;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --raised: #222221;
+    --ink: #f0efec; --ink2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s6: #008300; --s8: #e66767;
+    --tip-bg: #2a2a28; --btn: #2c2c2a; --btn-ink: #f0efec; --accent: #3987e5;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --raised: #222221;
+  --ink: #f0efec; --ink2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s6: #008300; --s8: #e66767;
+  --tip-bg: #2a2a28; --btn: #2c2c2a; --btn-ink: #f0efec; --accent: #3987e5;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--page); color: var(--ink); }
+body { min-height: 100vh; -webkit-text-size-adjust: 100%; }
+button, select { font: inherit; }
+
+.top { display: flex; align-items: center; gap: 12px; max-width: 1280px; margin: 0 auto;
+  padding: max(12px, env(safe-area-inset-top)) 16px 4px; }
+.brand { display: flex; align-items: baseline; gap: 10px; flex: 1; min-width: 0; }
+.brand h1 { font-size: 20px; font-weight: 650; margin: 0; letter-spacing: -0.01em; white-space: nowrap; }
+@media (max-width: 520px) { .brand span { display: none; } }
+.brand span { color: var(--ink2); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.icon-btn { border: 1px solid var(--border); background: var(--btn); color: var(--btn-ink); width: 36px; height: 36px;
+  border-radius: 10px; cursor: pointer; display: grid; place-items: center; }
+
+.layout { max-width: 1280px; margin: 0 auto; padding: 12px 16px 24px; display: grid; gap: 14px;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  grid-template-areas: "stage readout" "stage wave" "trend spec" "settings diag"; align-items: start; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; min-width: 0; }
+.stage { grid-area: stage; padding: 10px; }
+.readout { grid-area: readout; }
+.wave { grid-area: wave; }
+.trend { grid-area: trend; }
+.spec { grid-area: spec; }
+.settings { grid-area: settings; }
+.diag { grid-area: diag; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "stage" "wave" "readout" "trend" "spec" "settings" "diag"; gap: 12px; }
+}
+.card h2 { font-size: 14px; font-weight: 600; margin: 0 0 8px; display: flex; align-items: baseline; gap: 8px; }
+.card h2 small { font-weight: 400; color: var(--muted); font-size: 12px; }
+
+/* camera stage */
+.viewport { position: relative; width: 100%; aspect-ratio: var(--ar, 4 / 3); max-height: 72vh; background: #000;
+  border-radius: 10px; overflow: hidden; margin: 0 auto; }
+@media (max-width: 900px) { .viewport { max-height: 46vh; } }
+#view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: manipulation; }
+.badge { position: absolute; left: 10px; top: 10px; display: flex; align-items: center; gap: 8px;
+  background: rgba(0,0,0,0.55); color: #fff; padding: 6px 12px 6px 10px; border-radius: 999px;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.badge b { font-size: 26px; font-weight: 650; line-height: 1; min-width: 2ch; text-align: right; }
+.badge span { font-size: 12px; opacity: 0.85; }
+.badge.dim b { opacity: 0.5; }
+.heart { width: 18px; height: 18px; color: #ff6b6b; }
+.heart.beating { animation: beat 1s infinite ease-out; }
+@keyframes beat { 0% { transform: scale(1.18); } 30% { transform: scale(0.95); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .heart.beating { animation: none; } }
+.view-msg { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); width: min(92%, 460px);
+  background: rgba(0,0,0,0.65); color: #fff; font-size: 13px; line-height: 1.4; text-align: center;
+  padding: 8px 12px; border-radius: 10px; }
+.view-msg[hidden] { display: none; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; align-items: center; }
+.btn { border: 1px solid var(--border); background: var(--btn); color: var(--btn-ink); padding: 9px 14px; border-radius: 10px; cursor: pointer; min-height: 40px; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; font-weight: 600; min-width: 96px; }
+.btn.primary.stop { background: var(--crit); }
+.controls select { flex: 1 1 150px; min-width: 0; }
+select { border: 1px solid var(--border); background: var(--btn); color: var(--btn-ink); padding: 8px 10px; border-radius: 10px; min-height: 40px; max-width: 100%; }
+
+/* readout */
+.hero { display: flex; align-items: baseline; gap: 8px; }
+#bpm { font-size: 64px; font-weight: 650; line-height: 1; letter-spacing: -0.02em; min-width: 2ch; }
+#bpm.dim { color: var(--muted); }
+.hero .unit { font-size: 16px; color: var(--ink2); }
+#hrState { margin: 6px 0 12px; font-size: 14px; color: var(--ink2); min-height: 1.4em; }
+#hrState[data-k="good"] { color: var(--ink); }
+.meters { display: grid; gap: 8px; margin-bottom: 12px; }
+.meter { display: grid; grid-template-columns: 92px 1fr auto; align-items: center; gap: 10px; font-size: 13px; }
+.meter label { color: var(--ink2); }
+.meter .track { height: 8px; background: var(--grid); border-radius: 999px; overflow: hidden; }
+.meter .fill { height: 100%; width: 0; border-radius: 999px; transition: width .3s, background .3s; }
+.meter output { color: var(--ink); font-variant-numeric: tabular-nums; min-width: 9ch; text-align: right; font-size: 12px; }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; margin: 0; font-size: 13px; }
+.stats div { min-width: 0; }
+.stats dt { color: var(--muted); font-size: 12px; }
+.stats dd { margin: 2px 0 0; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* charts */
+.chart { width: 100%; display: block; touch-action: pan-y; }
+.wave .chart { height: 150px; }
+.trend .chart, .spec .chart { height: 170px; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink2); margin: -2px 0 6px; }
+.legend i { display: inline-block; width: 14px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 6px; }
+.legend i.dash { border-top-style: dashed; }
+
+/* settings & diagnostics */
+details.card > summary { cursor: pointer; font-weight: 600; font-size: 14px; list-style: none; display: flex; align-items: center; gap: 8px; }
+details.card > summary::-webkit-details-marker { display: none; }
+details.card > summary::before { content: "›"; display: inline-block; transition: transform .2s; color: var(--muted); font-size: 18px; line-height: 1; }
+details[open].card > summary::before { transform: rotate(90deg); }
+.form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; margin-top: 12px; }
+.form label.f { display: grid; gap: 4px; font-size: 12px; color: var(--ink2); }
+.checks { grid-column: 1 / -1; display: grid; gap: 8px; margin-top: 4px; }
+.checks label { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--ink); }
+.checks input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--accent); flex: none; }
+.checks small { display: block; color: var(--muted); font-size: 12px; }
+.form .row { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
+@media (max-width: 480px) { .form { grid-template-columns: minmax(0, 1fr); } }
+.diag h3 { font-size: 12px; font-weight: 600; color: var(--ink2); margin: 12px 0 4px; }
+.diag .chart { height: 120px; }
+#diagText { font: 11px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--ink2); white-space: pre-wrap; margin: 10px 0 0; overflow-x: auto; }
+.howto { font-size: 13px; color: var(--ink2); line-height: 1.5; margin: 10px 0 0; padding-left: 18px; }
+footer { max-width: 1280px; margin: 0 auto; padding: 0 16px max(24px, env(safe-area-inset-bottom)); font-size: 12px; color: var(--muted); line-height: 1.5; }
+#video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+#hrState .ico { margin-right: 6px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><h1>Pulse Cam</h1><span>remote photoplethysmography in the browser</span></div>
+  <button class="icon-btn" id="themeBtn" title="Toggle light / dark" aria-label="Toggle light or dark theme">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+  </button>
+</header>
+
+<main class="layout">
+  <section class="card stage" aria-label="Camera">
+    <div class="viewport">
+      <video id="video" playsinline muted autoplay></video>
+      <canvas id="view"></canvas>
+      <div class="badge" id="badge" aria-live="polite">
+        <svg class="heart" id="heart" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 5 6.4 5c2 0 3.6 1.2 4.6 2.6.9-1.4 2.6-2.6 4.6-2.6C19 5 21.1 8.4 21.6 11.8 19.5 16.4 12 21 12 21z"/></svg>
+        <b id="badgeBpm">--</b><span>bpm</span>
+      </div>
+      <div class="view-msg" id="viewMsg">Press <b>Start</b>, allow the camera, and hold it 30–50 cm from your face in even light.</div>
+    </div>
+    <div class="controls">
+      <button class="btn primary" id="startBtn">Start</button>
+      <select id="optCam" aria-label="Camera"><option value="user">Front camera</option><option value="environment">Rear camera</option></select>
+      <button class="btn" id="resetBtn" title="Clear signal and history">Reset</button>
+      <button class="btn" id="exportBtn" title="Download raw traces and heart rate as CSV">Export CSV</button>
+    </div>
+  </section>
+
+  <section class="card readout" aria-label="Heart rate">
+    <div class="hero"><span id="bpm">--</span><span class="unit">bpm</span></div>
+    <div id="hrState" data-k="muted">Stopped</div>
+    <div class="meters">
+      <div class="meter"><label>Signal quality</label><div class="track"><div class="fill" id="mQual"></div></div><output id="vQual">—</output></div>
+      <div class="meter"><label>Motion</label><div class="track"><div class="fill" id="mMot"></div></div><output id="vMot">—</output></div>
+      <div class="meter"><label>Light</label><div class="track"><div class="fill" id="mLight"></div></div><output id="vLight">—</output></div>
+    </div>
+    <dl class="stats">
+      <div><dt>Beat-to-beat HR</dt><dd id="sIbi">—</dd></div>
+      <div><dt>HRV (RMSSD, experimental)</dt><dd id="sRmssd">—</dd></div>
+      <div><dt>Beats detected (2 min)</dt><dd id="sBeats">—</dd></div>
+      <div><dt>Frame rate</dt><dd id="sFps">—</dd></div>
+      <div><dt>Face tracking</dt><dd id="sTracker">—</dd></div>
+      <div><dt>Exposure / white balance</dt><dd id="sAE">—</dd></div>
+      <div><dt>Phone motion sensors</dt><dd id="sImu">—</dd></div>
+    </dl>
+  </section>
+
+  <section class="card wave">
+    <h2>Pulse waveform <small>blood-volume pulse, motion-corrected · dots = detected beats</small></h2>
+    <canvas class="chart" id="waveCv"></canvas>
+  </section>
+
+  <section class="card trend">
+    <h2>Heart rate <small>bpm · faded = low confidence</small></h2>
+    <canvas class="chart" id="trendCv"></canvas>
+  </section>
+
+  <section class="card spec">
+    <h2>Spectrum <small>bpm</small></h2>
+    <div class="legend"><span><i style="border-color:var(--s1)"></i>Pulse signal</span><span><i class="dash" style="border-color:var(--s2)"></i>Head / camera motion</span></div>
+    <canvas class="chart" id="specCv"></canvas>
+  </section>
+
+  <details class="card settings">
+    <summary>Settings</summary>
+    <div class="form">
+      <label class="f">Algorithm
+        <select id="optAlgo"><option value="pos">POS (recommended)</option><option value="chrom">CHROM</option><option value="green">Green channel</option></select></label>
+      <label class="f">Face tracking
+        <select id="optTracker"><option value="auto">Face landmarks (auto)</option><option value="skin">Skin-colour tracker only</option></select></label>
+      <label class="f">Analysis window
+        <select id="optWin"><option value="6">6 s (fast)</option><option value="8">8 s</option><option value="10">10 s</option><option value="12">12 s</option><option value="15">15 s (stable)</option></select></label>
+      <label class="f">Resolution
+        <select id="optRes"><option value="640">640 × 480</option><option value="1280">1280 × 720</option></select></label>
+      <div class="checks">
+        <label><input type="checkbox" id="optRegress"><span>Motion regression<small>Removes signal components that follow face position, scale and head pose.</small></span></label>
+        <label><input type="checkbox" id="optImu"><span>Use phone motion sensors<small>Adds gyroscope / accelerometer as extra motion references (phones, tablets).</small></span></label>
+        <label><input type="checkbox" id="optWeight"><span>Down-weight shaky moments<small>Samples taken while the face moves fast count less in the estimate.</small></span></label>
+        <label><input type="checkbox" id="optNotch"><span>Suppress motion frequencies<small>Penalises spectral peaks that coincide with shaking.</small></span></label>
+        <label><input type="checkbox" id="optAE"><span>Lock exposure &amp; white balance<small>Where the browser allows it (mostly Chrome on Android).</small></span></label>
+        <label><input type="checkbox" id="optOverlay"><span>Show measurement regions</span></label>
+        <label><input type="checkbox" id="optMirror"><span>Mirror preview</span></label>
+      </div>
+    </div>
+    <ol class="howto">
+      <li>Face a window or lamp so your face is evenly lit; avoid flicker from dim LED bulbs.</li>
+      <li>Fill about half the frame with your face and keep talking to a minimum.</li>
+      <li>Wait 5–10 s for the reading to settle. Small hand shake is corrected; big moves pause the estimate.</li>
+    </ol>
+  </details>
+
+  <details class="card diag" id="diag">
+    <summary>Diagnostics</summary>
+    <h3>Raw colour change (mean of regions, detrended)</h3>
+    <div class="legend"><span><i style="border-color:var(--s8)"></i>Red</span><span><i style="border-color:var(--s6)"></i>Green</span><span><i style="border-color:var(--s1)"></i>Blue</span></div>
+    <canvas class="chart" id="rawCv"></canvas>
+    <h3>Face motion (% of frame width)</h3>
+    <div class="legend"><span><i style="border-color:var(--s1)"></i>Horizontal</span><span><i style="border-color:var(--s2)"></i>Vertical</span><span><i style="border-color:var(--s3)"></i>Scale</span></div>
+    <canvas class="chart" id="motCv"></canvas>
+    <pre id="diagText"></pre>
+  </details>
+</main>
+
+<footer>
+  Pulse Cam estimates heart rate from tiny colour changes of the skin (rPPG). It is a research / demo tool, not a medical device.
+  Video never leaves your device; only the optional face-landmark model is downloaded from a CDN.
+</footer>
+
+<script>
+/* =====================================================================
+   DSP core — pure functions, no DOM.  (FFT, filters, rPPG projections,
+   motion regression, spectral analysis, beat detection)
+   ===================================================================== */
+const DSP = (() => {
+  'use strict';
+
+  /* ---------- basic stats ---------- */
+  function mean(x) { let s = 0; for (let i = 0; i < x.length; i++) s += x[i]; return x.length ? s / x.length : 0; }
+  function std(x) {
+    const m = mean(x); let s = 0;
+    for (let i = 0; i < x.length; i++) { const d = x[i] - m; s += d * d; }
+    return x.length > 1 ? Math.sqrt(s / (x.length - 1)) : 0;
+  }
+  function median(arr) {
+    if (!arr.length) return NaN;
+    const a = Array.from(arr).sort((p, q) => p - q), h = a.length >> 1;
+    return a.length % 2 ? a[h] : 0.5 * (a[h - 1] + a[h]);
+  }
+  /** remove least-squares linear trend */
+  function detrend(x) {
+    const n = x.length, y = new Float64Array(n);
+    if (n < 2) { y.set(x); return y; }
+    const tm = (n - 1) / 2; let sx = 0, sxy = 0, sxx = 0;
+    for (let i = 0; i < n; i++) { sx += x[i]; }
+    const xm = sx / n;
+    for (let i = 0; i < n; i++) { const d = i - tm; sxy += d * (x[i] - xm); sxx += d * d; }
+    const b = sxx ? sxy / sxx : 0;
+    for (let i = 0; i < n; i++) y[i] = x[i] - xm - b * (i - tm);
+    return y;
+  }
+  /** centred moving average (window w samples, shrinking at edges) */
+  function movingMean(x, w) {
+    const n = x.length, y = new Float64Array(n), h = Math.max(1, w >> 1);
+    const c = new Float64Array(n + 1);
+    for (let i = 0; i < n; i++) c[i + 1] = c[i] + x[i];
+    for (let i = 0; i < n; i++) {
+      const a = Math.max(0, i - h), b = Math.min(n, i + h + 1);
+      y[i] = (c[b] - c[a]) / (b - a);
+    }
+    return y;
+  }
+  function diff(x) { const n = x.length, y = new Float64Array(n); for (let i = 1; i < n; i++) y[i] = x[i] - x[i - 1]; if (n > 1) y[0] = y[1]; return y; }
+
+  /* ---------- FFT (iterative radix-2, complex, in place) ---------- */
+  function fft(re, im) {
+    const n = re.length;
+    for (let i = 1, j = 0; i < n; i++) {
+      let bit = n >> 1;
+      for (; j & bit; bit >>= 1) j ^= bit;
+      j ^= bit;
+      if (i < j) { let t = re[i]; re[i] = re[j]; re[j] = t; t = im[i]; im[i] = im[j]; im[j] = t; }
+    }
+    for (let len = 2; len <= n; len <<= 1) {
+      const ang = -2 * Math.PI / len, half = len >> 1;
+      const wr = Math.cos(ang), wi = Math.sin(ang);
+      for (let i = 0; i < n; i += len) {
+        let cr = 1, ci = 0;
+        for (let k = 0; k < half; k++) {
+          const a = i + k, b = a + half;
+          const tr = re[b] * cr - im[b] * ci, ti = re[b] * ci + im[b] * cr;
+          re[b] = re[a] - tr; im[b] = im[a] - ti; re[a] += tr; im[a] += ti;
+          const ncr = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = ncr;
+        }
+      }
+    }
+  }
+  /** one-sided power spectrum of a real (already windowed) signal, zero-padded to nfft */
+  function powerSpectrum(x, nfft) {
+    const re = new Float64Array(nfft), im = new Float64Array(nfft);
+    const n = Math.min(x.length, nfft);
+    for (let i = 0; i < n; i++) re[i] = x[i];
+    fft(re, im);
+    const P = new Float64Array((nfft >> 1) + 1);
+    for (let k = 0; k < P.length; k++) P[k] = re[k] * re[k] + im[k] * im[k];
+    return P;
+  }
+  function hann(n) { const w = new Float64Array(n); for (let i = 0; i < n; i++) w[i] = 0.5 - 0.5 * Math.cos(2 * Math.PI * (i + 0.5) / n); return w; }
+
+  /* ---------- IIR band-pass (4th-order Butterworth HP + LP, as biquads) ---------- */
+  function biquad(type, f0, fs, Q) {
+    const w0 = 2 * Math.PI * f0 / fs, c = Math.cos(w0), s = Math.sin(w0), al = s / (2 * Q);
+    const a0 = 1 + al, a1 = -2 * c, a2 = 1 - al;
+    let b0, b1, b2;
+    if (type === 'lp') { b0 = (1 - c) / 2; b1 = 1 - c; b2 = (1 - c) / 2; }
+    else { b0 = (1 + c) / 2; b1 = -(1 + c); b2 = (1 + c) / 2; }
+    return [b0 / a0, b1 / a0, b2 / a0, a1 / a0, a2 / a0];
+  }
+  function bandpassDesign(lo, hi, fs) {
+    const Q = [0.5412, 1.3066]; // 4th-order Butterworth pole-pair Qs
+    return [biquad('hp', lo, fs, Q[0]), biquad('hp', lo, fs, Q[1]), biquad('lp', hi, fs, Q[0]), biquad('lp', hi, fs, Q[1])];
+  }
+  function sosFilter(sos, x) {
+    const y = Float64Array.from(x);
+    for (const [b0, b1, b2, a1, a2] of sos) {
+      let z1 = 0, z2 = 0;
+      for (let i = 0; i < y.length; i++) {
+        const xi = y[i], yi = b0 * xi + z1;
+        z1 = b1 * xi - a1 * yi + z2; z2 = b2 * xi - a2 * yi; y[i] = yi;
+      }
+    }
+    return y;
+  }
+  /** zero-phase filtering with odd-reflection padding (like scipy.signal.filtfilt) */
+  function filtfilt(sos, x, padLen) {
+    const n = x.length;
+    if (n < 6) return Float64Array.from(x);
+    const p = Math.min(padLen, n - 2);
+    const e = new Float64Array(n + 2 * p);
+    for (let i = 0; i < p; i++) e[i] = 2 * x[0] - x[p - i];
+    e.set(x, p);
+    for (let i = 0; i < p; i++) e[n + p + i] = 2 * x[n - 1] - x[n - 2 - i];
+    let y = sosFilter(sos, e); y.reverse();
+    y = sosFilter(sos, y); y.reverse();
+    return y.slice(p, p + n);
+  }
+
+  /* ---------- resampling to a uniform grid (linear) ---------- */
+  function resample(ts, cols, tg) {
+    const out = cols.map(() => new Float64Array(tg.length));
+    const n = ts.length; let j = 0;
+    for (let i = 0; i < tg.length; i++) {
+      const t = tg[i];
+      while (j < n - 2 && ts[j + 1] < t) j++;
+      const t0 = ts[j], t1 = ts[j + 1];
+      let a = t1 > t0 ? (t - t0) / (t1 - t0) : 0;
+      a = a < 0 ? 0 : a > 1 ? 1 : a;
+      for (let c = 0; c < cols.length; c++) { const v = cols[c]; out[c][i] = v[j] + (v[j + 1] - v[j]) * a; }
+    }
+    return out;
+  }
+
+  /* ---------- rPPG projections. All return a signal oriented like BVP
+                (up = more blood volume) ---------- */
+  /** POS — Wang, den Brinker, Stuijk, de Haan, IEEE TBME 2017 */
+  function pos(R, G, B, fs) {
+    const n = R.length, H = new Float64Array(n);
+    const l = Math.min(n, Math.max(8, Math.round(1.6 * fs)));
+    const s1 = new Float64Array(l), s2 = new Float64Array(l);
+    for (let m = 0; m + l <= n; m++) {
+      let mr = 0, mg = 0, mb = 0;
+      for (let i = m; i < m + l; i++) { mr += R[i]; mg += G[i]; mb += B[i]; }
+      mr /= l; mg /= l; mb /= l;
+      if (mr <= 0 || mg <= 0 || mb <= 0) continue;
+      let a1 = 0, a2 = 0;
+      for (let k = 0; k < l; k++) {
+        const rn = R[m + k] / mr, gn = G[m + k] / mg, bn = B[m + k] / mb;
+        s1[k] = gn - bn; s2[k] = gn + bn - 2 * rn; a1 += s1[k]; a2 += s2[k];
+      }
+      a1 /= l; a2 /= l;
+      let v1 = 0, v2 = 0;
+      for (let k = 0; k < l; k++) { v1 += (s1[k] - a1) ** 2; v2 += (s2[k] - a2) ** 2; }
+      const alpha = v2 > 1e-24 ? Math.sqrt(v1 / v2) : 0;
+      let hm = 0;
+      for (let k = 0; k < l; k++) hm += s1[k] + alpha * s2[k];
+      hm /= l;
+      for (let k = 0; k < l; k++) H[m + k] += s1[k] + alpha * s2[k] - hm;
+    }
+    for (let i = 0; i < n; i++) H[i] = -H[i]; // POS output is anti-phase with blood volume
+    return H;
+  }
+  /** CHROM — de Haan & Jeanne, IEEE TBME 2013 (sliding-window variant) */
+  function chrom(R, G, B, fs, sos) {
+    const n = R.length, l = Math.min(n, Math.max(8, Math.round(1.6 * fs)));
+    const mr = movingMean(R, l), mg = movingMean(G, l), mb = movingMean(B, l);
+    const X = new Float64Array(n), Y = new Float64Array(n);
+    for (let i = 0; i < n; i++) {
+      const rn = R[i] / mr[i], gn = G[i] / mg[i], bn = B[i] / mb[i];
+      X[i] = 3 * rn - 2 * gn; Y[i] = 1.5 * rn + gn - 1.5 * bn;
+    }
+    const pad = Math.round(2 * fs);
+    const Xf = filtfilt(sos, detrend(X), pad), Yf = filtfilt(sos, detrend(Y), pad);
+    const S = new Float64Array(n);
+    for (let m = 0; m + l <= n; m++) {
+      let sx = 0, sy = 0, xx = 0, yy = 0;
+      for (let k = m; k < m + l; k++) { sx += Xf[k]; sy += Yf[k]; }
+      sx /= l; sy /= l;
+      for (let k = m; k < m + l; k++) { xx += (Xf[k] - sx) ** 2; yy += (Yf[k] - sy) ** 2; }
+      const alpha = yy > 1e-24 ? Math.sqrt(xx / yy) : 0;
+      let hm = 0;
+      for (let k = m; k < m + l; k++) hm += Xf[k] - alpha * Yf[k];
+      hm /= l;
+      for (let k = m; k < m + l; k++) S[k] += Xf[k] - alpha * Yf[k] - hm;
+    }
+    return S;
+  }
+  /** Green channel (Verkruysse 2008) */
+  function green(R, G, B, fs) {
+    const n = G.length, l = Math.max(8, Math.round(1.6 * fs)), mg = movingMean(G, l), y = new Float64Array(n);
+    for (let i = 0; i < n; i++) y[i] = -(G[i] / mg[i] - 1);
+    return y;
+  }
+
+  /* ---------- ridge regression: remove motion-correlated components ---------- */
+  function solveSym(A, b) { // Gaussian elimination w/ partial pivoting; A: k×k array of rows
+    const k = b.length, M = A.map((r, i) => [...r, b[i]]);
+    for (let c = 0; c < k; c++) {
+      let p = c;
+      for (let r = c + 1; r < k; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+      [M[c], M[p]] = [M[p], M[c]];
+      const d = M[c][c]; if (Math.abs(d) < 1e-12) return null;
+      for (let r = c + 1; r < k; r++) { const f = M[r][c] / d; for (let q = c; q <= k; q++) M[r][q] -= f * M[c][q]; }
+    }
+    const x = new Array(k).fill(0);
+    for (let r = k - 1; r >= 0; r--) { let s = M[r][k]; for (let q = r + 1; q < k; q++) s -= M[r][q] * x[q]; x[r] = s / M[r][r]; }
+    return x;
+  }
+  /** y ≈ Σβ·refs (ridge, standardized refs) → returns residual and explained fraction */
+  function regressOut(y, refs, lambdaFrac = 0.05) {
+    const n = y.length, cols = [];
+    for (const r of refs) {
+      const m = mean(r), s = std(r);
+      if (!(s > 1e-12)) continue;
+      const c = new Float64Array(n); for (let i = 0; i < n; i++) c[i] = (r[i] - m) / s; cols.push(c);
+    }
+    const k = cols.length;
+    if (!k) return { y, removed: 0 };
+    const A = [], b = [];
+    for (let i = 0; i < k; i++) {
+      A.push(new Array(k).fill(0));
+      let s = 0; for (let t = 0; t < n; t++) s += cols[i][t] * y[t]; b.push(s);
+    }
+    for (let i = 0; i < k; i++) for (let j = i; j < k; j++) {
+      let s = 0; const ci = cols[i], cj = cols[j];
+      for (let t = 0; t < n; t++) s += ci[t] * cj[t];
+      A[i][j] = A[j][i] = s;
+    }
+    for (let i = 0; i < k; i++) A[i][i] += lambdaFrac * n;
+    const beta = solveSym(A, b);
+    if (!beta) return { y, removed: 0 };
+    const out = Float64Array.from(y);
+    for (let i = 0; i < k; i++) { const bi = beta[i], c = cols[i]; for (let t = 0; t < n; t++) out[t] -= bi * c[t]; }
+    const v0 = std(y) ** 2, v1 = std(out) ** 2;
+    return { y: out, removed: v0 > 0 ? Math.max(0, 1 - v1 / v0) : 0 };
+  }
+
+  /* ---------- spectral helpers ---------- */
+  function parabolic(P, k) {
+    if (k <= 0 || k >= P.length - 1) return 0;
+    const a = P[k - 1], b = P[k], c = P[k + 1], d = a - 2 * b + c;
+    return d !== 0 ? Math.max(-0.5, Math.min(0.5, 0.5 * (a - c) / d)) : 0;
+  }
+  function peakBin(P, kLo, kHi) {
+    let best = kLo;
+    for (let k = kLo; k <= kHi; k++) if (P[k] > P[best]) best = k;
+    return best;
+  }
+  /** SNR as in de Haan & Jeanne 2013: power near f0 (±0.1 Hz) and 2·f0 (±0.2 Hz) vs rest of band */
+  function snrDb(P, df, f0, fLo, fHi) {
+    let sig = 0, noise = 0;
+    const kLo = Math.max(1, Math.floor(fLo / df)), kHi = Math.min(P.length - 1, Math.ceil(fHi / df));
+    for (let k = kLo; k <= kHi; k++) {
+      const f = k * df;
+      if (Math.abs(f - f0) <= 0.1 || Math.abs(f - 2 * f0) <= 0.2) sig += P[k]; else noise += P[k];
+    }
+    return 10 * Math.log10((sig + 1e-30) / (noise + 1e-30));
+  }
+  /** local maxima of P in [kLo,kHi], strongest first */
+  function localPeaks(P, kLo, kHi, maxN = 5) {
+    const out = [];
+    for (let k = Math.max(1, kLo); k <= Math.min(P.length - 2, kHi); k++)
+      if (P[k] >= P[k - 1] && P[k] > P[k + 1]) out.push(k);
+    out.sort((a, b) => P[b] - P[a]);
+    return out.slice(0, maxN);
+  }
+
+  /* ---------- beat (systolic peak) detection ---------- */
+  function findBeats(x, fs, t0, hrBpm) {
+    const n = x.length, sd = std(x);
+    const minDist = Math.max(3, Math.round(0.6 * (60 / hrBpm) * fs));
+    const cand = [];
+    for (let i = 1; i < n - 1; i++) if (x[i] > x[i - 1] && x[i] >= x[i + 1] && x[i] > 0.2 * sd) cand.push(i);
+    cand.sort((a, b) => x[b] - x[a]);
+    const acc = [];
+    for (const c of cand) if (acc.every(a => Math.abs(a - c) >= minDist)) acc.push(c);
+    acc.sort((a, b) => a - b);
+    return acc.map(i => ({ t: t0 + (i + parabolic(x, i)) / fs, i, amp: x[i] / (sd || 1) }));
+  }
+
+  return { mean, std, median, detrend, movingMean, diff, fft, powerSpectrum, hann, bandpassDesign, filtfilt,
+           resample, pos, chrom, green, regressOut, parabolic, peakBin, snrDb, localPeaks, findBeats };
+})();
+
+/* =====================================================================
+   Pulse Cam — camera, face tracking, signal pipeline, UI
+   ===================================================================== */
+(() => {
+'use strict';
+const $ = (id) => document.getElementById(id);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+/* ---------------- constants ---------------- */
+const FS = 30;                        // analysis sample rate (Hz) after resampling
+const BAND = [0.65, 4.0];             // band-pass (Hz)
+const HR_RANGE = [42, 210];           // search range (bpm)
+const NFFT = 4096;
+const SOS = DSP.bandpassDesign(BAND[0], BAND[1], FS);
+const PAD = Math.round(2 * FS);
+const MOTION_REF = 0.02;              // in-band face displacement (face widths) at which a sample gets half weight
+const PROC_W = 320;                   // processing width (px)
+
+const PARAMS = new URLSearchParams(location.search);
+const MP_VERSION = '0.10.21';
+const MP_BASE = PARAMS.get('mp') || `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MP_VERSION}`;
+const MP_MODEL = PARAMS.get('model') ||
+  'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task';
+
+// MediaPipe face-mesh polygons (subject's anatomy): forehead, right cheek, left cheek
+const ROI_NAMES = ['Forehead', 'Right cheek', 'Left cheek'];
+const ROI_SHORT = ['FH', 'RC', 'LC'];
+const LM_POLYS = [
+  [107, 66, 69, 109, 10, 338, 299, 296, 336, 9],
+  [117, 118, 101, 36, 205, 187, 123],
+  [346, 347, 330, 266, 425, 411, 352],
+];
+
+/* ---------------- options (bound to settings UI) ---------------- */
+const opt = {
+  cam: 'user', res: '640', algo: 'pos', tracker: 'auto', win: 10,
+  regress: true, imu: true, weight: true, notch: true, lockAE: true, overlay: true, mirror: true,
+};
+
+/* ---------------- state ---------------- */
+const S = {
+  running: false, stream: null, track: null, facing: 'user',
+  PW: 0, PH: 0, vw: 0, vh: 0,
+  mode: null,                          // 'landmarks' | 'skin'
+  landmarker: null, lmLoading: false, lmFailed: false, lmBroken: false, lmTs: 0, lmMs: 0, lmSkip: false,
+  lastLm: null, lastMat: null, lastTrack: null, lmPatch: null, lmOff: [0, 0], lmEvery: 1,
+  skin: { model: null, cx: 0, cy: 0, a: 0, b: 0, a0: 0, b0: 0, lost: 0 },
+  lumRef: [0, 0, 0], lastRoi: [null, null, null],
+  samples: [], log: [], lastT: 0, lastOkT: 0, noFaceSince: 0, frameCount: 0,
+  prevFace: null, speedEma: 0, motionNow: 0,
+  imuAcc: new Float64Array(6), imuN: 0, imuLast: new Float64Array(6), imuSeen: false, imuState: 'off',
+  hr: null, hrHistory: [], lastHistT: 0, beats: [], lastAnalysisT: 0,
+  res: null, dirty: true, fpsEma: 0, procMs: 0, aeState: '—', wakeLock: null, sessionStart: 0,
+  hover: {},
+};
+window.__pulsecam = { S, opt };   // handy for debugging from the console
+
+/* ---------------- DOM ---------------- */
+const video = $('video');
+const view = $('view'), vctx = view.getContext('2d');
+const proc = document.createElement('canvas');
+const pctx = proc.getContext('2d', { willReadFrequently: true });
+
+/* ---------------- theme tokens ---------------- */
+let T = {};
+function readTokens() {
+  const cs = getComputedStyle(document.documentElement), g = (n) => cs.getPropertyValue(n).trim();
+  T = { surface: g('--surface'), ink: g('--ink'), ink2: g('--ink2'), muted: g('--muted'), grid: g('--grid'),
+        axis: g('--axis'), s1: g('--s1'), s2: g('--s2'), s3: g('--s3'), s6: g('--s6'), s8: g('--s8'),
+        good: g('--good'), warn: g('--warn'), serious: g('--serious'), crit: g('--crit'), tipBg: g('--tip-bg') };
+  S.dirty = true;
+}
+
+/* =====================================================================
+   Camera
+   ===================================================================== */
+async function startCamera() {
+  stopStream();
+  const big = opt.res === '1280';
+  const v = { width: { ideal: big ? 1280 : 640 }, height: { ideal: big ? 720 : 480 }, frameRate: { ideal: 30 } };
+  if (opt.cam === 'user' || opt.cam === 'environment') v.facingMode = { ideal: opt.cam };
+  else v.deviceId = { exact: opt.cam };
+  const stream = await navigator.mediaDevices.getUserMedia({ video: v, audio: false });
+  S.stream = stream; S.track = stream.getVideoTracks()[0];
+  video.srcObject = stream;
+  await video.play().catch(() => {});
+  await new Promise((res) => { const chk = () => (video.videoWidth ? res() : setTimeout(chk, 30)); chk(); });
+  configureProc();
+  const st = S.track.getSettings ? S.track.getSettings() : {};
+  S.facing = st.facingMode || (opt.cam === 'environment' ? 'environment' : 'user');
+  opt.mirror = S.facing !== 'environment'; $('optMirror').checked = opt.mirror;
+  S.aeState = 'auto';
+  if (opt.lockAE) setTimeout(() => lockExposure(), 2500);
+  populateCameras();
+}
+function stopStream() {
+  if (S.stream) S.stream.getTracks().forEach((t) => t.stop());
+  S.stream = null; S.track = null;
+}
+function configureProc() {
+  S.vw = video.videoWidth; S.vh = video.videoHeight;
+  S.PW = Math.min(PROC_W, S.vw); S.PH = Math.round(S.PW * S.vh / S.vw);
+  proc.width = S.PW; proc.height = S.PH;
+  document.documentElement.style.setProperty('--ar', `${S.vw} / ${S.vh}`);
+  S.skin.model = null;
+  resetSignals();
+}
+async function populateCameras() {
+  try {
+    const devs = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === 'videoinput');
+    const sel = $('optCam'), cur = opt.cam;
+    sel.innerHTML = '';
+    const add = (val, txt) => { const o = document.createElement('option'); o.value = val; o.textContent = txt; sel.appendChild(o); };
+    add('user', 'Front camera'); add('environment', 'Rear camera');
+    devs.forEach((d, i) => add(d.deviceId, d.label || `Camera ${i + 1}`));
+    sel.value = [...sel.options].some((o) => o.value === cur) ? cur : 'user';
+  } catch (e) { /* ignore */ }
+}
+/** Lock auto-exposure / white balance at the current values where the browser allows it
+    (mostly Chrome on Android). AE/AWB hunting is a major source of rPPG artefacts. */
+async function lockExposure() {
+  const tr = S.track; if (!tr || !S.running) return;
+  try {
+    const caps = tr.getCapabilities ? tr.getCapabilities() : {}, st = tr.getSettings();
+    const adv = [];
+    if (caps.exposureMode && caps.exposureMode.includes('manual') && st.exposureTime) adv.push({ exposureMode: 'manual', exposureTime: st.exposureTime });
+    if (caps.whiteBalanceMode && caps.whiteBalanceMode.includes('manual') && st.colorTemperature) adv.push({ whiteBalanceMode: 'manual', colorTemperature: st.colorTemperature });
+    if (!adv.length) { S.aeState = 'auto (lock not supported)'; return; }
+    const lumBefore = S.lumRef[0] || S.lumRef[1] || 0;
+    await tr.applyConstraints({ advanced: adv });
+    S.aeState = 'locked';
+    resetSignals();
+    // safety: if the image changed brightness drastically, go back to auto
+    setTimeout(async () => {
+      const lumAfter = S.lumRef[0] || S.lumRef[1] || 0;
+      if (lumBefore && lumAfter && (lumAfter < 0.6 * lumBefore || lumAfter > 1.6 * lumBefore)) {
+        await unlockExposure(); S.aeState = 'auto (lock reverted)';
+      }
+    }, 1500);
+  } catch (e) { S.aeState = 'auto (lock failed)'; }
+}
+async function unlockExposure() {
+  const tr = S.track; if (!tr) return;
+  try {
+    const caps = tr.getCapabilities ? tr.getCapabilities() : {}, adv = [];
+    if (caps.exposureMode && caps.exposureMode.includes('continuous')) adv.push({ exposureMode: 'continuous' });
+    if (caps.whiteBalanceMode && caps.whiteBalanceMode.includes('continuous')) adv.push({ whiteBalanceMode: 'continuous' });
+    if (adv.length) await tr.applyConstraints({ advanced: adv });
+    S.aeState = 'auto';
+  } catch (e) { /* ignore */ }
+}
+
+/* ---------------- phone motion sensors ---------------- */
+function requestImu() {
+  if (!opt.imu) { S.imuState = 'off'; return; }
+  const attach = () => { window.addEventListener('devicemotion', onDeviceMotion); S.imuState = 'waiting'; };
+  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+    DeviceMotionEvent.requestPermission().then((r) => { if (r === 'granted') attach(); else S.imuState = 'denied'; })
+      .catch(() => { S.imuState = 'denied'; });
+  } else if (typeof DeviceMotionEvent !== 'undefined') attach();
+  else S.imuState = 'unavailable';
+}
+function onDeviceMotion(e) {
+  const rr = e.rotationRate || {}, ag = e.accelerationIncludingGravity || {};
+  if (rr.alpha == null && ag.x == null) return;
+  const v = [rr.alpha || 0, rr.beta || 0, rr.gamma || 0, ag.x || 0, ag.y || 0, ag.z || 0];
+  for (let i = 0; i < 6; i++) S.imuAcc[i] += v[i];
+  S.imuN++; S.imuSeen = true; S.imuState = 'active';
+}
+function takeImu() {
+  if (S.imuN) { for (let i = 0; i < 6; i++) { S.imuLast[i] = S.imuAcc[i] / S.imuN; S.imuAcc[i] = 0; } S.imuN = 0; }
+  return S.imuLast;
+}
+
+/* =====================================================================
+   Face tracking
+   ===================================================================== */
+const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
+async function loadLandmarker() {
+  if (S.landmarker || S.lmLoading || S.lmFailed) return;
+  S.lmLoading = true; updateStatusPanel();
+  try {
+    const vision = await withTimeout(import(/* webpackIgnore: true */ `${MP_BASE}/vision_bundle.mjs`), 20000);
+    const fileset = await withTimeout(vision.FilesetResolver.forVisionTasks(`${MP_BASE}/wasm`), 20000);
+    const make = (delegate) => vision.FaceLandmarker.createFromOptions(fileset, {
+      baseOptions: { modelAssetPath: MP_MODEL, delegate },
+      runningMode: 'VIDEO', numFaces: 1, outputFaceBlendshapes: false, outputFacialTransformationMatrixes: true,
+      minFaceDetectionConfidence: 0.5, minFacePresenceConfidence: 0.5, minTrackingConfidence: 0.5,
+    });
+    let lm;
+    try { lm = await withTimeout(make('GPU'), 30000); }
+    catch (e) { console.warn('GPU delegate failed, using CPU', e); lm = await withTimeout(make('CPU'), 30000); }
+    S.landmarker = lm;
+  } catch (e) {
+    console.warn('Face landmarker unavailable — using skin-colour tracker', e);
+    S.lmFailed = true;
+  }
+  S.lmLoading = false; updateStatusPanel();
+}
+
+/* Between landmark detections (slow devices) the face is followed by block matching of a
+   grey-level patch, so the regions keep up with hand shake instead of jumping. */
+function makePatch(img, L) {
+  const PW = S.PW, PH = S.PH;
+  const x0 = Math.min(L[234].x, L[454].x) * PW, x1 = Math.max(L[234].x, L[454].x) * PW;
+  const y0 = L[10].y * PH, y1 = L[152].y * PH;
+  const bw = x1 - x0, bh = y1 - y0, st = Math.max(2, Math.round(bw / 24));
+  const xs = [], ys = [], v = [];
+  for (let y = Math.round(y0 + 0.12 * bh); y < y1 - 0.12 * bh; y += st)
+    for (let x = Math.round(x0 + 0.12 * bw); x < x1 - 0.12 * bw; x += st) {
+      if (x < 8 || y < 8 || x >= PW - 8 || y >= PH - 8) continue;
+      const p = (y * PW + x) * 4; xs.push(x); ys.push(y); v.push(0.299 * img[p] + 0.587 * img[p + 1] + 0.114 * img[p + 2]);
+    }
+  return xs.length > 30 ? { xs, ys, v } : null;
+}
+function matchPatch(img, P, off) {
+  const PW = S.PW, PH = S.PH, R = 6, bx = Math.round(off[0]), by = Math.round(off[1]);
+  const sad = (dx, dy) => {
+    let s = 0, n = 0;
+    for (let i = 0; i < P.xs.length; i++) {
+      const x = P.xs[i] + dx, y = P.ys[i] + dy;
+      if (x < 0 || y < 0 || x >= PW || y >= PH) continue;
+      const p = (y * PW + x) * 4; s += Math.abs(0.299 * img[p] + 0.587 * img[p + 1] + 0.114 * img[p + 2] - P.v[i]); n++;
+    }
+    return n > 20 ? s / n : Infinity;
+  };
+  let best = Infinity, bdx = bx, bdy = by;
+  const tab = new Map();
+  for (let dy = by - R; dy <= by + R; dy++) for (let dx = bx - R; dx <= bx + R; dx++) {
+    const s = sad(dx, dy); tab.set(dx + ',' + dy, s);
+    if (s < best) { best = s; bdx = dx; bdy = dy; }
+  }
+  const g = (dx, dy) => tab.get(dx + ',' + dy) ?? sad(dx, dy);
+  const sub = (a, b, c) => { const d = a - 2 * b + c; return d > 0 && Number.isFinite(d) ? clamp(0.5 * (a - c) / d, -0.5, 0.5) : 0; };
+  return [bdx + sub(g(bdx - 1, bdy), best, g(bdx + 1, bdy)), bdy + sub(g(bdx, bdy - 1), best, g(bdx, bdy + 1))];
+}
+function trackLandmarks(t, img) {
+  const PW = S.PW, PH = S.PH;
+  const every = clamp(Math.ceil(S.lmMs / 25), 1, 8);
+  S.lmSkip = every > 1; S.lmEvery = every;
+  const detect = !S.lastLm || S.frameCount % every === 0;
+  if (detect) {
+    const ts = Math.max(S.lmTs + 1, Math.round(performance.now())); S.lmTs = ts;
+    const a = performance.now(); let r;
+    try { r = S.landmarker.detectForVideo(video, ts); }
+    catch (e) { console.warn('landmarker error', e); S.lmBroken = true; return { ok: false }; }
+    const dt = performance.now() - a;
+    S.lmMs = S.lmMs ? 0.9 * S.lmMs + 0.1 * dt : dt;
+    if (r && r.faceLandmarks && r.faceLandmarks.length) {
+      S.lastLm = r.faceLandmarks[0];
+      S.lastMat = (r.facialTransformationMatrixes && r.facialTransformationMatrixes[0]) ? r.facialTransformationMatrixes[0].data : null;
+      S.lmOff = [0, 0];
+      S.lmPatch = every > 1 ? makePatch(img, S.lastLm) : null;
+    } else { S.lastLm = null; S.lastMat = null; S.lmPatch = null; }
+  } else if (S.lmPatch) {
+    S.lmOff = matchPatch(img, S.lmPatch, S.lmOff || [0, 0]);
+  }
+  const L = S.lastLm;
+  if (!L) return { ok: false };
+  const [ox, oy] = S.lmOff || [0, 0];
+  const polys = LM_POLYS.map((idx) => {
+    const a = new Float32Array(idx.length * 2);
+    idx.forEach((id, i) => { a[2 * i] = L[id].x * PW + ox; a[2 * i + 1] = L[id].y * PH + oy; });
+    return a;
+  });
+  const lx = L[234].x * PW + ox, ly = L[234].y * PH + oy, rx = L[454].x * PW + ox, ry = L[454].y * PH + oy;
+  const size = Math.hypot(rx - lx, ry - ly);
+  const cx = (lx + rx + (L[10].x + L[152].x) * PW + 2 * ox) / 4, cy = (ly + ry + (L[10].y + L[152].y) * PH + 2 * oy) / 4;
+  let yaw, pitch, roll;
+  const m = S.lastMat;
+  if (m && m.length >= 16) { yaw = m[8]; pitch = m[9]; roll = Math.atan2(m[1], m[0]); }
+  else { roll = Math.atan2(ry - ly, rx - lx); yaw = ((L[1].x * PW + ox) - (lx + rx) / 2) / (size || 1); pitch = ((L[1].y * PH + oy) - cy) / (size || 1); }
+  return { ok: true, polys, cx, cy, size, pose: [yaw, pitch, roll] };
+}
+
+/* ---- fallback: skin-colour model + mean-shift ellipse tracker ---- */
+function ycc(r, g, b) {
+  return [128 - 0.168736 * r - 0.331264 * g + 0.5 * b, 128 + 0.5 * r - 0.418688 * g - 0.081312 * b];
+}
+function skinProb(r, g, b, M) {
+  const mx = r > g ? (r > b ? r : b) : (g > b ? g : b);
+  if (mx >= 250 || mx < 25) return 0;
+  const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b, cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+  const dx = cb - M.mcb, dy = cr - M.mcr;
+  const d2 = M.i11 * dx * dx + 2 * M.i12 * dx * dy + M.i22 * dy * dy;
+  return d2 > 16 ? 0 : Math.exp(-0.5 * d2);
+}
+function initSkinModel(img) {
+  const PW = S.PW, PH = S.PH, sk = S.skin;
+  const cx = PW / 2, cy = PH * 0.48, a = Math.min(PW, PH * 0.75) * 0.27, b = a * 1.3;
+  let n = 0, tot = 0, s1 = 0, s2 = 0, s11 = 0, s22 = 0, s12 = 0;
+  for (let y = Math.floor(cy - 0.6 * b); y < cy + 0.6 * b; y++) for (let x = Math.floor(cx - 0.6 * a); x < cx + 0.6 * a; x++) {
+    if (x < 0 || y < 0 || x >= PW || y >= PH) continue;
+    if (((x - cx) / (0.6 * a)) ** 2 + ((y - cy) / (0.6 * b)) ** 2 > 1) continue;
+    tot++;
+    const p = (y * PW + x) * 4, r = img[p], g = img[p + 1], bb = img[p + 2];
+    const [cb, cr] = ycc(r, g, bb);
+    const mx = Math.max(r, g, bb);
+    if (mx >= 250 || mx < 30 || cr < 128 || cr > 190 || cb < 65 || cb > 140) continue;   // broad skin gamut
+    n++; s1 += cb; s2 += cr; s11 += cb * cb; s22 += cr * cr; s12 += cb * cr;
+  }
+  if (tot === 0 || n < 0.3 * tot) return false;
+  const mcb = s1 / n, mcr = s2 / n;
+  const c11 = s11 / n - mcb * mcb + 4, c22 = s22 / n - mcr * mcr + 4, c12 = s12 / n - mcb * mcr;  // +4: regularise
+  const det = c11 * c22 - c12 * c12;
+  const k = 1 / 2.5; // widen the model (×2.5 variance) to tolerate shading
+  sk.model = { mcb, mcr, i11: k * c22 / det, i22: k * c11 / det, i12: -k * c12 / det };
+  Object.assign(sk, { cx, cy, a, b, a0: a, b0: b, lost: 0 });
+  return true;
+}
+function trackSkin(img) {
+  const sk = S.skin, PW = S.PW, PH = S.PH;
+  if (!sk.model && !initSkinModel(img)) return { ok: false, guide: true };
+  const M = sk.model;
+  let sw = 0, sx = 0, sy = 0, sxx = 0, syy = 0;
+  for (let it = 0; it < 5; it++) {
+    const ra = 1.25 * sk.a, rb = 1.25 * sk.b;
+    sw = sx = sy = sxx = syy = 0;
+    const x0 = Math.max(0, Math.floor(sk.cx - ra)), x1 = Math.min(PW - 1, Math.ceil(sk.cx + ra));
+    const y0 = Math.max(0, Math.floor(sk.cy - rb)), y1 = Math.min(PH - 1, Math.ceil(sk.cy + rb));
+    for (let y = y0; y <= y1; y += 2) {
+      const dy = (y - sk.cy) / rb;
+      for (let x = x0; x <= x1; x += 2) {
+        const dx = (x - sk.cx) / ra;
+        if (dx * dx + dy * dy > 1) continue;
+        const p = (y * PW + x) * 4, w = skinProb(img[p], img[p + 1], img[p + 2], M);
+        if (!w) continue;
+        sw += w; sx += w * x; sy += w * y; sxx += w * x * x; syy += w * y * y;
+      }
+    }
+    if (sw < 20) break;
+    const nx = sx / sw, ny = sy / sw, sh = Math.hypot(nx - sk.cx, ny - sk.cy);
+    sk.cx = nx; sk.cy = ny;
+    if (sh < 0.5) break;
+  }
+  const area = Math.PI * sk.a * sk.b / 4;            // pixels sampled at step 2
+  if (sw < 0.15 * area) {
+    if (++sk.lost > 45) sk.model = null;             // re-initialise from the guide oval
+    return { ok: false, guide: true };
+  }
+  sk.lost = 0;
+  // slow size adaptation from second moments (uniform ellipse: σ = r/2)
+  const vx = Math.max(1, sxx / sw - (sx / sw) ** 2), vy = Math.max(1, syy / sw - (sy / sw) ** 2);
+  sk.a = clamp(0.95 * sk.a + 0.05 * 2 * Math.sqrt(vx), 0.6 * sk.a0, 1.6 * sk.a0);
+  sk.b = clamp(0.95 * sk.b + 0.05 * 2 * Math.sqrt(vy), 0.6 * sk.b0, 1.6 * sk.b0);
+  const { cx, cy, a, b } = sk;
+  const rect = (x0, y0, x1, y1) => new Float32Array([cx + x0 * a, cy + y0 * b, cx + x1 * a, cy + y0 * b, cx + x1 * a, cy + y1 * b, cx + x0 * a, cy + y1 * b]);
+  // image-left cheek = subject's right cheek (camera not mirrored in processing)
+  const polys = [rect(-0.42, -0.78, 0.42, -0.48), rect(-0.62, -0.02, -0.22, 0.36), rect(0.22, -0.02, 0.62, 0.36)];
+  return { ok: true, polys, cx, cy, size: 2 * a, pose: null, ellipse: { cx, cy, a, b } };
+}
+
+/* ---- ROI statistics: scan-line polygon fill + pixel validity mask ---- */
+const xsBuf = [];
+function polyStats(img, W, H, pts, mask) {
+  const n = pts.length >> 1;
+  let ymin = Infinity, ymax = -Infinity;
+  for (let i = 0; i < n; i++) { const y = pts[2 * i + 1]; if (y < ymin) ymin = y; if (y > ymax) ymax = y; }
+  const y0 = Math.max(0, Math.ceil(ymin - 0.5)), y1 = Math.min(H - 1, Math.floor(ymax - 0.5));
+  let mr = 0, mg = 0, mb = 0, mn = 0, ar = 0, ag = 0, ab = 0, an = 0, tot = 0;
+  for (let y = y0; y <= y1; y++) {
+    const yc = y + 0.5; xsBuf.length = 0;
+    for (let i = 0, j = n - 1; i < n; j = i++) {
+      const yi = pts[2 * i + 1], yj = pts[2 * j + 1];
+      if ((yi > yc) !== (yj > yc)) xsBuf.push(pts[2 * i] + (yc - yi) * (pts[2 * j] - pts[2 * i]) / (yj - yi));
+    }
+    xsBuf.sort((p, q) => p - q);
+    for (let k = 0; k + 1 < xsBuf.length; k += 2) {
+      const xa = Math.max(0, Math.ceil(xsBuf[k] - 0.5)), xb = Math.min(W - 1, Math.floor(xsBuf[k + 1] - 0.5));
+      for (let x = xa; x <= xb; x++) {
+        const p = (y * W + x) * 4, r = img[p], g = img[p + 1], b = img[p + 2];
+        tot++;
+        if (r >= 250 || g >= 250 || b >= 250 || (r + g + b) < 45) continue;   // clipped / too dark
+        ar += r; ag += g; ab += b; an++;
+        if (mask(r, g, b)) { mr += r; mg += g; mb += b; mn++; }
+      }
+    }
+  }
+  if (mn >= Math.max(20, 0.15 * tot)) return { r: mr / mn, g: mg / mn, b: mb / mn, n: mn, tot };
+  if (an >= 20) return { r: ar / an, g: ag / an, b: ab / an, n: an, tot };
+  return null;
+}
+function landmarkMask(lumRef) {
+  const lo = lumRef ? lumRef * 0.55 : 20, hi = lumRef ? Math.min(250, lumRef * 1.6) : 250;
+  return (r, g, b) => {
+    const y = 0.299 * r + 0.587 * g + 0.114 * b;
+    return y >= lo && y <= hi && r >= 0.9 * b && r >= 0.8 * g;    // drops brows, hair, glare, shadows
+  };
+}
+
+/* =====================================================================
+   Per-frame processing
+   ===================================================================== */
+function resetSignals() {
+  S.samples = []; S.beats = []; S.prevFace = null; S.res = null; S.dirty = true;
+  S.lastRoi = [null, null, null];
+}
+function processFrame(t) {
+  if (!S.running || !video.videoWidth) return;
+  if (video.videoWidth !== S.vw || video.videoHeight !== S.vh) configureProc();   // rotation
+  if (S.lastT && t - S.lastT > 1.0) resetSignals();                                 // tab was hidden etc.
+  if (S.lastT && t <= S.lastT) return;
+  const dtF = S.lastT ? t - S.lastT : 0;
+  if (dtF > 0) S.fpsEma = S.fpsEma ? 0.95 * S.fpsEma + 0.05 / dtF : 1 / dtF;
+  S.lastT = t; S.frameCount++;
+  const c0 = performance.now();
+  const PW = S.PW, PH = S.PH;
+  pctx.drawImage(video, 0, 0, PW, PH);
+  const img = pctx.getImageData(0, 0, PW, PH).data;
+
+  const useLm = opt.tracker === 'auto' && S.landmarker && !S.lmBroken;
+  const mode = useLm ? 'landmarks' : 'skin';
+  if (mode !== S.mode) { S.mode = mode; resetSignals(); S.skin.model = null; }
+  const tr = useLm ? trackLandmarks(t, img) : trackSkin(img);
+  S.lastTrack = tr;
+
+  const vals = [null, null, null];
+  if (tr.ok) {
+    for (let k = 0; k < 3; k++) {
+      const mask = useLm ? landmarkMask(S.lumRef[k]) : ((r, g, b) => skinProb(r, g, b, S.skin.model) > 0.2);
+      const st = polyStats(img, PW, PH, tr.polys[k], mask);
+      if (st) {
+        vals[k] = st;
+        const y = 0.299 * st.r + 0.587 * st.g + 0.114 * st.b;
+        S.lumRef[k] = S.lumRef[k] ? 0.95 * S.lumRef[k] + 0.05 * y : y;
+      }
+    }
+  }
+  const ok = tr.ok && vals.some(Boolean);
+  if (ok) { S.lastOkT = t; S.noFaceSince = 0; }
+  else if (!S.noFaceSince) S.noFaceSince = t;
+  if (!ok && S.noFaceSince && t - S.noFaceSince > 1.5 && S.samples.length) resetSignals();
+
+  // motion: face speed in face-widths per second
+  let speed = 0;
+  if (ok) {
+    const f = { cx: tr.cx, cy: tr.cy, size: tr.size, t };
+    if (S.prevFace && t > S.prevFace.t) {
+      const d = Math.hypot(f.cx - S.prevFace.cx, f.cy - S.prevFace.cy) + 0.5 * Math.abs(f.size - S.prevFace.size);
+      speed = d / (f.size || 1) / (t - S.prevFace.t);
+    }
+    S.prevFace = f;
+    S.speedEma = 0.9 * S.speedEma + 0.1 * speed;
+  }
+  const imu = takeImu();
+
+  if (ok || S.samples.length) {
+    const rgb = new Float64Array(9);
+    for (let k = 0; k < 3; k++) {
+      const v = vals[k] || S.lastRoi[k];
+      if (v) { rgb[3 * k] = v.r; rgb[3 * k + 1] = v.g; rgb[3 * k + 2] = v.b; S.lastRoi[k] = v; }
+      else { rgb[3 * k] = rgb[3 * k + 1] = rgb[3 * k + 2] = NaN; }
+    }
+    const last = S.samples[S.samples.length - 1];
+    const pose = tr.pose || [0, 0, 0];
+    const smp = {
+      t, ok: ok ? 1 : 0, rgb,
+      cx: ok ? tr.cx / PW : (last ? last.cx : 0.5), cy: ok ? tr.cy / PH : (last ? last.cy : 0.5),
+      sc: ok ? tr.size / PW : (last ? last.sc : 0.3),
+      yaw: ok ? pose[0] : (last ? last.yaw : 0), pitch: ok ? pose[1] : (last ? last.pitch : 0), roll: ok ? pose[2] : (last ? last.roll : 0),
+      imu: Float64Array.from(imu), speed,
+    };
+    S.samples.push(smp);
+    const hr = S.hr;
+    if (S.log.length < 200000) S.log.push([t - S.sessionStart, smp.ok, ...rgb, smp.cx, smp.cy, smp.sc, smp.yaw, smp.pitch, smp.roll, ...imu, speed,
+      hr ? hr.bpm : NaN, S.res && S.res.snr != null ? S.res.snr : NaN]);
+  }
+  while (S.samples.length && S.samples[0].t < t - 40) S.samples.shift();
+  const pm = performance.now() - c0;
+  S.procMs = S.procMs ? 0.95 * S.procMs + 0.05 * pm : pm;
+
+  if (t - S.lastAnalysisT >= 0.1) { S.lastAnalysisT = t; try { analyze(t); } catch (e) { console.error(e); } }
+}
+
+/* =====================================================================
+   Signal analysis (≈10 Hz)
+   ===================================================================== */
+function analyze(now) {
+  const smp = S.samples;
+  const W = opt.win;
+  if (smp.length < 10) { S.res = { warm: 0, span: 0 }; S.dirty = true; return; }
+  const tEnd = smp[smp.length - 1].t;
+  const tFirst = smp[0].t;
+  const span = Math.min(W, tEnd - tFirst);
+  const minSpan = Math.min(5, W);
+  if (span < minSpan) { S.res = { warm: span / minSpan, span }; S.dirty = true; return; }
+
+  let i0 = 0; while (i0 < smp.length - 2 && smp[i0 + 1].t < tEnd - span) i0++;
+  const sub = smp.slice(i0);
+  const ts = sub.map((s) => s.t);
+  const N = Math.floor(span * FS);
+  const tg = new Float64Array(N);
+  for (let i = 0; i < N; i++) tg[i] = tEnd - (N - 1 - i) / FS;
+
+  const names = ['cx', 'cy', 'sc', 'yaw', 'pitch', 'roll'];
+  const cols = [];
+  for (let c = 0; c < 9; c++) cols.push(sub.map((s) => s.rgb[c]));
+  names.forEach((nm) => cols.push(sub.map((s) => s[nm])));
+  for (let c = 0; c < 6; c++) cols.push(sub.map((s) => s.imu[c]));
+  cols.push(sub.map((s) => s.speed));
+  cols.push(sub.map((s) => s.ok));
+  const rs = DSP.resample(ts, cols, tg);
+  const posRefs = rs.slice(9, 12), poseRefs = rs.slice(12, 15), imuRefs = rs.slice(15, 21);
+  const okR = rs[22];
+
+  // ---- reference signals for motion regression (band-passed like the pulse) ----
+  const bp = (x) => DSP.filtfilt(SOS, DSP.detrend(x), PAD);
+  const refs = [];
+  const posBP = posRefs.map(bp);
+  refs.push(...posBP, DSP.diff(posBP[0]), DSP.diff(posBP[1]));
+  if (S.mode === 'landmarks') refs.push(...poseRefs.map(bp));
+  const imuActive = opt.imu && S.imuSeen && imuRefs.some((r) => DSP.std(r) > 1e-6);
+  const imuBP = imuActive ? imuRefs.map(bp) : [];
+  refs.push(...imuBP);
+
+  // ---- in-band motion (displacement inside the pulse band, in face widths) ----
+  // Fast tremor is harmless (ROI tracking follows it and it is out of band); what hurts is
+  // displacement at heart-rate-like frequencies, so the metric is computed on band-passed motion.
+  const fw = Math.max(0.05, DSP.mean(posRefs[2]));
+  const asp = S.PH / S.PW;
+  const m2 = new Float64Array(N);
+  for (let i = 0; i < N; i++) m2[i] = (posBP[0][i] ** 2 + (posBP[1][i] * asp) ** 2 + posBP[2][i] ** 2) / (fw * fw);
+  const mloc = DSP.movingMean(m2, 15).map(Math.sqrt);          // 0.5-s RMS
+  const medM = DSP.median(mloc);
+  const mRef = Math.max(MOTION_REF, 1.5 * medM);                // relative: bursts count, steady shake does not
+  const w = new Float64Array(N);
+  for (let i = 0; i < N; i++) {
+    const q = mloc[i] / mRef;
+    w[i] = (opt.weight ? 1 / (1 + q * q) : 1) * clamp(okR[i], 0, 1);
+  }
+  const wS = DSP.movingMean(w, 9);
+  let mNow = 0; for (let i = Math.max(0, N - 15); i < N; i++) mNow += mloc[i]; S.motionNow = mNow / Math.min(15, N);
+  const hw = DSP.hann(N);
+  const df = FS / NFFT;
+  const kLo = Math.ceil(HR_RANGE[0] / 60 / df), kHi = Math.floor(HR_RANGE[1] / 60 / df);
+  const fLo = BAND[0] + 0.05, fHi = BAND[1];
+
+  // ---- pulse per ROI ----
+  const roi = [];
+  let removedSum = 0, removedN = 0;
+  for (let k = 0; k < 3; k++) {
+    const R = rs[3 * k], G = rs[3 * k + 1], B = rs[3 * k + 2];
+    if (!R.every(Number.isFinite) || DSP.mean(G) < 5) { roi.push(null); continue; }
+    let p;
+    if (opt.algo === 'chrom') p = DSP.chrom(R, G, B, FS, SOS);
+    else if (opt.algo === 'green') p = DSP.green(R, G, B, FS);
+    else p = DSP.pos(R, G, B, FS);
+    p = bp(p);
+    if (opt.regress && refs.length) { const rr = DSP.regressOut(p, refs, 0.05); p = rr.y; removedSum += rr.removed; removedN++; }
+    const sd = DSP.std(p) || 1;
+    const x = new Float64Array(N); for (let i = 0; i < N; i++) x[i] = p[i] * hw[i] * wS[i];
+    const P = DSP.powerSpectrum(x, NFFT);
+    const kb = DSP.peakBin(P, kLo, kHi), f0 = (kb + DSP.parabolic(P, kb)) * df;
+    const snr = DSP.snrDb(P, df, f0, fLo, fHi);
+    roi.push({ p, sd, snr, bpm: f0 * 60 });
+  }
+  const valid = roi.filter(Boolean);
+  if (!valid.length) { S.res = { warm: 1, span, noSignal: true }; S.dirty = true; return; }
+
+  // ---- SNR-weighted fusion of ROIs ----
+  const wts = roi.map((r) => (r ? Math.max(0.02, Math.pow(10, r.snr / 10)) ** 2 : 0));
+  const wsum = wts.reduce((a, b) => a + b, 0);
+  const fused = new Float64Array(N);
+  roi.forEach((r, k) => { if (r) for (let i = 0; i < N; i++) fused[i] += (wts[k] / wsum) * r.p[i] / r.sd; });
+
+  const xf = new Float64Array(N); for (let i = 0; i < N; i++) xf[i] = fused[i] * hw[i] * wS[i];
+  const Pf = DSP.powerSpectrum(xf, NFFT);
+
+  // ---- motion spectrum (for display + soft suppression) ----
+  const Pm = new Float64Array(Pf.length);
+  for (const r of [...posBP, ...imuBP]) {
+    const s = DSP.std(r); if (!(s > 1e-12)) continue;
+    const x = new Float64Array(N); for (let i = 0; i < N; i++) x[i] = (r[i] / s) * hw[i];
+    const P = DSP.powerSpectrum(x, NFFT);
+    for (let k = 0; k < P.length; k++) Pm[k] += P[k];
+  }
+  let pmMax = 0; for (let k = kLo; k <= kHi; k++) if (Pm[k] > pmMax) pmMax = Pm[k];
+  if (pmMax > 0) for (let k = 0; k < Pm.length; k++) Pm[k] /= pmMax;
+  const motionLevel = medM;
+  const meanW = DSP.mean(w);
+  const gamma = opt.notch ? clamp((medM - 0.004) / 0.015, 0, 2) : 0;
+  const Pp = new Float64Array(Pf.length);
+  for (let k = 0; k < Pf.length; k++) Pp[k] = Pf[k] / (1 + gamma * Pm[k]);
+
+  // ---- harmonic-sum spectrum + continuity prior → HR ----
+  const Q = new Float64Array(Pf.length);
+  for (let k = 0; k < Pf.length; k++) Q[k] = Pp[k] + (2 * k < Pp.length ? 0.5 * Pp[2 * k] : 0);
+  const cands = DSP.localPeaks(Q, kLo, kHi, 5);
+  let kSel = cands.length ? cands[0] : DSP.peakBin(Q, kLo, kHi);
+  const hr = S.hr;
+  if (hr && now - hr.t < 10 && cands.length > 1) {
+    const sigma = 10 + 3 * Math.max(0, now - hr.tConf);
+    let best = -1, bestScore = -1;
+    for (const k of cands) {
+      const sc = Q[k] * Math.exp(-0.5 * ((k * df * 60 - hr.bpm) / sigma) ** 2);
+      if (sc > bestScore) { bestScore = sc; best = k; }
+    }
+    if (best >= 0 && Q[cands[0]] < 4 * Q[best]) kSel = best;
+  }
+  const fSel = (kSel + DSP.parabolic(Pp, kSel)) * df;
+  const bpmNow = fSel * 60;
+  const snr = DSP.snrDb(Pf, df, fSel, fLo, fHi);
+  const conf = 1 / (1 + Math.exp(-(snr + 1) / 1.5));
+  const tooMuchMotion = (medM > 0.08 && conf < 0.35) || meanW < 0.25;
+
+  if (!tooMuchMotion) {
+    if (!hr || now - hr.t > 10) S.hr = { bpm: bpmNow, t: now, tConf: conf > 0.4 ? now : now - 5, conf };
+    else {
+      const a = 0.06 + 0.24 * conf;
+      hr.bpm += a * (bpmNow - hr.bpm); hr.t = now; hr.conf = 0.8 * hr.conf + 0.2 * conf;
+      if (conf > 0.4) hr.tConf = now;
+    }
+  }
+  if (S.hr && now - S.lastHistT >= 1) {
+    S.lastHistT = now;
+    S.hrHistory.push({ t: now, bpm: S.hr.bpm, snr, conf: S.hr.conf, motion: tooMuchMotion });
+    while (S.hrHistory.length && S.hrHistory[0].t < now - 600) S.hrHistory.shift();
+  }
+
+  // ---- beats & HRV ----
+  const hrB = S.hr ? S.hr.bpm : bpmNow;
+  const beats = DSP.findBeats(fused, FS, tg[0], hrB);
+  if (conf > 0.45 && !tooMuchMotion) {
+    const minGap = 0.4 * 60 / hrB;
+    for (const b of beats) {
+      if (b.t > tEnd - 1.0 || b.t < tEnd - span + 1.0) continue;
+      const idx = Math.round((b.t - tg[0]) * FS);
+      if (idx < 0 || idx >= N || wS[idx] < 0.6) continue;
+      if (S.beats.some((q) => Math.abs(q.t - b.t) < minGap)) continue;
+      S.beats.push({ t: b.t });
+    }
+    S.beats.sort((a, b) => a.t - b.t);
+  }
+  while (S.beats.length && S.beats[0].t < now - 120) S.beats.shift();
+  const hrv = computeHrv(now, hrB);
+
+  S.res = {
+    warm: 1, span, tg, fused, beats, Pf, Pm, df, kLo, kHi, bpmNow, snr, conf, motionLevel, meanW, tooMuchMotion,
+    roi: roi.map((r, k) => (r ? { snr: r.snr, bpm: r.bpm, w: wts[k] / wsum } : null)),
+    removed: removedN ? removedSum / removedN : 0, nRefs: refs.length, imuActive, gamma,
+    raw: { R: rs[0], G: rs[1], B: rs[2], rgbAll: [0, 1, 2].map((c) => rs[c]), posRefs }, hrv,
+  };
+  S.dirty = true;
+}
+function computeHrv(now, hrB) {
+  const b = S.beats.filter((q) => q.t > now - 60);
+  const exp = 60 / hrB, ibis = [];
+  for (let i = 1; i < b.length; i++) {
+    const d = b[i].t - b[i - 1].t;
+    if (d > 0.5 * exp && d < 1.6 * exp) ibis.push({ t: b[i].t, d });
+  }
+  if (ibis.length < 4) return { n: b.length, ibiHr: null, rmssd: null };
+  const med = DSP.median(ibis.map((x) => x.d));
+  const good = ibis.filter((x) => Math.abs(x.d - med) < 0.25 * med);
+  let ss = 0, ns = 0;
+  for (let i = 1; i < good.length; i++) {
+    if (good[i].t - good[i - 1].t > 1.6 * med) continue;   // only successive beats
+    ss += (good[i].d - good[i - 1].d) ** 2; ns++;
+  }
+  const last = good.slice(-6).map((x) => x.d);
+  return { n: b.length, ibiHr: last.length >= 3 ? 60 / DSP.median(last) : null, rmssd: ns >= 8 ? 1000 * Math.sqrt(ss / ns) : null };
+}
+
+/* =====================================================================
+   Frame scheduling
+   ===================================================================== */
+const hasRVFC = 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
+let lastVT = -1;
+function schedule() {
+  if (!S.running) return;
+  if (hasRVFC) video.requestVideoFrameCallback(onVFC); else requestAnimationFrame(onRafFrame);
+}
+function onVFC(now, meta) {
+  let t = (meta && meta.captureTime) ? meta.captureTime : now;
+  if (Math.abs(t - now) > 1000) t = now;     // guard against odd clocks
+  processFrame(t / 1000);
+  schedule();
+}
+function onRafFrame(now) {
+  if (video.currentTime !== lastVT) { lastVT = video.currentTime; processFrame(now / 1000); }
+  schedule();
+}
+
+/* =====================================================================
+   Rendering — camera view
+   ===================================================================== */
+function sizeCanvas(cv) {
+  const dpr = Math.min(2, window.devicePixelRatio || 1), r = cv.getBoundingClientRect();
+  const w = Math.max(10, Math.round(r.width)), h = Math.max(10, Math.round(r.height));
+  if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+  return { ctx, w, h };
+}
+const ROI_COLORS = () => [T.s1, T.s2, T.s3];
+function drawView() {
+  const { ctx, w, h } = sizeCanvas(view);
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
+  if (!S.running || !video.videoWidth) return;
+  const s = Math.min(w / S.vw, h / S.vh), dw = S.vw * s, dh = S.vh * s, ox = (w - dw) / 2, oy = (h - dh) / 2;
+  ctx.save();
+  if (opt.mirror) { ctx.translate(w, 0); ctx.scale(-1, 1); }
+  ctx.drawImage(video, ox, oy, dw, dh);
+  const k = dw / S.PW;
+  const tr = S.lastTrack;
+  if (opt.overlay && tr) {
+    if (tr.ok) {
+      const cols = ROI_COLORS();
+      tr.polys.forEach((p, i) => {
+        ctx.beginPath();
+        for (let j = 0; j < p.length; j += 2) ctx[j ? 'lineTo' : 'moveTo'](ox + p[j] * k, oy + p[j + 1] * k);
+        ctx.closePath();
+        ctx.globalAlpha = 0.18; ctx.fillStyle = cols[i]; ctx.fill();
+        ctx.globalAlpha = 1; ctx.lineWidth = 2; ctx.strokeStyle = cols[i]; ctx.stroke();
+      });
+      if (tr.ellipse) {
+        ctx.setLineDash([6, 6]); ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.ellipse(ox + tr.ellipse.cx * k, oy + tr.ellipse.cy * k, tr.ellipse.a * k, tr.ellipse.b * k, 0, 0, 2 * Math.PI); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+  }
+  if (!tr || !tr.ok) {   // guide oval
+    const a = Math.min(S.PW, S.PH * 0.75) * 0.27 * k, b = a * 1.3;
+    ctx.setLineDash([8, 8]); ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.ellipse(ox + dw / 2, oy + dh * 0.48, a, b, 0, 0, 2 * Math.PI); ctx.stroke(); ctx.setLineDash([]);
+  }
+  ctx.restore();
+}
+
+/* =====================================================================
+   Rendering — charts (plain canvas)
+   ===================================================================== */
+const FONT = '11px system-ui, -apple-system, "Segoe UI", sans-serif';
+function niceStep(range, target) {
+  const raw = range / Math.max(1, target), p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / p;
+  return (m < 1.5 ? 1 : m < 3 ? 2 : m < 7 ? 5 : 10) * p;
+}
+function plotFrame(ctx, w, h, o) {
+  const L = o.left ?? 36, R = 10, Tm = 8, B = 22;
+  const pr = { x: L, y: Tm, w: w - L - R, h: h - Tm - B };
+  const X = (v) => pr.x + (v - o.x0) / (o.x1 - o.x0) * pr.w;
+  const Y = (v) => pr.y + pr.h - (v - o.y0) / (o.y1 - o.y0) * pr.h;
+  ctx.font = FONT; ctx.lineWidth = 1;
+  // y grid
+  if (o.yTicks !== false) {
+    const st = niceStep(o.y1 - o.y0, o.yTarget || 4);
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    for (let v = Math.ceil(o.y0 / st) * st; v <= o.y1 + 1e-9; v += st) {
+      const y = Math.round(Y(v)) + 0.5;
+      ctx.strokeStyle = T.grid; ctx.beginPath(); ctx.moveTo(pr.x, y); ctx.lineTo(pr.x + pr.w, y); ctx.stroke();
+      ctx.fillStyle = T.muted; ctx.fillText(o.yFmt ? o.yFmt(v) : String(+v.toFixed(2)), pr.x - 6, y);
+    }
+  }
+  // x ticks
+  const xs = o.xStep || niceStep(o.x1 - o.x0, o.xTarget || 6);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for (let v = Math.ceil(o.x0 / xs) * xs; v <= o.x1 + 1e-9; v += xs) {
+    const x = Math.round(X(v)) + 0.5;
+    if (o.xGrid) { ctx.strokeStyle = T.grid; ctx.beginPath(); ctx.moveTo(x, pr.y); ctx.lineTo(x, pr.y + pr.h); ctx.stroke(); }
+    ctx.fillStyle = T.muted; ctx.fillText(o.xFmt ? o.xFmt(v) : String(+v.toFixed(1)), x, pr.y + pr.h + 6);
+  }
+  // baseline
+  ctx.strokeStyle = T.axis; ctx.beginPath(); ctx.moveTo(pr.x, Math.round(pr.y + pr.h) + 0.5); ctx.lineTo(pr.x + pr.w, Math.round(pr.y + pr.h) + 0.5); ctx.stroke();
+  return { pr, X, Y };
+}
+function line(ctx, xs, ys, X, Y, color, width = 2, dash) {
+  ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  if (dash) ctx.setLineDash(dash);
+  ctx.beginPath();
+  let started = false;
+  for (let i = 0; i < ys.length; i++) {
+    if (!Number.isFinite(ys[i])) { started = false; continue; }
+    const x = X(xs[i]), y = Y(ys[i]);
+    if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+  }
+  ctx.stroke(); ctx.setLineDash([]);
+}
+function tooltip(ctx, pr, x, lines) {
+  ctx.strokeStyle = T.axis; ctx.lineWidth = 1; ctx.beginPath();
+  ctx.moveTo(Math.round(x) + 0.5, pr.y); ctx.lineTo(Math.round(x) + 0.5, pr.y + pr.h); ctx.stroke();
+  ctx.font = FONT; const pad = 6, lh = 15;
+  const tw = Math.max(...lines.map((l) => ctx.measureText(l).width)) + 2 * pad, th = lines.length * lh + 2 * pad - 3;
+  let bx = x + 10; if (bx + tw > pr.x + pr.w) bx = x - 10 - tw;
+  const by = pr.y + 4;
+  ctx.fillStyle = T.tipBg; ctx.strokeStyle = T.grid;
+  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(bx, by, tw, th, 6) : ctx.rect(bx, by, tw, th); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = T.ink; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  lines.forEach((l, i) => ctx.fillText(l, bx + pad, by + pad + i * lh));
+}
+function emptyMsg(ctx, w, h, msg) {
+  ctx.fillStyle = T.muted; ctx.font = '13px system-ui, -apple-system, "Segoe UI", sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(msg, w / 2, h / 2);
+}
+
+function drawWave() {
+  const cv = $('waveCv'), { ctx, w, h } = sizeCanvas(cv), r = S.res;
+  if (!r || !r.fused) { emptyMsg(ctx, w, h, S.running ? (r && r.warm ? `Collecting signal… ${Math.round(r.warm * 100)}%` : 'Looking for your face…') : 'Press Start'); return; }
+  const tEnd = r.tg[r.tg.length - 1], xs = Array.from(r.tg, (t) => t - tEnd);
+  let amp = 0; for (const v of r.fused) amp = Math.max(amp, Math.abs(v));
+  amp = amp * 1.15 || 1;
+  const o = { x0: -r.span, x1: 0, y0: -amp, y1: amp, yTicks: false, left: 12, xStep: 2, xFmt: (v) => (v === 0 ? 'now' : `${v}s`) };
+  const { pr, X, Y } = plotFrame(ctx, w, h, o);
+  ctx.strokeStyle = T.grid; ctx.beginPath(); ctx.moveTo(pr.x, Math.round(Y(0)) + 0.5); ctx.lineTo(pr.x + pr.w, Math.round(Y(0)) + 0.5); ctx.stroke();
+  line(ctx, xs, r.fused, X, Y, T.s1, 2);
+  // committed beats inside the window
+  const t0 = r.tg[0];
+  for (const b of S.beats) {
+    if (b.t < t0 || b.t > tEnd) continue;
+    const i = clamp(Math.round((b.t - t0) * FS), 0, r.fused.length - 1);
+    const x = X(b.t - tEnd), y = Y(r.fused[i]);
+    ctx.beginPath(); ctx.arc(x, y, 4, 0, 2 * Math.PI); ctx.fillStyle = T.s1; ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = T.surface; ctx.stroke();
+  }
+  const hv = S.hover.waveCv;
+  if (hv != null && hv >= pr.x && hv <= pr.x + pr.w) {
+    const tv = o.x0 + (hv - pr.x) / pr.w * (o.x1 - o.x0);
+    tooltip(ctx, pr, hv, [`${tv.toFixed(1)} s`]);
+  }
+  cv._pr = pr;
+}
+function drawTrend() {
+  const cv = $('trendCv'), { ctx, w, h } = sizeCanvas(cv), H = S.hrHistory;
+  if (H.length < 2) { emptyMsg(ctx, w, h, 'Heart-rate history will appear here'); return; }
+  const now = H[H.length - 1].t, spanT = Math.min(300, Math.max(60, now - H[0].t));
+  const pts = H.filter((p) => p.t >= now - spanT);
+  let lo = Math.min(...pts.map((p) => p.bpm)), hi = Math.max(...pts.map((p) => p.bpm));
+  const mid = (lo + hi) / 2, half = Math.max(12, (hi - lo) / 2 + 6);
+  lo = Math.max(30, Math.floor((mid - half) / 5) * 5); hi = Math.ceil((mid + half) / 5) * 5;
+  const xs = pts.map((p) => p.t - now);
+  const o = { x0: -spanT, x1: 0, y0: lo, y1: hi, yTarget: 4, xTarget: 5, xFmt: (v) => (v === 0 ? 'now' : `${Math.round(v)}s`), yFmt: (v) => String(Math.round(v)) };
+  const { pr, X, Y } = plotFrame(ctx, w, h, o);
+  // segments: full opacity when confident, faded when not
+  ctx.lineWidth = 2; ctx.lineCap = 'round';
+  for (let i = 1; i < pts.length; i++) {
+    if (pts[i].t - pts[i - 1].t > 3) continue;
+    ctx.globalAlpha = pts[i].conf > 0.45 && !pts[i].motion ? 1 : 0.35;
+    ctx.strokeStyle = T.s1; ctx.beginPath(); ctx.moveTo(X(xs[i - 1]), Y(pts[i - 1].bpm)); ctx.lineTo(X(xs[i]), Y(pts[i].bpm)); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  const lp = pts[pts.length - 1];
+  ctx.beginPath(); ctx.arc(X(0), Y(lp.bpm), 4, 0, 2 * Math.PI); ctx.fillStyle = T.s1; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = T.surface; ctx.stroke();
+  const hv = S.hover.trendCv;
+  if (hv != null && hv >= pr.x && hv <= pr.x + pr.w) {
+    const tv = o.x0 + (hv - pr.x) / pr.w * (o.x1 - o.x0);
+    let bi = 0; xs.forEach((x, i) => { if (Math.abs(x - tv) < Math.abs(xs[bi] - tv)) bi = i; });
+    const p = pts[bi];
+    ctx.beginPath(); ctx.arc(X(xs[bi]), Y(p.bpm), 4, 0, 2 * Math.PI); ctx.fillStyle = T.s1; ctx.fill(); ctx.strokeStyle = T.surface; ctx.stroke();
+    tooltip(ctx, pr, X(xs[bi]), [`${Math.round(-xs[bi])} s ago`, `${Math.round(p.bpm)} bpm`, `SNR ${p.snr.toFixed(1)} dB${p.motion ? ' · motion' : ''}`]);
+  }
+}
+function drawSpectrum() {
+  const cv = $('specCv'), { ctx, w, h } = sizeCanvas(cv), r = S.res;
+  if (!r || !r.Pf) { emptyMsg(ctx, w, h, 'Spectrum appears after a few seconds'); return; }
+  const { Pf, Pm, df, kLo, kHi } = r;
+  let mx = 0; for (let k = kLo; k <= kHi; k++) mx = Math.max(mx, Pf[k]);
+  const step = 2, xs = [], ys = [], ym = [];
+  for (let k = kLo; k <= kHi; k += step) { xs.push(k * df * 60); ys.push(Pf[k] / (mx || 1)); ym.push(Pm[k]); }
+  const o = { x0: HR_RANGE[0], x1: HR_RANGE[1], y0: 0, y1: 1.08, yTicks: false, left: 12, xStep: 20, xGrid: true, xFmt: (v) => String(v) };
+  const { pr, X, Y } = plotFrame(ctx, w, h, o);
+  line(ctx, xs, ym, X, Y, T.s2, 1.5, [4, 4]);
+  line(ctx, xs, ys, X, Y, T.s1, 2);
+  // selected peak
+  const xb = X(r.bpmNow);
+  ctx.strokeStyle = T.ink2; ctx.lineWidth = 1; ctx.setLineDash([2, 3]);
+  ctx.beginPath(); ctx.moveTo(Math.round(xb) + 0.5, pr.y); ctx.lineTo(Math.round(xb) + 0.5, pr.y + pr.h); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle = T.ink2; ctx.font = FONT; ctx.textBaseline = 'top';
+  ctx.textAlign = xb > pr.x + pr.w - 60 ? 'right' : 'left';
+  ctx.fillText(`${Math.round(r.bpmNow)} bpm`, xb + (ctx.textAlign === 'left' ? 5 : -5), pr.y + 2);
+  const hv = S.hover.specCv;
+  if (hv != null && hv >= pr.x && hv <= pr.x + pr.w) {
+    const bv = o.x0 + (hv - pr.x) / pr.w * (o.x1 - o.x0), k = Math.round(bv / 60 / df);
+    tooltip(ctx, pr, hv, [`${bv.toFixed(0)} bpm (${(bv / 60).toFixed(2)} Hz)`, `pulse ${(Pf[k] / (mx || 1)).toFixed(2)}`, `motion ${Pm[k].toFixed(2)}`]);
+  }
+}
+function drawDiag() {
+  if (!$('diag').open) return;
+  const r = S.res;
+  // raw colour traces (% change, mean over ROIs)
+  {
+    const cv = $('rawCv'), { ctx, w, h } = sizeCanvas(cv);
+    if (!r || !r.raw) emptyMsg(ctx, w, h, 'No data yet');
+    else {
+      const tEnd = r.tg[r.tg.length - 1], xs = Array.from(r.tg, (t) => t - tEnd);
+      const ser = r.raw.rgbAll.map((c) => { const m = DSP.mean(c) || 1; return DSP.detrend(c).map((v) => 100 * v / m); });
+      let a = 0.2; ser.forEach((s) => s.forEach((v) => { if (Number.isFinite(v)) a = Math.max(a, Math.abs(v)); }));
+      const o = { x0: -r.span, x1: 0, y0: -a * 1.1, y1: a * 1.1, yTarget: 4, xStep: 2, yFmt: (v) => `${v.toFixed(1)}%`, left: 44 };
+      const { X, Y } = plotFrame(ctx, w, h, o);
+      [T.s8, T.s6, T.s1].forEach((c, i) => line(ctx, xs, ser[i], X, Y, c, 1.5));
+    }
+  }
+  {
+    const cv = $('motCv'), { ctx, w, h } = sizeCanvas(cv);
+    if (!r || !r.raw) emptyMsg(ctx, w, h, 'No data yet');
+    else {
+      const tEnd = r.tg[r.tg.length - 1], xs = Array.from(r.tg, (t) => t - tEnd);
+      const ser = r.raw.posRefs.map((c) => DSP.detrend(c).map((v) => 100 * v));
+      let a = 0.5; ser.forEach((s) => s.forEach((v) => { a = Math.max(a, Math.abs(v)); }));
+      const o = { x0: -r.span, x1: 0, y0: -a * 1.1, y1: a * 1.1, yTarget: 4, xStep: 2, yFmt: (v) => `${v.toFixed(1)}%`, left: 44 };
+      const { X, Y } = plotFrame(ctx, w, h, o);
+      [T.s1, T.s2, T.s3].forEach((c, i) => line(ctx, xs, ser[i], X, Y, c, 1.5));
+    }
+  }
+}
+
+/* =====================================================================
+   Readout panel
+   ===================================================================== */
+const QUALITY = [
+  { min: 3, key: 'good', label: 'Good signal', icon: '●' },
+  { min: -1, key: 'warn', label: 'Fair signal', icon: '◐' },
+  { min: -Infinity, key: 'crit', label: 'Weak signal', icon: '○' },
+];
+function setMeter(id, frac, color) { const el = $(id); el.style.width = `${clamp(frac, 0, 1) * 100}%`; el.style.background = color; }
+function updateStatusPanel() {
+  const r = S.res, hr = S.hr;
+  const bpmEl = $('bpm'), badge = $('badgeBpm');
+  let state = '', stateKey = 'muted';
+  const tr = S.lastTrack;
+  if (!S.running) { state = 'Stopped'; }
+  else if (!tr || !tr.ok) { state = 'Looking for your face — centre it in the oval'; stateKey = 'warn'; }
+  else if (!r || !r.fused) { state = `Collecting signal… keep still (${Math.round(((r && r.warm) || 0) * 100)}%)`; }
+  else if (r.tooMuchMotion) { state = 'Too much motion — hold the camera steadier'; stateKey = 'serious'; }
+  else { const q = QUALITY.find((x) => r.snr >= x.min); state = q.label; stateKey = q.key; }
+  const showHr = S.running && hr && r && r.fused && hr.conf > 0.2;
+  const txt = showHr ? String(Math.round(hr.bpm)) : '--';
+  bpmEl.textContent = txt; badge.textContent = txt;
+  const dim = !showHr || hr.conf < 0.4 || (r && (r.tooMuchMotion || r.snr < -1));
+  bpmEl.classList.toggle('dim', dim); $('badge').classList.toggle('dim', dim);
+  $('heart').style.animationDuration = showHr ? `${(60 / hr.bpm).toFixed(3)}s` : '0s';
+  $('heart').classList.toggle('beating', !!showHr);
+  const st = $('hrState'); st.dataset.k = stateKey; st.textContent = '';
+  const icons = { good: '●', warn: '◐', serious: '▲', crit: '○' };
+  if (icons[stateKey]) { const ic = document.createElement('span'); ic.className = 'ico'; ic.textContent = icons[stateKey]; ic.style.color = `var(--${stateKey})`; st.appendChild(ic); }
+  st.appendChild(document.createTextNode(state));
+
+  // meters
+  if (r && r.fused) {
+    const q = QUALITY.find((x) => r.snr >= x.min);
+    setMeter('mQual', (r.snr + 8) / 16, `var(--${q.key})`); $('vQual').textContent = `${r.snr.toFixed(1)} dB · ${q.label.split(' ')[0]}`;
+  } else { setMeter('mQual', 0, 'var(--muted)'); $('vQual').textContent = '—'; }
+  const mot = S.res && S.res.fused ? S.motionNow : 0;
+  const mk = mot < 0.012 ? ['good', 'Steady'] : mot < 0.04 ? ['warn', 'Some motion'] : ['serious', 'Moving'];
+  setMeter('mMot', Math.sqrt(mot / 0.1), `var(--${mk[0]})`); $('vMot').textContent = S.running && S.res && S.res.fused ? mk[1] : '—';
+  const lum = (S.lumRef[0] + S.lumRef[1] + S.lumRef[2]) / 3;
+  const lk = !S.running || !lum ? ['muted', '—'] : lum < 50 ? ['serious', 'Too dark'] : lum > 215 ? ['serious', 'Too bright'] : lum < 80 ? ['warn', 'Dim'] : ['good', 'OK'];
+  setMeter('mLight', lum / 255, `var(--${lk[0]})`); $('vLight').textContent = lk[1];
+
+  // stats
+  const hv = r && r.hrv;
+  $('sIbi').textContent = hv && hv.ibiHr ? `${Math.round(hv.ibiHr)} bpm` : '—';
+  $('sRmssd').textContent = hv && hv.rmssd && hr && hr.conf > 0.55 ? `${Math.round(hv.rmssd)} ms` : '—';
+  $('sBeats').textContent = hv ? String(hv.n) : '—';
+  $('sFps').textContent = S.running ? `${S.fpsEma.toFixed(1)} fps` : '—';
+  const trk = S.mode === 'landmarks' ? 'Face landmarks' : S.lmLoading ? 'Skin tracker (loading face model…)' : S.mode === 'skin' ? (S.lmFailed && opt.tracker === 'auto' ? 'Skin tracker (face model unavailable)' : 'Skin tracker') : '—';
+  $('sTracker').textContent = S.running ? trk : '—';
+  $('sAE').textContent = S.running ? S.aeState : '—';
+  const imuTxt = { active: 'In use', waiting: 'No sensor data', denied: 'Not available', unavailable: 'Not available', off: 'Off' };
+  $('sImu').textContent = S.running ? (opt.imu ? imuTxt[S.imuState] || S.imuState : 'Off') : '—';
+
+  // diagnostics text
+  if ($('diag').open) {
+    const lines = [];
+    lines.push(`Camera ${S.vw}×${S.vh} → processing ${S.PW}×${S.PH}, ${S.fpsEma.toFixed(1)} fps, ${S.procMs.toFixed(1)} ms/frame` + (S.mode === 'landmarks' ? `, landmarks ${S.lmMs.toFixed(1)} ms${S.lmSkip ? ` (every ${S.lmEvery}th frame + patch tracking)` : ''}` : ''));
+    if (r && r.roi) {
+      r.roi.forEach((q, k) => lines.push(q ? `${ROI_NAMES[k].padEnd(12)} SNR ${q.snr.toFixed(1).padStart(5)} dB  peak ${q.bpm.toFixed(0).padStart(3)} bpm  weight ${(100 * q.w).toFixed(0).padStart(3)}%` : `${ROI_NAMES[k].padEnd(12)} —`));
+      lines.push(`Motion regression: ${opt.regress ? `${r.nRefs} references, ${(100 * r.removed).toFixed(0)}% variance removed` : 'off'}${r.imuActive ? ' (incl. phone IMU)' : ''}`);
+      lines.push(`In-band motion ${(100 * r.motionLevel).toFixed(1)}% of face width (median), mean sample weight ${(100 * r.meanW).toFixed(0)}%, motion-peak suppression γ=${r.gamma.toFixed(2)}`);
+    }
+    $('diagText').textContent = lines.join('\n');
+  }
+}
+
+/* =====================================================================
+   Main render loop
+   ===================================================================== */
+let lastPanel = 0;
+function render(ts) {
+  drawView();
+  if (S.dirty) { S.dirty = false; drawWave(); drawSpectrum(); drawTrend(); drawDiag(); }
+  if (ts - lastPanel > 200) { lastPanel = ts; updateStatusPanel(); }
+  requestAnimationFrame(render);
+}
+
+/* =====================================================================
+   Controls
+   ===================================================================== */
+async function start() {
+  const msg = $('viewMsg');
+  if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    msg.innerHTML = 'Camera access needs a secure page. Open this file over <b>https://</b> (e.g. GitHub Pages) or from <b>localhost</b>.';
+    msg.hidden = false; return;
+  }
+  requestImu();                      // must run inside the click gesture on iOS
+  try {
+    if (navigator.wakeLock) { S.wakeLock = await navigator.wakeLock.request('screen'); S.wakeLock.addEventListener('release', () => { S.wakeLock = null; }); }
+  } catch (e) { /* optional */ }
+  msg.hidden = false; msg.textContent = 'Starting camera…';
+  try {
+    S.running = true;
+    await startCamera();
+  } catch (e) {
+    S.running = false;
+    msg.textContent = e && e.name === 'NotAllowedError' ? 'Camera permission was denied. Allow camera access in the browser settings and try again.'
+      : `Could not open the camera (${(e && (e.name || e.message)) || e}).`;
+    return;
+  }
+  msg.hidden = true;
+  S.sessionStart = S.sessionStart || S.lastT || performance.now() / 1000;
+  S.lmBroken = false;
+  $('startBtn').textContent = 'Stop'; $('startBtn').classList.add('stop');
+  schedule();
+  if (opt.tracker === 'auto') loadLandmarker();
+}
+function stop() {
+  S.running = false;
+  stopStream();
+  window.removeEventListener('devicemotion', onDeviceMotion);
+  if (S.wakeLock) { S.wakeLock.release().catch(() => {}); S.wakeLock = null; }
+  $('startBtn').textContent = 'Start'; $('startBtn').classList.remove('stop');
+  S.lastT = 0; S.lastTrack = null; S.dirty = true;
+  $('viewMsg').hidden = false; $('viewMsg').textContent = 'Stopped. Press Start to measure again.';
+}
+function exportCsv() {
+  if (!S.log.length) { flash('Nothing recorded yet'); return; }
+  const head = ['t_s', 'face_ok', 'fh_R', 'fh_G', 'fh_B', 'rc_R', 'rc_G', 'rc_B', 'lc_R', 'lc_G', 'lc_B', 'face_cx', 'face_cy', 'face_scale',
+    'yaw', 'pitch', 'roll', 'gyro_alpha', 'gyro_beta', 'gyro_gamma', 'acc_x', 'acc_y', 'acc_z', 'speed_fw_per_s', 'hr_bpm', 'snr_db'];
+  const rows = S.log.map((r) => r.map((v) => (Number.isFinite(v) ? +v.toFixed(5) : '')).join(','));
+  const meta = `# Pulse Cam export ${new Date().toISOString()}; algorithm=${opt.algo}; tracker=${S.mode}; camera=${S.vw}x${S.vh}`;
+  const blob = new Blob([meta + '\n' + head.join(',') + '\n' + rows.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `pulsecam_${new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+function flash(t) { const m = $('viewMsg'); m.textContent = t; m.hidden = false; setTimeout(() => { if (S.running) m.hidden = true; }, 1800); }
+
+function bindSettings() {
+  const bind = (id, key, kind, onChange) => {
+    const el = $(id);
+    if (kind === 'check') el.checked = opt[key]; else el.value = String(opt[key]);
+    el.addEventListener('change', () => {
+      opt[key] = kind === 'check' ? el.checked : kind === 'num' ? Number(el.value) : el.value;
+      if (onChange) onChange(); S.dirty = true;
+    });
+  };
+  const restartCam = async () => { if (S.running) { try { await startCamera(); } catch (e) { flash('Could not switch camera'); } } };
+  bind('optCam', 'cam', 'sel', restartCam);
+  bind('optRes', 'res', 'sel', restartCam);
+  bind('optAlgo', 'algo', 'sel');
+  bind('optTracker', 'tracker', 'sel', () => { resetSignals(); if (opt.tracker === 'auto' && S.running) loadLandmarker(); });
+  bind('optWin', 'win', 'num');
+  bind('optRegress', 'regress', 'check');
+  bind('optImu', 'imu', 'check', () => { if (opt.imu && S.running) requestImu(); });
+  bind('optWeight', 'weight', 'check');
+  bind('optNotch', 'notch', 'check');
+  bind('optAE', 'lockAE', 'check', () => { if (!S.running) return; if (opt.lockAE) lockExposure(); else { unlockExposure(); resetSignals(); } });
+  bind('optOverlay', 'overlay', 'check');
+  bind('optMirror', 'mirror', 'check');
+  $('startBtn').addEventListener('click', () => (S.running ? stop() : start()));
+  $('exportBtn').addEventListener('click', exportCsv);
+  $('resetBtn').addEventListener('click', () => { resetSignals(); S.hr = null; S.hrHistory = []; S.log = []; S.skin.model = null; S.dirty = true; });
+  // hover on charts
+  for (const id of ['waveCv', 'trendCv', 'specCv']) {
+    const cv = $(id);
+    const mv = (e) => { const r = cv.getBoundingClientRect(); S.hover[id] = e.clientX - r.left; S.dirty = true; };
+    cv.addEventListener('pointermove', mv); cv.addEventListener('pointerdown', mv);
+    cv.addEventListener('pointerleave', () => { S.hover[id] = null; S.dirty = true; });
+  }
+  $('diag').addEventListener('toggle', () => { S.dirty = true; });
+  // theme toggle
+  $('themeBtn').addEventListener('click', () => {
+    const root = document.documentElement, cur = root.dataset.theme;
+    const sysDark = matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = cur ? cur === 'dark' : sysDark;
+    root.dataset.theme = isDark ? 'light' : 'dark';
+    try { localStorage.setItem('pulsecam-theme', root.dataset.theme); } catch (e) { /* ignore */ }
+    readTokens();
+  });
+  try { const th = localStorage.getItem('pulsecam-theme'); if (th) document.documentElement.dataset.theme = th; } catch (e) { /* ignore */ }
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readTokens);
+  window.addEventListener('resize', () => { S.dirty = true; });
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible' && S.running && navigator.wakeLock && !S.wakeLock) {
+      try { S.wakeLock = await navigator.wakeLock.request('screen'); } catch (e) { /* optional */ }
+    }
+  });
+}
+
+bindSettings();
+readTokens();
+requestAnimationFrame(render);
+})();
+
+</script>
+</body>
+</html>
