@@ -29,7 +29,7 @@ abstract: We report the experimental observation of systematically occurring pha
 summary: The limit of resolution with coherent illumination is extended by a factor of 1.64x.
 
 tags:
-- Jornal article
+- Journal article
 featured: false
 
 # links:

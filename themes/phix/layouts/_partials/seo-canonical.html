@@ -1,0 +1,12 @@
+{{- /* The page search engines should treat as the original.
+     A Turkish page whose file is not in content_tr/ is the English page shown again
+     under /tr/, so it points to the English original. Once a translation is added
+     to content_tr/, the Turkish page becomes its own original automatically. */ -}}
+{{- $c := . -}}
+{{- if ne .Language.Lang "en" -}}
+  {{- $own := and .File (strings.Contains .File.Filename (printf "/content_%s/" .Language.Lang)) -}}
+  {{- if not $own -}}
+    {{- range .Translations }}{{ if eq .Language.Lang "en" }}{{ $c = . }}{{ end }}{{ end -}}
+  {{- end -}}
+{{- end -}}
+{{- return $c -}}

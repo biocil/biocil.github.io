@@ -1,4 +1,14 @@
 {{ define "main" }}
-{{- /* Project pages carry their own title and layout in their HTML, so only the content is rendered. */ -}}
+{{- /* Project pages carry their own title and layout in their HTML, so only the content is rendered.
+     The /projects/ list has no such content, so it gets the usual heading and a list of projects. */ -}}
+{{- if .Content }}
 <div class="wrap page-body project-wrap">{{ .Content }}</div>
+{{- else }}
+{{ partial "page-head.html" . }}
+<div class="wrap page-body">
+  <ul class="card-list">
+    {{ range .Pages.ByDate.Reverse }}<li><a href="{{ .RelPermalink }}">{{ .Title }}</a> <span class="muted">{{ .Date.Format "2006" }}</span></li>{{ end }}
+  </ul>
+</div>
+{{- end }}
 {{ end }}

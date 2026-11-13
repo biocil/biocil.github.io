@@ -1,16 +1,45 @@
 <meta charset="utf-8">
 <script>try{var p=localStorage.getItem("phix-palette");if(p)document.documentElement.setAttribute("data-palette",p)}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+{{- with site.Params.google_site_verification }}
+<meta name="google-site-verification" content="{{ . }}">
+{{- end }}
 {{- $title := cond .IsHome (printf "%s | %s" site.Params.lab.short (T "lab_name")) (printf "%s | %s" .Title site.Params.lab.short) }}
 <title>{{ $title }}</title>
-{{- $desc := site.Params.description }}
-{{- with .Params.summary }}{{ $desc = . }}{{ else }}{{ with .Params.abstract }}{{ $desc = . }}{{ end }}{{ end }}
-{{- if and (not .IsHome) (not .Params.summary) (not .Params.abstract) .Content }}{{ $desc = .Summary }}{{ end }}
-{{- $desc = $desc | plainify | htmlUnescape | strings.TrimSpace | truncate 200 }}
+{{- /* Description: the page's own text first, then one built from its details,
+     and the lab description only as a last resort, so that pages do not all share it. */}}
+{{- $desc := "" }}
+{{- with .Params.description }}{{ $desc = . }}
+{{- else with .Params.summary }}{{ $desc = . }}
+{{- else with .Params.abstract }}{{ $desc = . }}
+{{- else with .Params.lede }}{{ $desc = . }}
+{{- end }}
+{{- if and (not $desc) (not .IsHome) .Content }}{{ $desc = .Summary }}{{ end }}
+{{- if and (not $desc) (eq .Kind "term") }}
+  {{- if eq .Data.Plural "authors" }}{{ $desc = .Params.bio | default (printf (T "desc_author") .Title) }}
+  {{- else }}{{ $desc = printf (T "desc_tag") .Title }}{{ end }}
+{{- end }}
+{{- if and (not $desc) .Params.scheme }}
+  {{- $bits := slice .Params.scheme }}
+  {{- with .Params.code }}{{ $bits = $bits | append . }}{{ end }}
+  {{- with .Params.funder }}{{ $bits = $bits | append . }}{{ end }}
+  {{- if .Params.start }}{{ $bits = $bits | append (printf "%s–%s" (time.Format "2006" .Params.start) (time.Format "2006" (.Params.end | default now))) }}
+  {{- else if not .Date.IsZero }}{{ $bits = $bits | append (.Date.Format "2006") }}{{ end }}
+  {{- $desc = printf "%s. %s." .Title (delimit $bits ", ") }}
+  {{- with .Params.team }}{{ $desc = printf "%s %s: %s." $desc (T "team") (delimit . ", ") }}{{ end }}
+{{- end }}
+{{- $desc = $desc | default site.Params.description | plainify | htmlUnescape | strings.TrimSpace | truncate 200 }}
 <meta name="description" content="{{ $desc }}">
+{{- /* Thin listing pages are kept out of search results; English pages repeated under /tr/
+     point to their English original (see the seo-*.html partials). */}}
+{{- if partial "seo-indexable.html" . }}
+<link rel="canonical" href="{{ (partial "seo-canonical.html" .).Permalink }}">
+{{- else }}
+<meta name="robots" content="noindex, follow">
 <link rel="canonical" href="{{ .Permalink }}">
+{{- end }}
 <meta property="og:site_name" content="{{ site.Params.lab.short }}">
-<meta property="og:title" content="{{ .Title | default site.Title }}">
+<meta property="og:title" content="{{ cond .IsHome $title (.Title | default site.Title) }}">
 <meta property="og:description" content="{{ $desc }}">
 <meta property="og:type" content="{{ cond .IsPage "article" "website" }}">
 <meta property="og:url" content="{{ .Permalink }}">

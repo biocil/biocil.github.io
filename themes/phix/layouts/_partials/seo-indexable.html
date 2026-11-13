@@ -1,0 +1,8 @@
+{{- /* Whether search engines should index this page (and list it in the sitemap).
+     Thin listing pages are kept out: the /tags/ and /authors/ indexes, every tag page,
+     and author pages of co-authors who have no profile in content/authors/.
+     Any page can also opt out with `noindex: true` in its front matter. */ -}}
+{{- $ok := not .Params.noindex -}}
+{{- if eq .Kind "taxonomy" }}{{ $ok = false }}{{ end -}}
+{{- if eq .Kind "term" }}{{ if or (ne .Data.Plural "authors") (not .File) }}{{ $ok = false }}{{ end }}{{ end -}}
+{{- return $ok -}}

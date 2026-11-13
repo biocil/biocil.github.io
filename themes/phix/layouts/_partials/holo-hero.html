@@ -1,12 +1,25 @@
-{{- /* The interactive hologram/phase comparison used in the home page hero. */ -}}
+{{- /* The interactive hero: a brightfield image, the hologram band that follows the divider, and the computed phase. */ -}}
 <figure class="holo-fig">
   <div class="holo" id="holo">
     <canvas id="holoCanvas" role="img" aria-label="{{ T "hero_canvas" }}"></canvas>
-    <span class="tag l">{{ T "phase" }}</span>
-    <span class="tag r">{{ T "hologram" }}</span>
-    <div class="divider" id="divider"><div class="grip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5"/></svg></div></div>
+    <span class="tag l">{{ T "hero_tag_brightfield" }}</span>
+    <span class="tag r">{{ T "hero_tag_phase" }}</span>
+    <div class="divider band" id="divider"><span class="tag c">{{ T "hologram" }}</span><div class="grip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5"/></svg></div></div>
     <label class="sr-only" for="holoRange">{{ T "divider_label" }}</label>
     <input id="holoRange" type="range" min="0" max="100" value="50">
+  </div>
+  <div class="holo-legend" aria-hidden="true">
+    <div class="lg">
+      <span class="lg-t">{{ T "hero_legend_intensity" }}</span>
+      <span class="lg-bar" id="holoCbarH"></span>
+      <span class="lg-ticks"><b>0</b><b>{{ T "hero_imax" }}</b></span>
+    </div>
+    <div class="lg">
+      <span class="lg-t">{{ T "hero_legend_phase" }}</span>
+      <span class="lg-bar" id="holoCbarP"></span>
+      <span class="lg-ticks"><b>0</b><b>π</b><b>2π rad</b></span>
+      <span class="lg-ticks sub"><b>0</b><b>{{ T "hero_opd_mid" }}</b><b>{{ T "hero_opd_end" | safeHTML }}</b></span>
+    </div>
   </div>
   <figcaption>{{ T "hero_figcaption" | safeHTML }}</figcaption>
 </figure>

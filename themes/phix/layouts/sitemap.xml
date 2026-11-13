@@ -1,0 +1,25 @@
+{{- /* Like Hugo's built-in sitemap, but lists only pages search engines should index
+     (see _partials/seo-listed.html) and pairs languages only when both versions are real. */ -}}
+{{ printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+{{- range where .Pages "Sitemap.Disable" "ne" true }}
+{{- if and .Permalink (partial "seo-listed.html" .) }}
+  <url>
+    <loc>{{ .Permalink }}</loc>
+    {{- if not .Lastmod.IsZero }}
+    <lastmod>{{ .Lastmod.Format "2006-01-02T15:04:05-07:00" | safeHTML }}</lastmod>
+    {{- end }}
+    {{- $alts := slice }}
+    {{- range .AllTranslations }}{{ if partial "seo-listed.html" . }}{{ $alts = $alts | append . }}{{ end }}{{ end }}
+    {{- if gt (len $alts) 1 }}
+    {{- range $alts }}
+    <xhtml:link rel="alternate" hreflang="{{ .Language.Lang }}" href="{{ .Permalink }}"/>
+    {{- end }}
+    {{- range first 1 (where $alts "Language.Lang" "en") }}
+    <xhtml:link rel="alternate" hreflang="x-default" href="{{ .Permalink }}"/>
+    {{- end }}
+    {{- end }}
+  </url>
+{{- end }}
+{{- end }}
+</urlset>

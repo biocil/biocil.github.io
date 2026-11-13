@@ -3,7 +3,7 @@
   <aside>
     {{ partial "avatar.html" (dict "page" . "fill" "640x640" "class" "avatar big") }}
     <ul class="plain social">
-      {{ range .Params.social }}{{ if .link }}{{ $name := .label | default (index (dict "envelope" "Email" "linkedin" "LinkedIn" "google-scholar" "Google Scholar" "github" "GitHub" "twitter" "X (Twitter)" "x-twitter" "X" "orcid" "ORCID" "researchgate" "ResearchGate" "globe" "Website" "youtube" "YouTube" "cv" "CV") .icon | default (humanize .icon)) }}<li><a href="{{ .link }}">{{ $name }}</a></li>{{ end }}{{ end }}
+      {{ range .Params.social }}{{ if .link }}{{ $name := .label | default (index (dict "envelope" (T "social_email") "linkedin" "LinkedIn" "google-scholar" "Google Scholar" "github" "GitHub" "twitter" "X (Twitter)" "x-twitter" "X" "orcid" "ORCID" "researchgate" "ResearchGate" "globe" (T "social_website") "youtube" "YouTube" "cv" (T "social_cv")) .icon | default (humanize .icon)) }}<li><a href="{{ .link }}">{{ $name }}</a></li>{{ end }}{{ end }}
     </ul>
   </aside>
   <div>

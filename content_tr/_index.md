@@ -1,5 +1,8 @@
 ---
 title: Phi-X
+description: >-
+  Phi-X, İstanbul Medipol Üniversitesi’nde nicel faz, dijital holografik ve
+  holotomografik mikroskoplar ile bunların arkasındaki hesaplama yöntemlerini geliştiriyor.
 hero:
   title: Canlı hücreleri ışığı ne kadar yavaşlattıklarıyla görüntülüyoruz.
   lede: >-

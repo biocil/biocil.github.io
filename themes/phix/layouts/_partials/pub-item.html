@@ -1,7 +1,9 @@
 {{- $p := . -}}
 {{- $type := index ($p.Params.publication_types | default (slice "other")) 0 -}}
 {{- $label := T (printf "type_%s" $type) | default (T "type_other") -}}
-<li class="pub-row" data-type="{{ $type }}" data-text="{{ lower (printf "%s %s %s" $p.Title (delimit ($p.Params.authors | default slice) " ") ($p.Params.publication | default "" | plainify)) }}">
+{{- /* Search text has author names both as written and as shown (e.g. "Oguz" and "Oğuz"). */ -}}
+{{- $names := $p.Params.authors | default slice }}{{ range $p.GetTerms "authors" }}{{ $names = $names | append .LinkTitle }}{{ end }}{{ $names = uniq $names }}
+<li class="pub-row" data-type="{{ $type }}" data-text="{{ lower (printf "%s %s %s" $p.Title (delimit $names " ") ($p.Params.publication | default "" | plainify)) }}">
   <a class="pub-thumb" href="{{ $p.RelPermalink }}" tabindex="-1" aria-hidden="true">
     {{- with partial "featured.html" $p }}{{ partial "img.html" (dict "img" . "w" 360 "alt" "") }}{{ end -}}
   </a>

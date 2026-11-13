@@ -3,7 +3,7 @@ title: "Applications of complex field deconvolution using digital holographic mi
 authors:
 - Yann Cotte
 - M. Fatih Toy
-- Isabelle Borgoend
+- Isabelle Bergoend
 - Cristian Arfire
 - Shan Shan Kou
 - Christian Depeursinge

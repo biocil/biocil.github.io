@@ -10,32 +10,32 @@ last_name: Toy
 superuser: true
 
 # Role/position
-role: Doçent, Biyomedikal Mühendisliği Bölüm Başkanı
+role: Doçent ve Biyomedikal Mühendisliği Bölümü başkanı
 # Organizations/Affiliations
 organizations:
-  - name: Istanbul Medipol University
-    url: 'https://www.medipol.edu.tr/en/'
+  - name: İstanbul Medipol Üniversitesi
+    url: https://www.medipol.edu.tr/
 
 # Short bio (displayed in user profile at end of posts)
 bio: Laboratuvarın yürütücüsü. Dijital holografi, nicel faz görüntüleme, holotomografi ve hesaplamalı mikroskopi.
 interests:
-  - Digital Holography
-  - Quantitative Phase Imaging
-  - Optical Diffraction Tomography
-  - Holo-Tomography
-  - Optical Superresolution
+  - Dijital holografi
+  - Nicel faz görüntüleme
+  - Optik kırınım tomografisi
+  - Holotomografi
+  - Optik süper çözünürlük
 
 education:
   courses:
-    - course: PhD in Photonics
-      institution: École Polytechnique Fédérale de Lausanne (EPFL), Switzerland
-      year: 2013
-    - course: MSc in Electrical and Computer Engineering
-      institution: Koç University, Turkey
-      year: 2008
-    - course: BSc in Electrical & Electronics Engineering
-      institution: Koç University, Turkey 
-      year: 2006
+  - course: Fotonik doktorası
+    institution: École Polytechnique Fédérale de Lausanne (EPFL), İsviçre
+    year: 2013
+  - course: Elektrik ve Bilgisayar Mühendisliği yüksek lisansı
+    institution: Koç Üniversitesi
+    year: 2008
+  - course: Elektrik-Elektronik Mühendisliği lisansı
+    institution: Koç Üniversitesi
+    year: 2006
 
 # Social/Academic Networking
 # For available icons, see: https://docs.hugoblox.com/getting-started/page-builder/#icons

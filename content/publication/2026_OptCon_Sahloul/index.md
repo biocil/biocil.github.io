@@ -2,7 +2,7 @@
 title: "All-optical selective target highlighting for augmented reality microscopy"
 authors:
 - Maha Sahloul
-- Kaan Akşit
+- Kaan Aksit
 - M. Fatih Toy
 
 

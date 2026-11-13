@@ -36,6 +36,11 @@ var LUT_I=polyLUT(INF);
 var LUT_P=rampLUT(cssStops("--phase-stops","0 #0B201B, 0.22 #134A3E, 0.45 #1F7A64, 0.68 #5DB89A, 0.86 #BFE8D2, 1 #F5FBF6"));
 var LUT_H=rampLUT(cssStops("--holo-stops","0 #0B201B, 0.5 #8C5F12, 0.82 #E0B252, 1 #FDF3DA"));
 var LUT_G=rampLUT([[0,[0,0,0]],[1,[255,255,255]]]);
+/* Home page hero: fixed maps that carry physical meaning, so they do not follow the site palette.
+   Viridis (perceptually uniform, false colour) for the computed phase, and plain grey for the
+   intensity a camera records. */
+var VIR=[[0.2777273272234177,0.005407344544966578,0.3340998053353061],[0.1050930431085774,1.404613529898575,1.384590162594685],[-0.3308618287255563,0.214847559468213,0.09509516302823659],[-4.634230498983486,-5.799100973351585,-19.33244095627987],[6.228269936347081,14.17993336680509,56.69055260068105],[4.776384997670288,-13.74514537774601,-65.35303263337234],[-5.435455855934631,4.645852612178535,26.3124352495832]];
+var LUT_V=polyLUT(VIR);
 /* When the visitor switches colour scheme, recompute the maps in place and let each demo repaint. */
 var paletteFns=[];
 document.addEventListener("phix:palette",function(){
@@ -175,12 +180,20 @@ function laplacianNorm(phi,W,H,d){
 }
 
 /* ======================= HERO ======================= */
+/* Three views of the same transparent cells, left to right: a brightfield image (intensity only,
+   almost nothing), a hologram band that travels with the divider (the phase hidden in bent fringes),
+   and the phase map computed from the hologram. */
 function initHero(){
 var holo=document.getElementById("holo");
 if(!holo) return;
 var hc=document.getElementById("holoCanvas"), hctx=hc.getContext("2d");
 var divider=document.getElementById("divider"), hr=document.getElementById("holoRange");
-var heroImgs=null, heroPos=0.5, lastW=0, swept=false;
+var tagL=holo.querySelector(".tag.l"), tagR=holo.querySelector(".tag.r");
+var cbP=document.getElementById("holoCbarP"), cbH=document.getElementById("holoCbarH");
+if(cbP) cbP.style.background=lutCSS(LUT_V,12);
+if(cbH) cbH.style.background=lutCSS(LUT_G,4);
+var BAND=0.2, REST=0.5;   /* hologram band width and resting divider position, as fractions of the width */
+var heroImgs=null, heroPos=REST, lastW=0, swept=false;
 function buildHero(){
   var rect=holo.getBoundingClientRect(), cw=Math.round(rect.width), ch=Math.round(rect.height);
   if(cw<10||ch<10) return;
@@ -191,47 +204,65 @@ function buildHero(){
   /* Transparent cells: the amplitude stays almost flat and the phase does the work.
      Cell bodies delay the light by about 2–3.5 rad and nuclei by a further ~2 rad, up to about one
      fringe in total, and the fringes are wide enough on screen that their bends are easy to see. */
-  var PH=2.4, PMAX=2.9*PH;
+  var PH=2.4;
   var lap=laplacianNorm(phi,W,H,Math.max(2,Math.round(2.5*s)));
   var period=13*s, th=38*Math.PI/180, kx=TAU*Math.cos(th)/period, ky=TAU*Math.sin(th)/period;
-  var nr=rng(11), hol=new ImageData(W,H), ph=new ImageData(W,H), hd=hol.data, pd=ph.data, a0=0.8, norm=1/((1+a0*1.1)*(1+a0*1.1));
+  var nr=rng(11), hol=new ImageData(W,H), ph=new ImageData(W,H), bf=new ImageData(W,H), hd=hol.data, pd=ph.data, bd=bf.data, a0=0.8, norm=1/((1+a0*1.1)*(1+a0*1.1));
   for(var y=0;y<H;y++){
     var ny=(y/H-0.5)*2;
     for(var x=0;x<W;x++){
       var i=y*W+x, p=phi[i]*PH, nx=(x/W-0.5)*2;
       var env=0.6+0.4*Math.exp(-(nx*nx*0.4+ny*ny*0.5));
-      var A=a0*(1+0.08*lap[i]);
+      var A=a0*(1+0.08*lap[i]), o=i*4;
+      /* Hologram: object and reference beams interfere, so the phase bends the fringes. */
       var I=(1+A*A+2*A*Math.cos(kx*x+ky*y-p))*norm*env*1.15+(nr()-0.5)*0.04;
-      var hi=Math.max(0,Math.min(255,Math.round(I*255)))*3, o=i*4;
-      hd[o]=LUT_H[hi]; hd[o+1]=LUT_H[hi+1]; hd[o+2]=LUT_H[hi+2]; hd[o+3]=255;
-      var t=Math.max(0,Math.min(255,Math.round((p+0.2)/PMAX*255)))*3;
-      pd[o]=LUT_P[t]; pd[o+1]=LUT_P[t+1]; pd[o+2]=LUT_P[t+2]; pd[o+3]=255;
+      var hi=Math.max(0,Math.min(255,Math.round(I*255)))*3;
+      hd[o]=hd[o+1]=hd[o+2]=hi/3; hd[o+3]=255;
+      /* Brightfield: the same camera without the reference beam records only |amplitude|², so the cells barely show. */
+      var Ib=(A*A)/(a0*a0)*0.55*env+(nr()-0.5)*0.03;
+      var bi=Math.max(0,Math.min(255,Math.round(Ib*255)))*3;
+      bd[o]=bd[o+1]=bd[o+2]=bi/3; bd[o+3]=255;
+      /* Phase shown from 0 to 2π rad (the colour bar below the image); the few nucleolus pixels above 2π saturate. */
+      var t=Math.max(0,Math.min(255,Math.round(p/TAU*255)))*3;
+      pd[o]=LUT_V[t]; pd[o+1]=LUT_V[t+1]; pd[o+2]=LUT_V[t+2]; pd[o+3]=255;
     }
   }
-  var a=document.createElement("canvas"), b=document.createElement("canvas");
-  a.width=b.width=W; a.height=b.height=H;
-  a.getContext("2d").putImageData(hol,0,0); b.getContext("2d").putImageData(ph,0,0);
-  heroImgs={holo:a,phase:b,W:W,H:H};
+  function cv(img){ var c=document.createElement("canvas"); c.width=W; c.height=H; c.getContext("2d").putImageData(img,0,0); return c; }
+  heroImgs={holo:cv(hol),phase:cv(ph),bf:cv(bf),W:W,H:H,s:s};
   drawHero();
 }
+/* Hide a corner label when its side of the image is too narrow to hold it. */
+function fade(tag,px){ if(tag) tag.style.opacity=Math.max(0,Math.min(1,(px-tag.offsetWidth-16)/16)); }
 function drawHero(){
   if(!heroImgs) return;
-  var W=heroImgs.W,H=heroImgs.H,sx=Math.round(heroPos*W);
-  hctx.drawImage(heroImgs.holo,0,0);
-  if(sx>0) hctx.drawImage(heroImgs.phase,0,0,sx,H,0,0,sx,H);
+  var W=heroImgs.W,H=heroImgs.H;
+  var x0=Math.round((heroPos-BAND/2)*W), x1=Math.round((heroPos+BAND/2)*W);
+  var c0=Math.max(0,Math.min(W,x0)), c1=Math.max(0,Math.min(W,x1));
+  hctx.drawImage(heroImgs.bf,0,0);
+  if(c1>c0) hctx.drawImage(heroImgs.holo,c0,0,c1-c0,H,c0,0,c1-c0,H);
+  if(c1<W) hctx.drawImage(heroImgs.phase,c1,0,W-c1,H,c1,0,W-c1,H);
+  var lw=Math.max(1,Math.round(1.5*heroImgs.s));
+  hctx.fillStyle="rgba(255,255,255,.9)";
+  if(x0>0&&x0<W) hctx.fillRect(x0,0,lw,H);
+  if(x1>0&&x1<W) hctx.fillRect(x1-lw,0,lw,H);
   divider.style.left=(heroPos*100)+"%";
-  hr.value=Math.round(heroPos*100);
-  hr.setAttribute("aria-valuetext",Math.round(heroPos*100)+"% reconstructed");
+  var cw=W/heroImgs.s;
+  fade(tagL,Math.max(0,x0)/heroImgs.s); fade(tagR,cw-Math.min(W,x1)/heroImgs.s);
+  var v=Math.round(Math.min(1,Math.max(0,heroPos))*100);
+  hr.value=v;
+  hr.setAttribute("aria-valuetext",v+"%");
 }
 function setPos(e){ var r=holo.getBoundingClientRect(); heroPos=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)); swept=true; drawHero(); }
 holo.addEventListener("pointerdown",function(e){ holo.setPointerCapture(e.pointerId); setPos(e); });
 holo.addEventListener("pointermove",function(e){ if(holo.hasPointerCapture(e.pointerId)) setPos(e); });
 hr.addEventListener("input",function(){ heroPos=hr.value/100; swept=true; drawHero(); });
+/* Opening animation: start with only the brightfield image, then let the hologram band pass over
+   the cells and leave the computed phase behind it. */
 function sweep(){
-  if(swept||reduceMotion){ if(!swept) heroPos=0.5; drawHero(); return; }
-  var t0=null, from=0.985, to=0.5, dur=1700;
-  function step(ts){ if(swept) return; if(t0===null) t0=ts; var k=Math.min(1,(ts-t0)/dur), e=1-Math.pow(1-k,3); heroPos=from+(to-from)*e; drawHero(); if(k<1) requestAnimationFrame(step); else swept=true; }
-  heroPos=from; drawHero(); setTimeout(function(){ requestAnimationFrame(step); },350);
+  if(swept||reduceMotion){ if(!swept) heroPos=REST; drawHero(); return; }
+  var t0=null, from=1+BAND/2+0.01, to=REST, dur=2200;
+  function step(ts){ if(swept) return; if(t0===null) t0=ts; var k=Math.min(1,(ts-t0)/dur), e=k<0.5?2*k*k:1-Math.pow(-2*k+2,2)/2; heroPos=from+(to-from)*e; drawHero(); if(k<1) requestAnimationFrame(step); else swept=true; }
+  heroPos=from; drawHero(); setTimeout(function(){ requestAnimationFrame(step); },900);
 }
 var rT=null;
 if(window.ResizeObserver){ new ResizeObserver(function(){ var w=Math.round(holo.getBoundingClientRect().width); if(Math.abs(w-lastW)<4) return; clearTimeout(rT); rT=setTimeout(buildHero,160); }).observe(holo); }

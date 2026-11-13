@@ -45,6 +45,10 @@ part_of:
 # Footer notice. {year} is replaced with the current year.
 copyright: '© {year} Phi-X. Text licensed under CC BY-NC-ND 4.0; figures from publications remain © their publishers.'
 
+# Google Search Console: paste only the content="…" code from the HTML-tag
+# verification method here, then push. Leave empty if not used.
+google_site_verification: ''
+
 # Image used when pages are shared on social media (in assets/media/).
 share_image: media/share.jpg
 

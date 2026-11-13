@@ -7,7 +7,7 @@ team:
   - Beyza Konyar
 authors:
   - M. Fatih Toy
-  - Mert Mestçi
+  - Mert Mestci
   - Beyza Konyar
 tags:
   - Incubator

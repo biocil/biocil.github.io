@@ -8,7 +8,7 @@ tags:
 authors:
   - Maha Sahloul
   - M. Fatih Toy
-  - Kaan Akşit
+  - Kaan Aksit
 ---
 
 <style>

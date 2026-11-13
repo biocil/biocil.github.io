@@ -1,7 +1,7 @@
 {{ define "main" }}
 <header class="page-head">
   <div class="wrap">
-    <p class="venue-line"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ time.Format (cond (eq .Params.date_precision "month") "January 2006" "2 January 2006") .Date }}</time>{{ with .Params.kind }}, {{ T (printf "kind_%s" .) | default . }}{{ end }}</p>
+    <p class="venue-line"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ time.Format (index (dict "year" "2006" "month" "January 2006") (.Params.date_precision | default "") | default "2 January 2006") .Date }}</time>{{ with .Params.kind }}, {{ T (printf "kind_%s" .) | default . }}{{ end }}</p>
     <h1>{{ .Title }}</h1>
   </div>
 </header>

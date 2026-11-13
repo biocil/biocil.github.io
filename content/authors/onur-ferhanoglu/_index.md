@@ -1,16 +1,16 @@
 ---
 # Display name
-title: Onur Ferhanoglu
+title: Onur Ferhanoğlu
 
 # Full name (for SEO)
 first_name: Onur
-last_name: Ferhanoglu
+last_name: Ferhanoğlu
 
 # Is this the primary user of the site?
 superuser: false
 
 # Role/position
-role: Associate Professor 
+role: Professor
 
 # Organizations/Affiliations
 organizations:
@@ -24,6 +24,9 @@ organizations:
 #   For an email link, use "fas" icon pack, "envelope" icon, and a link in the
 #   form "mailto:your-email@example.com" or "#contact" for contact widget.
 social:
+  - icon: globe
+    link: https://edl.itu.edu.tr/
+    label: Research group website
   - icon: google-scholar
     icon_pack: ai
     link: https://scholar.google.com/citations?user=n5CUOykAAAAJ&hl=en
