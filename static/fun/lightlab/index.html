@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Light in Tissue Lab</title>
+<style>
+:root{--navy:#22275E;--gray:#7D8488;--ink:#1F2433;--bg:#F6F7FA;--card:#FFFFFF;--line:#E2E5EC;
+--red:#C62839;--teal:#1B8A8F;--amber:#E08E0B;--green:#2E9E4F;--violet:#5A3E7A;--blue:#2F5DD3}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Calibri,Roboto,"Helvetica Neue",Arial,sans-serif}
+header{background:var(--navy);color:#fff;padding:14px 20px 0}
+header h1{margin:0;font-size:22px;letter-spacing:.2px}
+header p{margin:4px 0 10px;color:#C9CDE6;font-size:14px}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:transparent;border:0;color:#C9CDE6;font:inherit;font-size:15px;padding:10px 14px;border-radius:10px 10px 0 0;cursor:pointer}
+nav button.on{background:var(--bg);color:var(--navy);font-weight:700}
+main{max-width:1180px;margin:0 auto;padding:16px}
+.view{display:none}.view.on{display:block}
+.grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:16px}
+@media(max-width:860px){.grid.main{display:flex;flex-direction:column;gap:0}.grid.main>div{display:contents}.o1{order:1}.o2{order:2}.o3{order:3}.o4{order:4}.o5{order:5}
+.stick{position:sticky;top:0;z-index:5;box-shadow:0 4px 12px #0001}.big{font-size:34px}.stick .stat .v{font-size:17px}.stick .stats{gap:6px}.stick{padding:10px 12px}
+#v-oxi .stick .row{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;align-items:end}#v-oxi .stick .row>div{min-height:52px}#v-oxi .stick .big{font-size:30px}#v-oxi .stick #sq{font-size:20px}#calc{min-height:7.5em!important}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:16px}
+.card h2{font-size:16px;margin:0 0 10px;color:var(--navy)}
+.card h3{font-size:14px;margin:12px 0 6px;color:var(--navy)}
+label{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:14px;margin:10px 0 2px}
+label b{color:var(--navy);white-space:nowrap;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--navy)}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.seg button,.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+.seg button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn.primary{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--bg);border-radius:10px;padding:8px 10px}
+.stat .k{font-size:12px;color:var(--gray)}
+.stat .v{font-size:20px;font-weight:700;color:var(--navy);white-space:nowrap;font-variant-numeric:tabular-nums;min-height:27px}
+.stat .v small{font-size:13px;font-weight:600}
+canvas{width:100%;display:block;border-radius:10px;max-width:100%}
+.wlline{min-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.swatch{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px;border:1px solid #0002}
+.note{font-size:12.5px;color:var(--gray);line-height:1.45}
+.chal{font-size:14px;line-height:1.5;padding-left:18px;margin:6px 0}
+.chal li{margin-bottom:4px}
+details summary{cursor:pointer;color:var(--navy);font-size:13.5px;font-weight:600}
+.big{font-size:44px;font-weight:800;color:var(--navy);line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.big small{font-size:18px;color:var(--gray);font-weight:600}
+.flag{display:none;margin-top:8px;padding:8px 10px;border-radius:10px;background:#FBE9EC;color:var(--red);font-size:13.5px;font-weight:600}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.qbox{background:#FDF1DC;border-radius:10px;padding:10px 12px;font-size:14.5px;line-height:1.5}
+footer{max-width:1180px;margin:0 auto;padding:4px 16px 28px;font-size:12px;color:var(--gray)}
+.sr{position:absolute;left:-9999px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Light in Tissue Lab</h1>
+  <p>Interactive companion to the Biomedical Optics lecture · Introduction to Biomedical Engineering</p>
+  <nav id="tabs">
+    <button data-v="window" class="on">① Optical window</button>
+    <button data-v="beer">② Beer–Lambert</button>
+    <button data-v="oxi">③ Pulse oximeter</button>
+  </nav>
+</header>
+<main>
+<!-- ================= TAB 1 ================= -->
+<section class="view on" id="v-window">
+ <div class="grid main">
+  <div>
+   <div class="card o2">
+    <h2>Choose the light and the tissue</h2>
+    <label>Wavelength <b id="wlv">650 nm</b></label>
+    <input id="wl" type="range" min="400" max="1000" step="5" value="650">
+    <div class="note wlline"><span class="swatch" id="sw"></span><span id="wlname">red</span> · photon energy <b id="ev">1.91 eV</b></div>
+    <label>Blood in tissue <b id="bvv">2.0 %</b></label>
+    <input id="bv" type="range" min="0.5" max="6" step="0.5" value="2">
+    <label>Oxygen saturation of that blood <b id="sov">75 %</b></label>
+    <input id="so" type="range" min="0" max="100" step="1" value="75">
+    <label>Skin pigment (melanin in top 0.1 mm)</label>
+    <div class="seg" id="mel">
+      <button data-m="0.02" class="on">light</button><button data-m="0.10">medium</button><button data-m="0.30">dark</button>
+    </div>
+   </div>
+   <div class="card o5">
+    <h2>Challenges</h2>
+    <ol class="chal">
+     <li>Find the colour that reaches <b>deepest</b>. Which colour is worst?</li>
+     <li>Set blood to 6 %. Which colours suffer most? Why do surgeons see red tissue?</li>
+     <li>Push past 950 nm. What new absorber appears?</li>
+     <li>Change skin pigment. Does it matter more for green or for near-IR light?</li>
+    </ol>
+    <details><summary>Show hints</summary>
+     <p class="note">1) Somewhere in 650–900 nm; blue/green are absorbed by blood within a fraction of a millimetre. 2) Blood absorbs blue and green strongly, so the light that comes back out is mostly red. 3) Water (we are ~60 % water) starts to absorb near 970 nm. 4) Melanin absorbs much more at short wavelengths, so green is hit harder.</p>
+    </details>
+   </div>
+  </div>
+  <div>
+   <div class="card o1 stick">
+    <div class="stats">
+     <div class="stat"><div class="k">absorption μₐ</div><div class="v" id="o-mua">–</div></div>
+     <div class="stat"><div class="k">scattering μₛ′</div><div class="v" id="o-mus">–</div></div>
+     <div class="stat"><div class="k">penetration depth δ</div><div class="v" id="o-del">–</div></div>
+     <div class="stat"><div class="k">left at 2 mm depth</div><div class="v" id="o-2mm">–</div></div>
+     <div class="stat"><div class="k">passes the skin pigment layer</div><div class="v" id="o-epi">–</div></div>
+    </div>
+   </div>
+   <div class="card o3">
+    <h2>Absorption spectrum of tissue components</h2>
+    <canvas id="c-spec" height="300" style="height:300px;"></canvas>
+    <p class="note">Log scale. Contributions to μₐ for the tissue you set (blood, water) and for the thin pigmented skin layer (melanin). Shaded band: the “optical window”.</p>
+   </div>
+   <div class="card o4">
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">Fire photons into tissue</h2>
+     <div class="row"><button class="btn primary" id="fire">Fire 40 photons</button><button class="btn" id="clear">Clear</button></div></div>
+    <canvas id="c-mc" height="330" style="height:330px;margin-top:10px"></canvas>
+    <div class="stats" style="margin-top:10px">
+     <div class="stat"><div class="k">absorbed (●)</div><div class="v" id="mc-abs">0</div></div>
+     <div class="stat"><div class="k">came back out (▲) – detectable</div><div class="v" id="mc-esc">0</div></div>
+     <div class="stat"><div class="k">deepest photon</div><div class="v" id="mc-max">–</div></div>
+    </div>
+    <p class="note">Each photon takes random steps (scattering) and may be absorbed at each step. Simplified 2-D Monte Carlo with the coefficients above.</p>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- ================= TAB 2 ================= -->
+<section class="view" id="v-beer">
+ <div class="grid main">
+  <div>
+   <div class="card o2">
+    <h2>Beer–Lambert law</h2>
+    <div class="qbox" style="font-size:16px"><b>A = ε · l · c</b> &nbsp;&nbsp; and &nbsp;&nbsp; <b>T = I / I₀ = 10<sup>−A</sup></b></div>
+    <label>Attenuation coefficient ε <b id="epsv">–</b></label>
+    <input id="eps" type="range" min="2.5" max="5.5" step="0.001" value="4.726">
+    <div class="seg" id="epspre">
+      <button data-e="53236">HbO₂ at 540 nm (green)</button>
+      <button data-e="319.6">HbO₂ at 660 nm (red)</button>
+      <button data-e="3226.6">Hb at 660 nm (red)</button>
+    </div>
+    <label>Concentration c <b id="cv">–</b></label>
+    <input id="conc" type="range" min="0" max="100" step="1" value="20">
+    <label>Path length l <b id="lv">–</b></label>
+    <input id="len" type="range" min="0.1" max="5" step="0.1" value="1">
+   </div>
+   <div class="card o5">
+    <h2>Practice problem</h2>
+    <div class="qbox" id="pq">Press “New problem”.</div>
+    <div class="row" style="margin-top:10px"><button class="btn primary" id="pnew">New problem</button><button class="btn" id="pshow">Show solution</button></div>
+    <div class="note" id="psol" style="display:none;margin-top:8px"></div>
+   </div>
+  </div>
+  <div>
+   <div class="card o1 stick">
+    <div class="stats">
+     <div class="stat"><div class="k">absorbance A</div><div class="v" id="b-A">–</div></div>
+     <div class="stat"><div class="k">transmitted T</div><div class="v" id="b-T">–</div></div>
+     <div class="stat"><div class="k">absorbed</div><div class="v" id="b-Ab">–</div></div>
+    </div>
+   </div>
+   <div class="card o3">
+    <h2>Light through a cuvette</h2>
+    <canvas id="c-cuv" height="240" style="height:240px;"></canvas>
+   </div>
+   <div class="card o4">
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+     <div><h3>A grows linearly with concentration</h3><canvas id="c-Ac" height="220" style="height:220px;"></canvas></div>
+     <div><h3>T decays exponentially with path length</h3><canvas id="c-Tl" height="220" style="height:220px;"></canvas></div>
+    </div>
+    <p class="note">Rule of thumb: every extra absorbance unit cuts the light by 10×. A = 1 → 10 % passes; A = 2 → 1 %; A = 3 → 0.1 %.</p>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- ================= TAB 3 ================= -->
+<section class="view" id="v-oxi">
+ <div class="grid main">
+  <div>
+   <div class="card o2">
+    <h2>Patient and sensor</h2>
+    <label>True arterial saturation SaO₂ <b id="sav">97 %</b></label>
+    <input id="sa" type="range" min="65" max="100" step="1" value="97">
+    <label>Heart rate <b id="hrv">72 bpm</b></label>
+    <input id="hr" type="range" min="40" max="180" step="1" value="72">
+    <label>Perfusion (pulse strength) <b id="pfv">normal</b></label>
+    <input id="pf" type="range" min="0.2" max="3" step="0.1" value="1.5">
+    <label>Hand motion <b id="mov">none</b></label>
+    <input id="mo" type="range" min="0" max="10" step="1" value="0">
+    <label>Skin pigment</label>
+    <div class="seg" id="pig"><button data-p="0" class="on">light</button><button data-p="1">medium</button><button data-p="2">dark</button></div>
+    <label style="margin-top:12px;justify-content:flex-start"><input type="checkbox" id="bias" style="margin:0 6px 0 0"> Show calibration-bias scenario</label>
+    <p class="note">Studies found some pulse oximeters over-read saturation in people with darker skin. This switch adds an <i>illustrative</i> +2 / +4 % bias for medium / dark skin so you can see the clinical consequence; it is not a physical model.</p>
+   </div>
+   <div class="card o5">
+    <h2>Try this</h2>
+    <ol class="chal">
+     <li>Lower SaO₂ from 97 % to 80 %. Which trace’s pulse gets bigger: red or IR?</li>
+     <li>Add strong motion. What reading does the device drift towards? (R → 1)</li>
+     <li>Make perfusion weak (cold fingers). What happens to signal quality?</li>
+     <li>Turn on the bias scenario, choose dark skin and set SaO₂ = 88 %. Many clinical protocols start oxygen when SpO₂ drops below 92 %. What does the device show?</li>
+    </ol>
+   </div>
+  </div>
+  <div>
+   <div class="card o1 stick">
+    <div class="row" style="justify-content:space-between;align-items:flex-end">
+     <div><div class="note">SpO₂ shown by device</div><div class="big" id="spo2">–<small> %</small></div></div>
+     <div><div class="note">pulse rate</div><div class="big" id="pr" style="font-size:34px">–<small> bpm</small></div></div>
+     <div><div class="note">ratio of ratios R</div><div class="big" id="rr" style="font-size:34px">–</div></div>
+     <div><div class="note">signal quality</div><div class="big" id="sq" style="font-size:22px">–</div></div>
+    </div>
+    <div class="flag" id="occ">Occult hypoxaemia: the device reads ≥ 92 % while the true saturation is below 88 %.</div>
+   </div>
+   <div class="card o3">
+    <h2>What the photodetector sees (light transmitted through the finger)</h2>
+    <canvas id="c-ppg" height="300" style="height:300px;"></canvas>
+    <p class="note">Both traces use the same scale: the grey bar is 1 % of the steady (DC) light. AC/DC = size of the pulse relative to the steady light.</p>
+   </div>
+   <div class="card o4">
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+     <div><h3>From R to SpO₂ (empirical calibration)</h3><canvas id="c-cal" height="230" style="height:230px;"></canvas></div>
+     <div><h3>How it works</h3>
+      <ol class="chal" style="font-size:13.5px">
+       <li>Blood volume pulses with each heartbeat → absorbed light pulses (AC on top of DC).</li>
+       <li>Deoxy-Hb absorbs red (660 nm) ~10× more than oxy-Hb; at 940 nm oxy-Hb absorbs a bit more.</li>
+       <li>R = (AC/DC)<sub>red</sub> ÷ (AC/DC)<sub>IR</sub> cancels skin, bone and LED brightness.</li>
+       <li>SpO₂ ≈ 110 − 25·R (typical calibration curve, measured on volunteers).</li>
+      </ol>
+      <p class="note" id="calc" style="min-height:5.2em"></p>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
+</section>
+</main>
+<footer>Phi-X Lab · Istanbul Medipol University · Educational model, not a medical device. Data: hemoglobin molar extinction compiled by S. Prahl (omlc.org); water, Hale &amp; Querry 1973; melanin and scattering, S. L. Jacques, Phys. Med. Biol. 58 (2013) R37.</footer>
+
+<script>
+const HB=[[400,266232,223296],[410,466840,303956],[420,480360,407560],[430,246072,528600],[440,102580,413280],[450,62816,103292],[460,44480,23388.8],[470,33209.2,16156.4],[480,26629.2,14550],[490,23684.4,16684],[500,20932.8,20862],[510,20035.2,25773.6],[520,24202.4,31589.6],[530,39956.8,39036.4],[540,53236,46592],[550,43016,53412],[560,32613.2,53788],[570,44496,45072],[580,50104,37020],[590,14400.8,28324.4],[600,3200,14677.2],[610,1506,9443.6],[620,942,6509.6],[630,610,5148.8],[640,442,4345.2],[650,368,3750.12],[660,319.6,3226.56],[670,294,2795.12],[680,277.6,2407.92],[690,276,2051.96],[700,290,1794.28],[710,314,1540.48],[720,348,1325.88],[730,390,1102.2],[740,446,1115.88],[750,518,1405.24],[760,586,1548.52],[770,650,1311.88],[780,710,1075.44],[790,756,890.8],[800,816,761.72],[810,864,717.08],[820,916,693.76],[830,974,693.04],[840,1022,692.36],[850,1058,691.32],[860,1092,694.32],[870,1128,705.84],[880,1154,726.44],[890,1178,743.6],[900,1198,761.84],[910,1214,774.56],[920,1224,777.36],[930,1222,763.84],[940,1214,693.44],[950,1204,602.24],[960,1186,525.56],[970,1162,429.32],[980,1128,359.656],[990,1080,283.22],[1000,1024,206.784]];
+const WATER=[[400,0.00058],[425,0.00038],[450,0.00028],[475,0.000247],[500,0.00025],[525,0.00032],[550,0.00045],[575,0.00079],[600,0.0023],[625,0.0028],[650,0.0032],[675,0.00415],[700,0.006],[725,0.0159],[750,0.026],[775,0.024],[800,0.02],[810,0.019858],[820,0.023907],[825,0.028],[830,0.029069],[840,0.034707],[850,0.043],[860,0.046759],[870,0.051999],[875,0.056],[880,0.055978],[890,0.060432],[900,0.068],[910,0.072913],[920,0.10927],[925,0.144],[930,0.17296],[940,0.26737],[950,0.39],[960,0.42],[970,0.45],[975,0.45],[980,0.43],[990,0.41],[1000,0.36]];
+const $=id=>document.getElementById(id);
+const C={navy:'#22275E',gray:'#7D8488',ink:'#1F2433',line:'#E2E5EC',red:'#C62839',teal:'#1B8A8F',amber:'#E08E0B',green:'#2E9E4F',violet:'#5A3E7A',blue:'#2F5DD3',brown:'#8C5A2B'};
+function interp(tab,x,col){col=col||1;if(x<=tab[0][0])return tab[0][col];for(let i=1;i<tab.length;i++){if(x<=tab[i][0]){const a=tab[i-1],b=tab[i],t=(x-a[0])/(b[0]-a[0]);return a[col]+t*(b[col]-a[col]);}}return tab[tab.length-1][col];}
+const epsO=l=>interp(HB,l,1), epsD=l=>interp(HB,l,2);
+const muaBlood=(l,S)=>2.303*(S*epsO(l)+(1-S)*epsD(l))*150/64500;   // cm^-1, whole blood
+const muaWater=l=>interp(WATER,l,1);
+const muaMel=l=>519*Math.pow(l/500,-3.5);
+const musp=l=>46*Math.pow(l/500,-1.421);
+function wlColor(w){let r=0,g=0,b=0;
+ if(w<380){return 'rgb(115,90,165)';} if(w>780){const t=Math.min(1,(w-780)/220);return `rgb(${Math.round(140-40*t)},${20},${26})`;}
+ if(w<440){r=-(w-440)/60;b=1}else if(w<490){g=(w-440)/50;b=1}else if(w<510){g=1;b=-(w-510)/20}else if(w<580){r=(w-510)/70;g=1}else if(w<645){r=1;g=-(w-645)/65}else{r=1}
+ let f=w<420?0.3+0.7*(w-380)/40:(w>700?0.3+0.7*(780-w)/80:1);
+ const c=v=>Math.round(255*Math.pow(Math.max(0,Math.min(1,v*f)),0.8));return `rgb(${c(r)},${c(g)},${c(b)})`;}
+function wlName(w){if(w<450)return 'violet';if(w<490)return 'blue';if(w<560)return 'green';if(w<590)return 'yellow';if(w<625)return 'orange';if(w<700)return 'red';if(w<780)return 'deep red';return 'near-infrared (invisible)';}
+// ---------- canvas helpers
+function setup(cv){const dpr=window.devicePixelRatio||1;
+ if(!cv.dataset.h)cv.dataset.h=cv.getAttribute('height');   // CSS height, read once (cv.height below changes the attribute)
+ const h=+cv.dataset.h;cv.style.height=h+'px';const w=cv.clientWidth;
+ if(cv._w!==w||cv._dpr!==dpr){cv.width=Math.max(1,Math.round(w*dpr));cv.height=Math.round(h*dpr);cv._w=w;cv._dpr=dpr;}
+ const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);return {g,w,h};}
+function axes(g,box,o){ // box={x,y,w,h}; o={x0,x1,y0,y1,logy,xt,yt,xl,yl}
+ g.strokeStyle='#AEB4BD';g.lineWidth=1;g.beginPath();g.moveTo(box.x,box.y);g.lineTo(box.x,box.y+box.h);g.lineTo(box.x+box.w,box.y+box.h);g.stroke();
+ g.fillStyle='#4A5160';g.font='12px system-ui,Segoe UI,Arial';g.textAlign='center';g.textBaseline='top';
+ (o.xt||[]).forEach(t=>{const X=sx(box,o,t);g.fillText(o.xf?o.xf(t):t,X,box.y+box.h+5);g.strokeStyle='#EEF0F4';g.beginPath();g.moveTo(X,box.y);g.lineTo(X,box.y+box.h);g.stroke();});
+ g.textAlign='right';g.textBaseline='middle';
+ (o.yt||[]).forEach(t=>{const Y=sy(box,o,t);g.fillStyle='#4A5160';g.fillText(o.yf?o.yf(t):t,box.x-6,Y);g.strokeStyle='#EEF0F4';g.beginPath();g.moveTo(box.x,Y);g.lineTo(box.x+box.w,Y);g.stroke();});
+ g.fillStyle='#4A5160';g.textAlign='center';g.textBaseline='bottom';if(o.xl)g.fillText(o.xl,box.x+box.w/2,box.y+box.h+34);
+ if(o.yl){g.save();g.translate(box.x-44,box.y+box.h/2);g.rotate(-Math.PI/2);g.textBaseline='middle';g.fillText(o.yl,0,0);g.restore();}}
+function sx(b,o,x){return b.x+(x-o.x0)/(o.x1-o.x0)*b.w;}
+function sy(b,o,y){if(o.logy){const l=Math.log10(Math.max(y,1e-12));return b.y+b.h-(l-Math.log10(o.y0))/(Math.log10(o.y1)-Math.log10(o.y0))*b.h;}return b.y+b.h-(y-o.y0)/(o.y1-o.y0)*b.h;}
+function line(g,b,o,xs,f,col,lw,dash){g.save();g.beginPath();g.rect(b.x,b.y,b.w,b.h);g.clip();g.strokeStyle=col;g.lineWidth=lw||2;g.setLineDash(dash||[]);g.beginPath();xs.forEach((x,i)=>{const X=sx(b,o,x),Y=sy(b,o,f(x));i?g.lineTo(X,Y):g.moveTo(X,Y);});g.stroke();g.restore();}
+const sup=n=>String(n).replace(/-/g,'⁻').replace(/\d/g,d=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[d]);
+function fmt(x,d){if(x===0)return '0';const a=Math.abs(x);if(a>=1000)return x.toLocaleString('en-US',{maximumFractionDigits:0});if(a>=10)return x.toFixed(d==null?1:d);if(a>=0.1)return x.toFixed(d==null?2:d);return x.toExponential(1);}
+function pct(x){if(x>=0.1)return (100*x).toFixed(1)+' %';if(x>=1e-4)return (100*x).toFixed(3)+' %';return (100*x).toExponential(1)+' %';}
+
+// ================= TAB 1
+const T1={wl:650,B:0.02,S:0.75,M:0.02};
+function t1Props(l){const ma=T1.B*muaBlood(l,T1.S)+0.65*muaWater(l);const ms=musp(l);const d=1/Math.sqrt(3*ma*(ma+ms));return {ma,ms,d};}
+function drawSpec(){const cv=$('c-spec');const {g,w,h}=setup(cv);g.clearRect(0,0,w,h);
+ const b={x:58,y:12,w:w-72,h:h-62};const o={x0:400,x1:1000,y0:1e-4,y1:3e3,logy:true,xt:[400,500,600,700,800,900,1000],yt:[1e-4,1e-3,1e-2,1e-1,1,10,100,1000],yf:t=>'10'+sup(Math.round(Math.log10(t))),xl:'wavelength (nm)',yl:'μₐ (cm⁻¹)'};
+ g.fillStyle='rgba(251,227,184,.55)';g.fillRect(sx(b,o,650),b.y,sx(b,o,950)-sx(b,o,650),b.h);
+ for(let x=400;x<1000;x+=2){g.fillStyle=wlColor(x);g.fillRect(sx(b,o,x),b.y+b.h+1,sx(b,o,x+2)-sx(b,o,x)+0.5,4);}
+ axes(g,b,o);
+ const xs=[];for(let x=400;x<=1000;x+=2)xs.push(x);
+ line(g,b,o,xs,x=>T1.B*muaBlood(x,1),C.red,2.2);
+ line(g,b,o,xs,x=>T1.B*muaBlood(x,0),C.violet,2.2);
+ line(g,b,o,xs,x=>T1.B*muaBlood(x,T1.S),C.navy,3.2);
+ line(g,b,o,xs,x=>0.65*muaWater(x),C.blue,2.2);
+ line(g,b,o,xs,x=>T1.M*muaMel(x),C.brown,1.8,[6,4]);
+ const X=sx(b,o,T1.wl);g.strokeStyle=wlColor(T1.wl);g.lineWidth=3;g.beginPath();g.moveTo(X,b.y);g.lineTo(X,b.y+b.h);g.stroke();
+ const items=[[C.navy,'your blood mix ('+Math.round(T1.S*100)+' % O₂)'],[C.red,'oxy-blood'],[C.violet,'deoxy-blood'],[C.blue,'water'],[C.brown,'melanin (skin layer)']];
+ g.font='12px system-ui,Segoe UI,Arial';g.textAlign='left';g.textBaseline='middle';let ly=b.y+10;const lx=b.x+b.w-170;
+ g.fillStyle='rgba(255,255,255,.85)';g.fillRect(lx-8,b.y+2,176,items.length*17+8);
+ items.forEach(([c,t])=>{g.fillStyle=c;g.fillRect(lx,ly-1.5,18,3);g.fillStyle=C.ink;g.fillText(t,lx+24,ly);ly+=17;});
+ g.fillStyle='#9A5B00';g.textAlign='center';g.font='bold 12px system-ui,Segoe UI,Arial';g.fillText('optical window',sx(b,o,800),b.y+b.h-12);}
+function updT1(){T1.wl=+$('wl').value;T1.B=$('bv').value/100;T1.S=$('so').value/100;
+ $('wlv').textContent=T1.wl+' nm';$('sw').style.background=wlColor(T1.wl);$('wlname').textContent=wlName(T1.wl);
+ $('ev').textContent=(1239.84/T1.wl).toFixed(2)+' eV';$('bvv').textContent=(T1.B*100).toFixed(1)+' %';$('sov').textContent=Math.round(T1.S*100)+' %';
+ const p=t1Props(T1.wl);$('o-mua').innerHTML=fmt(p.ma)+' <small>cm⁻¹</small>';$('o-mus').innerHTML=fmt(p.ms,1)+' <small>cm⁻¹</small>';
+ $('o-del').innerHTML=(10*p.d<1?(10*p.d).toFixed(2):(10*p.d).toFixed(1))+' <small>mm</small>';
+ $('o-2mm').textContent=pct(Math.exp(-0.2/p.d));
+ $('o-epi').textContent=pct(Math.exp(-T1.M*muaMel(T1.wl)*0.01));
+ drawSpec();drawMC();}
+['wl','bv','so'].forEach(id=>$(id).addEventListener('input',updT1));
+document.querySelectorAll('#mel button').forEach(bt=>bt.addEventListener('click',()=>{document.querySelectorAll('#mel button').forEach(x=>x.classList.remove('on'));bt.classList.add('on');T1.M=+bt.dataset.m;updT1();}));
+// ---------- Monte Carlo
+const MC={photons:[],done:[],abs:0,esc:0,max:0,anim:null};
+const MW=10,MD=8; // mm
+function fire(){const p=t1Props(T1.wl);const ma=p.ma/10,ms=p.ms/10,mt=ma+ms;const col=wlColor(T1.wl);
+ for(let i=0;i<40;i++){MC.photons.push({x:(Math.random()-.5)*0.3,z:0,th:Math.PI/2+(Math.random()-.5)*0.1,pts:[[0,0]],ma,mt,col,alive:true,delay:i*2,fate:null,steps:0});}
+ if(!MC.anim)MC.anim=requestAnimationFrame(stepMC);}
+function stepMC(){let any=false;
+ MC.photons.forEach(ph=>{if(!ph.alive)return;any=true;if(ph.delay>0){ph.delay--;return;}
+  for(let k=0;k<4;k++){const s=-Math.log(Math.random())/ph.mt;let nx=ph.x+s*Math.cos(ph.th),nz=ph.z+s*Math.sin(ph.th);
+   if(nz<0){const f=ph.z/(ph.z-nz);nx=ph.x+f*(nx-ph.x);nz=0;ph.pts.push([nx,0]);ph.alive=false;ph.fate='esc';MC.esc++;break;}
+   ph.x=nx;ph.z=nz;ph.pts.push([nx,nz]);MC.max=Math.max(MC.max,nz);ph.steps++;
+   if(Math.random()<ph.ma/ph.mt){ph.alive=false;ph.fate='abs';MC.abs++;break;}
+   if(ph.steps>2500||nz>40||Math.abs(nx)>40){ph.alive=false;ph.fate='lost';break;}
+   ph.th=Math.random()*2*Math.PI;}
+ });
+ drawMC();$('mc-abs').textContent=MC.abs;$('mc-esc').textContent=MC.esc;$('mc-max').innerHTML=MC.max?(MC.max<1?MC.max.toFixed(2):MC.max.toFixed(1))+' <small>mm</small>':'–';
+ if(any)MC.anim=requestAnimationFrame(stepMC);else MC.anim=null;}
+function drawMC(){const cv=$('c-mc');const {g,w,h}=setup(cv);g.clearRect(0,0,w,h);
+ const top=34;const sc=Math.min(w/MW,(h-top-6)/MD);const ox=w/2;const H=MD*sc;
+ g.fillStyle='#F7DCD3';g.fillRect(ox-MW/2*sc,top,MW*sc,H);g.fillStyle='#E9B8A8';g.fillRect(ox-MW/2*sc,top,MW*sc,Math.max(2,0.1*sc));
+ g.fillStyle=C.gray;g.font='11px system-ui,Segoe UI,Arial';g.textAlign='left';g.textBaseline='middle';
+ for(let d=1;d<MD;d++){g.fillText(d+' mm',ox-MW/2*sc+4,top+d*sc);}
+ // penetration depth marker
+ const p=t1Props(T1.wl);const dm=p.d*10;if(dm<MD){g.strokeStyle=C.navy;g.setLineDash([5,4]);g.beginPath();g.moveTo(ox-MW/2*sc,top+dm*sc);g.lineTo(ox+MW/2*sc,top+dm*sc);g.stroke();g.setLineDash([]);g.fillStyle=C.navy;g.textAlign='right';g.fillText('δ = '+(dm<1?dm.toFixed(2):dm.toFixed(1))+' mm',ox+MW/2*sc-4,top+dm*sc-8);}
+ // arrow
+ g.strokeStyle=wlColor(T1.wl);g.fillStyle=wlColor(T1.wl);g.lineWidth=4;g.beginPath();g.moveTo(ox,4);g.lineTo(ox,top-8);g.stroke();g.beginPath();g.moveTo(ox-7,top-12);g.lineTo(ox+7,top-12);g.lineTo(ox,top-1);g.fill();
+ g.save();g.beginPath();g.rect(ox-MW/2*sc,top-14,MW*sc,H+14);g.clip();
+ MC.photons.forEach(ph=>{if(ph.pts.length<2)return;g.strokeStyle=ph.col;g.globalAlpha=0.6;g.lineWidth=1;g.beginPath();ph.pts.forEach((q,i)=>{const X=ox+q[0]*sc,Y=top+q[1]*sc;i?g.lineTo(X,Y):g.moveTo(X,Y);});g.stroke();g.globalAlpha=1;
+  const L=ph.pts[ph.pts.length-1];const X=ox+L[0]*sc,Y=top+L[1]*sc;
+  if(ph.fate==='abs'){g.fillStyle='#000';g.beginPath();g.arc(X,Y,2.6,0,7);g.fill();}
+  if(ph.fate==='esc'){g.fillStyle=ph.col;g.strokeStyle='#000';g.lineWidth=.6;g.beginPath();g.moveTo(X,top-10);g.lineTo(X-4,top-2);g.lineTo(X+4,top-2);g.closePath();g.fill();g.stroke();}});
+ g.restore();}
+$('fire').addEventListener('click',fire);
+$('clear').addEventListener('click',()=>{MC.photons=[];MC.abs=MC.esc=MC.max=0;$('mc-abs').textContent='0';$('mc-esc').textContent='0';$('mc-max').textContent='–';drawMC();});
+
+// ================= TAB 2
+const T2={eps:53236,c:20e-6,l:1};
+function updT2(fromPreset){if(!fromPreset)T2.eps=Math.pow(10,+$('eps').value);T2.c=$('conc').value*1e-6;T2.l=+$('len').value;
+ $('epsv').textContent=fmt(T2.eps,0)+' M⁻¹cm⁻¹';$('cv').textContent=$('conc').value+' µM';$('lv').textContent=T2.l.toFixed(1)+' cm';
+ const A=T2.eps*T2.l*T2.c,T=Math.pow(10,-A);$('b-A').textContent=A.toFixed(3);$('b-T').textContent=pct(T);$('b-Ab').textContent=pct(1-T);
+ drawCuv(A);drawAc();drawTl();}
+$('eps').addEventListener('input',()=>{document.querySelectorAll('#epspre button').forEach(x=>x.classList.remove('on'));updT2(false);});
+['conc','len'].forEach(id=>$(id).addEventListener('input',()=>updT2(true)));   // keep the chosen ε (preset or slider)
+document.querySelectorAll('#epspre button').forEach(bt=>bt.addEventListener('click',()=>{document.querySelectorAll('#epspre button').forEach(x=>x.classList.remove('on'));bt.classList.add('on');T2.eps=+bt.dataset.e;$('eps').value=Math.log10(T2.eps);updT2(true);}));
+function drawCuv(A){const cv=$('c-cuv');const {g,w,h}=setup(cv);g.clearRect(0,0,w,h);
+ const cx0=w*0.28,cx1=w*0.72,cy=h/2-14,bh=34;const T=Math.pow(10,-A);
+ // cuvette
+ g.fillStyle='#EEF3FA';g.strokeStyle='#9AA6B8';g.lineWidth=2;g.fillRect(cx0,cy-70,cx1-cx0,140);g.strokeRect(cx0,cy-70,cx1-cx0,140);
+ const tint=Math.min(0.85,A/3);g.fillStyle=`rgba(198,40,57,${0.08+tint*0.6})`;g.fillRect(cx0+2,cy-58,cx1-cx0-4,126);
+ // beam in
+ g.fillStyle='rgba(255,60,60,0.95)';g.fillRect(14,cy-bh/2,cx0-14,bh);
+ const n=60;for(let i=0;i<n;i++){const x=cx0+(cx1-cx0)*i/n;const I=Math.pow(10,-A*i/n);g.fillStyle=`rgba(255,60,60,${0.95*I})`;g.fillRect(x,cy-bh/2,(cx1-cx0)/n+1,bh);}
+ g.fillStyle=`rgba(255,60,60,${0.95*T})`;g.fillRect(cx1,cy-bh/2,w-60-cx1,bh);
+ g.fillStyle='#333A4D';g.fillRect(w-58,cy-30,24,60);
+ g.fillStyle=C.ink;g.font='bold 14px system-ui,Segoe UI,Arial';g.textAlign='center';g.textBaseline='bottom';
+ g.fillText('I₀ = 100 %',(14+cx0)/2,cy-bh/2-8);g.fillText('I = '+pct(T),(cx1+w-60)/2,cy-bh/2-8);
+ g.font='13px system-ui,Segoe UI,Arial';g.fillStyle=C.gray;g.textBaseline='top';g.fillText('sample: ε, c',(cx0+cx1)/2,cy+74);
+ g.strokeStyle=C.gray;g.lineWidth=1;g.beginPath();g.moveTo(cx0,cy+94);g.lineTo(cx1,cy+94);g.stroke();g.fillText('path length l = '+T2.l.toFixed(1)+' cm',(cx0+cx1)/2,cy+98);
+ g.textAlign='right';g.fillText('detector',w-8,cy+34);}
+function drawAc(){const cv=$('c-Ac');const {g,w,h}=setup(cv);g.clearRect(0,0,w,h);const b={x:52,y:10,w:w-64,h:h-56};
+ const o={x0:0,x1:100,y0:0,y1:3,xt:[0,25,50,75,100],yt:[0,1,2,3],xl:'c (µM)',yl:'A'};   // fixed axes: the line gets steeper as ε·l grows
+ axes(g,b,o);line(g,b,o,[0,100],c=>T2.eps*T2.l*c*1e-6,C.navy,2.6);const A0=T2.eps*T2.l*T2.c;
+ if(A0<=3){g.fillStyle=C.red;g.beginPath();g.arc(sx(b,o,T2.c*1e6),sy(b,o,A0),5,0,7);g.fill();}
+ else{g.fillStyle=C.red;g.font='12px system-ui,Segoe UI,Arial';g.textAlign='right';g.textBaseline='top';g.fillText('A = '+A0.toFixed(1)+' (off scale)',b.x+b.w-4,b.y+4);}}
+function drawTl(){const cv=$('c-Tl');const {g,w,h}=setup(cv);g.clearRect(0,0,w,h);const b={x:52,y:10,w:w-64,h:h-56};
+ const o={x0:0,x1:5,y0:0,y1:100,xt:[0,1,2,3,4,5],yt:[0,25,50,75,100],xl:'l (cm)',yl:'T (%)'};axes(g,b,o);
+ const xs=[];for(let x=0;x<=5;x+=0.02)xs.push(x);line(g,b,o,xs,l=>100*Math.pow(10,-T2.eps*l*T2.c),C.navy,2.6);
+ g.fillStyle=C.red;g.beginPath();g.arc(sx(b,o,T2.l),sy(b,o,100*Math.pow(10,-T2.eps*T2.l*T2.c)),5,0,7);g.fill();}
+// practice problems
+let PQ=null;
+function newProblem(){const kind=Math.floor(Math.random()*3);const r=(a,b,s)=>Math.round((a+Math.random()*(b-a))/s)*s;
+ if(kind===0){const e=r(5000,60000,1000),c=r(2,40,1),l=r(0.5,2,0.5);const A=e*c*1e-6*l;PQ={q:`A sample has ε = ${e.toLocaleString('en-US')} M⁻¹cm⁻¹, concentration ${c} µM, in a cuvette of ${l} cm. What percentage of the light is transmitted?`,s:`A = ε·l·c = ${e} × ${l} × ${c}×10⁻⁶ = ${A.toFixed(3)}. T = 10^(−A) = ${pct(Math.pow(10,-A))}.`};}
+ else if(kind===1){const T=[50,25,10,5,1][Math.floor(Math.random()*5)];const A=-Math.log10(T/100);PQ={q:`Only ${T} % of the light gets through a sample. What is its absorbance A?`,s:`A = −log₁₀(T) = −log₁₀(${T/100}) = ${A.toFixed(2)}.`};}
+ else {const A1=r(0.2,0.6,0.1),f=[2,3,4][Math.floor(Math.random()*3)];PQ={q:`A sample has absorbance ${A1.toFixed(1)}. The concentration is multiplied by ${f}. What are the new absorbance and transmittance?`,s:`A is proportional to c → A = ${f} × ${A1.toFixed(1)} = ${(f*A1).toFixed(1)}. T = 10^(−${(f*A1).toFixed(1)}) = ${pct(Math.pow(10,-f*A1))}.`};}
+ $('pq').textContent=PQ.q;$('psol').style.display='none';$('psol').textContent=PQ.s;}
+$('pnew').addEventListener('click',newProblem);$('pshow').addEventListener('click',()=>{if(PQ)$('psol').style.display='block';});
+
+// ================= TAB 3
+const T3={S:0.97,hr:72,pf:1.5,mo:0,pig:0,bias:false,t:0,buf:[],last:0,run:false,mstate:0,mvel:0,disp:null};
+const K=1.52; // path-length ratio factor so the Beer-Lambert model matches the empirical calibration
+function muArt(l,S){return S*epsO(l)+(1-S)*epsD(l);}
+function pulseShape(ph){const tau=0.32;const vend=Math.exp(-0.85/tau)+0.18*Math.exp(-Math.pow((1-0.47)/0.06,2));
+ if(ph<0.15)return vend+(1-vend)*Math.pow(Math.sin(Math.PI/2*ph/0.15),2);return Math.exp(-(ph-0.15)/tau)+0.18*Math.exp(-Math.pow((ph-0.47)/0.06,2));}
+function gauss(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+const FS=60;let phase=0;
+function simStep(dt){const n=Math.max(1,Math.round(dt*FS));
+ for(let i=0;i<n;i++){T3.t+=1/FS;phase=(phase+T3.hr/60/FS)%1;const p=pulseShape(phase);
+  const acIR=0.006*T3.pf; // AC/DC at 940 nm at full pulse
+  const acR=acIR*K*muArt(660,T3.S)/muArt(940,T3.S);
+  // motion: shared random walk + bursts (same relative change in both channels)
+  T3.mvel+=(-0.6*T3.mvel-3*T3.mstate)/FS+gauss()*Math.sqrt(1/FS)*0.9;T3.mstate+=T3.mvel/FS;
+  const m=T3.mo*0.0016*T3.mstate*6;
+  const dcScale=[1,0.6,0.3][T3.pig];const noise=0.00025/Math.sqrt(dcScale);
+  const r=1-acR*p+m+noise*gauss(), ir=1-acIR*p+m*1.02+noise*gauss();
+  T3.buf.push([T3.t,r,ir]);}
+ while(T3.buf.length&&T3.buf[0][0]<T3.t-6)T3.buf.shift();}
+function smooth(arr,k){const out=[];let acc=0;for(let i=0;i<arr.length;i++){acc+=arr[i];if(i>=k)acc-=arr[i-k];out.push(acc/Math.min(i+1,k));}return out;}
+function estimate(){const win=T3.buf.filter(s=>s[0]>T3.t-4);if(win.length<FS*2)return null;
+ const r=smooth(win.map(s=>s[1]),7).slice(7),ir=smooth(win.map(s=>s[2]),7).slice(7);
+ const st=x=>{let mn=1e9,mx=-1e9,sum=0;x.forEach(v=>{mn=Math.min(mn,v);mx=Math.max(mx,v);sum+=v;});return {ac:mx-mn,dc:sum/x.length};};
+ const a=st(r),b=st(ir);const R=(a.ac/a.dc)/(b.ac/b.dc);let sp=110-25*R;
+ if(T3.bias)sp+=[0,2,4][T3.pig];
+ // pulse rate: first strong peak of the autocorrelation of the IR signal
+ const mean=ir.reduce((p,c)=>p+c,0)/ir.length;const y=ir.map(v=>v-mean);
+ const ac=lag=>{let s=0;for(let i=0;i+lag<y.length;i++)s+=y[i]*y[i+lag];return s/(y.length-lag);};
+ const a0=ac(0);let bl=0;const lo=Math.round(FS*60/200),hi=Math.round(FS*60/35);let prev=ac(lo-1),cur=ac(lo);
+ for(let lag=lo;lag<hi;lag++){const nxt=ac(lag+1);if(cur>prev&&cur>=nxt&&cur>0.4*a0){bl=lag;break;}prev=cur;cur=nxt;}
+ const pr=bl?60*FS/bl:0;const nz=0.00025/Math.sqrt([1,0.6,0.3][T3.pig])/2.6+T3.mo*0.0016*1.5;const snr=(b.ac/b.dc)/(nz+1e-9);
+ return {R,sp:Math.max(0,Math.min(100,sp)),pr,acR:a.ac/a.dc,acI:b.ac/b.dc,snr};}
+function drawPPG(){const cv=$('c-ppg');const {g,w,h}=setup(cv);g.clearRect(0,0,w,h);
+ const half=(h-20)/2;const t0=T3.t-6;
+ const lanes=[[1,'#E0303A','red 660 nm',8],[2,'#7A1F2B','infrared 940 nm',8+half+10]];
+ lanes.forEach(([k,col,lab,y0])=>{g.fillStyle='#FAFBFC';g.fillRect(0,y0,w,half);const vals=T3.buf.map(s=>s[k]);if(vals.length<2)return;
+  const sm=smooth(vals,4);const mid=sm.reduce((p,c)=>p+c,0)/sm.length;const span=0.04;   // whole lane = 4 % of DC, same for both colours
+  g.save();g.beginPath();g.rect(0,y0,w,half);g.clip();
+  const tw=w-44;g.strokeStyle=col;g.lineWidth=2;g.beginPath();T3.buf.forEach((s,i)=>{const X=(s[0]-t0)/6*tw,Y=y0+half/2-(sm[i]-mid)/span*half;i?g.lineTo(X,Y):g.moveTo(X,Y);});g.stroke();g.restore();
+  const bar=0.01/span*half;g.strokeStyle=C.gray;g.lineWidth=2;g.beginPath();g.moveTo(w-16,y0+half/2-bar/2);g.lineTo(w-16,y0+half/2+bar/2);g.stroke();
+  g.fillStyle=C.gray;g.font='11px system-ui,Segoe UI,Arial';g.textAlign='center';g.textBaseline='bottom';g.fillText('1 %',w-16,y0+half/2-bar/2-3);
+  g.fillStyle=col;g.font='bold 13px system-ui,Segoe UI,Arial';g.textAlign='left';g.textBaseline='top';g.fillText(lab,8,y0+6);});
+ g.fillStyle=C.gray;g.font='11px system-ui,Segoe UI,Arial';g.textAlign='right';g.textBaseline='bottom';g.fillText('last 6 s →',w-6,h-2);}
+function drawCal(e){const cv=$('c-cal');const {g,w,h}=setup(cv);g.clearRect(0,0,w,h);const b={x:48,y:10,w:w-60,h:h-56};
+ const o={x0:0.3,x1:2,y0:50,y1:105,xt:[0.5,1,1.5,2],yt:[60,70,80,90,100],xl:'R',yl:'SpO₂ (%)'};axes(g,b,o);
+ line(g,b,o,[0.3,2],R=>110-25*R,C.navy,2.6);
+ if(e){g.fillStyle=C.red;g.beginPath();g.arc(sx(b,o,Math.min(2,Math.max(0.3,e.R))),sy(b,o,Math.max(50,110-25*e.R)),6,0,7);g.fill();}}
+function loop(ts){if(!T3.run)return;const dt=T3.last?Math.min(0.1,(ts-T3.last)/1000):1/60;T3.last=ts;simStep(dt);
+ T3.frame=(T3.frame||0)+1;drawPPG();
+ if(T3.frame%15===0){const e=estimate();if(e){
+   T3.disp=T3.disp==null?e.sp:T3.disp+0.35*(e.sp-T3.disp);
+   const q=e.snr>12?'good':(e.snr>4?'fair':'poor');$('sq').textContent=q;$('sq').style.color=q==='good'?C.green:(q==='fair'?C.amber:C.red);
+   $('spo2').innerHTML=Math.round(T3.disp)+'<small> %</small>';$('pr').innerHTML=Math.round(e.pr)+'<small> bpm</small>';$('rr').textContent=e.R.toFixed(2);
+   $('calc').innerHTML=`Now: (AC/DC)<sub>red</sub> = ${(100*e.acR).toFixed(2)} %, (AC/DC)<sub>IR</sub> = ${(100*e.acI).toFixed(2)} % → R = ${e.R.toFixed(2)} → SpO₂ ≈ 110 − 25 × ${e.R.toFixed(2)} = ${(110-25*e.R).toFixed(0)} %`+(T3.bias&&T3.pig?` (+${[0,2,4][T3.pig]} % bias)`:'');
+   $('occ').style.display=(T3.S<0.88&&Math.round(T3.disp)>=92)?'block':'none';drawCal(e);}}
+ requestAnimationFrame(loop);}
+function updT3(){T3.S=$('sa').value/100;T3.hr=+$('hr').value;T3.pf=+$('pf').value;T3.mo=+$('mo').value;T3.bias=$('bias').checked;
+ $('sav').textContent=$('sa').value+' %';$('hrv').textContent=T3.hr+' bpm';$('pfv').textContent=T3.pf<0.6?'weak':(T3.pf<2?'normal':'strong');
+ $('mov').textContent=T3.mo===0?'none':(T3.mo<4?'slight':(T3.mo<8?'moderate':'strong'));}
+['sa','hr','pf','mo','bias'].forEach(id=>$(id).addEventListener('input',updT3));
+document.querySelectorAll('#pig button').forEach(bt=>bt.addEventListener('click',()=>{document.querySelectorAll('#pig button').forEach(x=>x.classList.remove('on'));bt.classList.add('on');T3.pig=+bt.dataset.p;}));
+
+// ================= tabs & init
+function show(v){document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+ document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));
+ if(location.hash!=='#'+v)history.replaceState(null,'','#'+v);
+ T3.run=(v==='oxi');if(T3.run){T3.last=0;requestAnimationFrame(loop);}
+ if(v==='window')updT1();if(v==='beer')updT2(true);if(v==='oxi'){drawCal(null);}}
+document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.v)));
+window.addEventListener('hashchange',()=>{const v=location.hash.slice(1);if(['window','beer','oxi'].includes(v))show(v);});
+let rzPending=false;function redraw(){rzPending=false;const v=document.querySelector('.view.on').id.slice(2);if(v==='window')updT1();if(v==='beer')updT2(true);if(v==='oxi')drawCal(null);}
+const RO=window.ResizeObserver?new ResizeObserver(()=>{if(!rzPending){rzPending=true;requestAnimationFrame(redraw);}}):null;
+if(RO)document.querySelectorAll('canvas').forEach(c=>RO.observe(c));else window.addEventListener('resize',redraw);
+updT3();$('eps').value=Math.log10(T2.eps);document.querySelector('#epspre button').classList.add('on');
+const h0=location.hash.slice(1);show(['window','beer','oxi'].includes(h0)?h0:'window');
+</script>
+</body>
+</html>
